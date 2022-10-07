@@ -8,7 +8,7 @@
 *.suo
 *.user
 *.sln
-*vcxproj
+*vcxproj*
 *.userosscache
 *.sln.docstates
 

@@ -41,7 +41,8 @@ workspace "Night-Owl-Engine"
             "_USE_MATH_DEFINES",
             "_CRT_SECURE_NO_WARNINGS",
             "GLFW_INCLUDE_NONE",
-            "STB_IMAGE_IMPLEMENTATION"
+            "STB_IMAGE_IMPLEMENTATION",
+            "OPEN_GL"
         }
 
         includedirs
