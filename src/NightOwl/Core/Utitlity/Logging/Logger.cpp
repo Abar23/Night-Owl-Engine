@@ -7,11 +7,6 @@
 
 namespace NightOwl::Utility
 {
-	Logger::Logger(const char* logFileName)
-	{
-		OpenFile(logFileName);
-	}
-
 	void Logger::OpenFile(const char* logFileName)
 	{
 		try
@@ -21,9 +16,9 @@ namespace NightOwl::Utility
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << "Failed to open log file!";
-			std::cerr << "Exception raised: " << e.what();
-			std::cerr << "Error raised: " << strerror(errno);
+			std::cerr << "Failed to open log file: " << logFileName << std::endl;
+			std::cerr << "Exception raised: " << e.what() << std::endl;;
+			std::cerr << "Error raised: " << strerror(errno) << std::endl;;
 		}
 	}
 
