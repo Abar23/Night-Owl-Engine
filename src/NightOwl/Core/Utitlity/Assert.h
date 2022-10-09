@@ -6,7 +6,7 @@
 #ifdef DEBUG
 #define ENGINE_ASSERT(condition, message) \
     if (! (condition)) { \
-		ENGINE_LOG_ASSERT(message)\
+		ENGINE_LOG_ASSERT(message);\
 		std::cerr << "***ENGINE ERROR*** (" << __FILE__ << ": " << __LINE__ << ")\n"; \
         std::cerr << "Assertion `" #condition "` failed! Error message: " << message << std::endl; \
         std::terminate(); \

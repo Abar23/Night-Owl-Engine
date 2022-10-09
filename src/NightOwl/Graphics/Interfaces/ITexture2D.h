@@ -2,16 +2,16 @@
 
 namespace NightOwl::Graphics
 {
-	class ITexture
+	class ITexture2D
 	{
 	public:
-		virtual ~ITexture() = default;
+		virtual ~ITexture2D() = default;
 
 		virtual void Bind(unsigned int textureUnit) = 0;
 		virtual void UnBind() = 0;
 
 		virtual int GetWidth() = 0;
 		virtual int GetHeight() = 0;
-		virtual int GetTextureId() = 0;
+		virtual unsigned int GetTextureId() = 0;
 	};
 }
