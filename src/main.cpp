@@ -1,4 +1,6 @@
+#include <dinput.h>
 #include <iostream>
+
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 
@@ -10,6 +12,7 @@ int main()
 	ENGINE_LOG_INFO("I am the engine logger!");
 	CLIENT_LOG_ERROR("I am the client logger!");
 	CLIENT_LOG_INFO("I am the client logger!");
+	CLIENT_LOG_ASSERT(std::string("HI"));
 	std::cout << a;
 	std::cout << "Hi" << std::endl;
 	return 0;

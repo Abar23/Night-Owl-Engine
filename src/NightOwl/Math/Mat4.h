@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <initializer_list>
 #include "Vec4.h"
 #include "Vec3.h"

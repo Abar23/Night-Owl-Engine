@@ -1,5 +1,11 @@
 #pragma once
-class OpenGlContext
+
+#include "NightOwl/Graphics/Interfaces/IContext.h"
+
+namespace NightOwl::Graphics
 {
-};
+	class OpenGlContext : public IContext
+	{
+	};
+}
 

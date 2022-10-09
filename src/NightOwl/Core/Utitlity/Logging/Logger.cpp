@@ -17,8 +17,8 @@ namespace NightOwl::Utility
 		catch (std::exception& e)
 		{
 			std::cerr << "Failed to open log file: " << logFileName << std::endl;
-			std::cerr << "Exception raised: " << e.what() << std::endl;;
-			std::cerr << "Error raised: " << strerror(errno) << std::endl;;
+			std::cerr << "Exception raised: " << e.what() << std::endl;
+			std::cerr << "Error raised: " << strerror(errno) << std::endl;
 		}
 	}
 
@@ -26,10 +26,17 @@ namespace NightOwl::Utility
 	{
 		switch (severity)
 		{
-		case ERROR:
-			return std::string{ "ERROR: " };
+		case Error:
+			return std::string{ "Error: " };
+
+		case Assert:
+			return std::string{ "Assert: " };
+
+		case Debug:
+			return std::string{ "Debug: " };
+
 		default:
-			return std::string{ "INFO: " };
+			return std::string{ "Info: " };
 		}
 	}
 }

@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <cmath>
-#include "MathConstants.h"
 #include "Vec2.h"
 
 namespace NightOwl::Math

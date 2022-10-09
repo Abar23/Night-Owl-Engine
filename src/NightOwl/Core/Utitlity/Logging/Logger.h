@@ -10,22 +10,24 @@ namespace NightOwl::Utility
 
 	enum MessageSeverity
 	{
-		ERROR,
-		INFO
+		Error,
+		Info,
+		Assert,
+		Debug
 	};
 
 	class Logger
 	{
 	public:
 		template <typename... Args>
-		void Log(MessageSeverity severity, const char* file, int line, const char* message, Args&&... args)
+		void Log(MessageSeverity severity, const std::string &file, int line, const std::string &message, Args&&... args)
 		{
 			if(logFile.is_open())
 			{
 				auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 				
 				#ifdef _WIN64
-				const std::string fileName = (strrchr(file, '\\') ? strrchr(file, '\\') + 1 : file);
+				const std::string fileName = (strrchr(file.c_str(), '\\') ? strrchr(file.c_str(), '\\') + 1 : file.c_str());
 				#else
 				std::string fileName = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
 				#endif

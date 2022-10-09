@@ -116,7 +116,7 @@ namespace NightOwl::Math
 		}
 	};
 
-	using Vec3UF = Vec3<unsigned int>;
+	using Vec3UI = Vec3<unsigned int>;
 	using Vec3F = Vec3<float>;
 }
 
