@@ -17,7 +17,13 @@ namespace NightOwl::Graphics
 
 		void Unbind() override;
 
-		void SetData(const void* vertexData, unsigned vertexDataSize) override;
+		void SetData(const void* vertexData) override;
+
+		void SetSize(unsigned vertexDataSize) override;
+
+		void GetSize() override;
+
+		void OverwriteVertexBufferDataAtIndex(int index) override;
 
 		void SetVertexBufferLayout(const VertexBufferLayout& layout) override;
 

@@ -31,7 +31,7 @@ namespace NightOwl::Components
 
 		std::vector<Math::Vec2F> GetUVs();
 
-		void SetUVs(const std::vector<Math::Vec3F>& uvs);
+		void SetUVs(const std::vector<Math::Vec2F>& uvs);
 
 	private:
 		std::vector<Math::Vec3F> vertices;

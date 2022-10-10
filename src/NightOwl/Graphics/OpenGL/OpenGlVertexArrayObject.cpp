@@ -69,6 +69,6 @@ namespace NightOwl::Graphics
 				accumulativeOffset += data.GetSizeofData();
 			}
 		}
-		GL_CALL(glVertexArrayVertexBuffer, vertexArrayObjectId, 0, vertexBuffer->GetVertexBufferId(), 0, accumulativeOffset);
+		GL_CALL(glVertexArrayVertexBuffer, vertexArrayObjectId, 0, vertexBuffer->GetVertexBufferId(), 0, layout.GetDataPerTriangle());
 	}
 }

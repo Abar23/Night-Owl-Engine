@@ -14,11 +14,17 @@ namespace NightOwl::Graphics
 
 		VertexBufferLayout(std::vector<VertexBufferData>& bufferDataDefs);
 
+		void AddVertexBufferDataDefinition(const VertexBufferData& vertexBufferDataDef);
+
 		const std::vector<VertexBufferData>& GetBufferDataDefinitions() const;
 
 		void SetBufferDataDefinitions(std::vector<VertexBufferData>& bufferDataDefs);
 
+		int GetDataPerTriangle() const;
+
 	private:
 		std::vector<VertexBufferData> bufferDataDefinitions;
+
+		int dataPerTriangle;
 	};
 }

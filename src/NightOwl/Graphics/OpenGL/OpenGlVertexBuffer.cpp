@@ -7,7 +7,7 @@ namespace NightOwl::Graphics
 	{
 		this->vertexDataSize = vertexDataSize;
 		GL_CALL(glCreateBuffers, 1, &vertexBufferId);
-		GL_CALL(glNamedBufferStorage, vertexBufferId, vertexDataSize, vertexData, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
+		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, vertexData, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
 	}
 
 	OpenGlVertexBuffer::~OpenGlVertexBuffer()
@@ -25,9 +25,8 @@ namespace NightOwl::Graphics
 		GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, 0);
 	}
 
-	void OpenGlVertexBuffer::SetData(const void* vertexData, unsigned vertexDataSize)
+	void OpenGlVertexBuffer::SetData(const void* vertexData)
 	{
-		this->vertexDataSize = vertexDataSize;
 		void* vertexBufferPointer = GL_CALL(glMapNamedBufferRange, vertexBufferId, 0, vertexDataSize, GL_MAP_WRITE_BIT);
 		std::memcpy(vertexBufferPointer, vertexData, vertexDataSize);
 		GL_CALL(glUnmapNamedBuffer, vertexBufferId);
