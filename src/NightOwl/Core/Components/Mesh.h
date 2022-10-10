@@ -13,25 +13,21 @@ namespace NightOwl::Components
 	public:
 		Mesh();
 
+		void Bind();
+
+		void UnBind();
+
 		std::vector<Math::Vec3F> GetVertices();
 
 		void SetVertices(const std::vector<Math::Vec3F>& vertices);
-
-		//std::vector<Math::Vec3F> GetNormals();
-
-		//void SetNormals(const std::vector<Math::Vec3F>& vertices);
-
-		//std::vector<Math::Vec3F> GetTangents();
-
-		//void SetTangents(const std::vector<Math::Vec3F>& vertices);
 
 		std::vector<Math::Vec3F> GetColors();
 
 		void SetColors(const std::vector<Math::Vec3F>& colors);
 
-		std::vector<Math::Vec3F> GetTriangles();
+		std::vector<unsigned int> GetTriangles();
 
-		void SetTriangles(const std::vector<Math::Vec3F>& triangles);
+		void SetTriangles(const std::vector<unsigned int>& triangles);
 
 		std::vector<Math::Vec2F> GetUVs();
 
@@ -40,15 +36,11 @@ namespace NightOwl::Components
 	private:
 		std::vector<Math::Vec3F> vertices;
 
-		//std::vector<Math::Vec3F> normals;
-
-		//std::vector<Math::Vec3F> tangents;
-
 		std::vector<Math::Vec3F> colors;
 
-		std::vector<Math::Vec3F> triangles;
+		std::vector<unsigned int> triangles;
 
-		std::vector<Math::Vec2F> uv;
+		std::vector<Math::Vec2F> uvs;
 
 		// IVertexArrayObject
 		std::shared_ptr<Graphics::IVertexArrayObject> vertexArrayObject;
@@ -58,6 +50,8 @@ namespace NightOwl::Components
 
 		// IIndexBuffer
 		std::shared_ptr<Graphics::IIndexBuffer> indexBuffer;
+
+		void ValidateMesh();
 
 	};
 }

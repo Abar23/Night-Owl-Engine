@@ -27,6 +27,11 @@ int main()
 		1, 2, 3   // second Triangle
 	};
 
+	std::vector<NightOwl::Math::Vec3UI> triangles = {
+		{0, 1, 3},
+		{1, 2, 3}
+	};
+
 	std::vector attributesList = {
 		NightOwl::Graphics::VertexBufferData("Position", NightOwl::Graphics::VectorFloat3),
 		NightOwl::Graphics::VertexBufferData("Color", NightOwl::Graphics::VectorFloat3)
@@ -36,7 +41,7 @@ int main()
 
 	auto vertexBuffer = NightOwl::Graphics::RenderApi::CreateVertexBuffer(vertices, sizeof(vertices));
 	vertexBuffer->SetVertexBufferLayout(layout);
-	auto indexBuffer = NightOwl::Graphics::RenderApi::CreateIndexBuffer(indices, sizeof(vertices) / sizeof(unsigned int));
+	auto indexBuffer = NightOwl::Graphics::RenderApi::CreateIndexBuffer(triangles.data(), triangles.size() * 3);
 	auto vao = NightOwl::Graphics::RenderApi::CreateVertexArrayObject();
 	vao->SetIndexBuffer(indexBuffer);
 	vao->SetVertexBuffer(vertexBuffer);

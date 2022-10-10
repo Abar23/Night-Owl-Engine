@@ -3,7 +3,7 @@
 
 namespace NightOwl::Graphics
 {
-	OpenGlVertexBuffer::OpenGlVertexBuffer(const float* vertexData, unsigned int vertexDataSize)
+	OpenGlVertexBuffer::OpenGlVertexBuffer(const void* vertexData, unsigned int vertexDataSize)
 	{
 		this->vertexDataSize = vertexDataSize;
 		GL_CALL(glCreateBuffers, 1, &vertexBufferId);

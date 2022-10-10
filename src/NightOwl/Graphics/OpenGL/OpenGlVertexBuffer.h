@@ -9,7 +9,7 @@ namespace NightOwl::Graphics
 	public:
 		OpenGlVertexBuffer() = delete;
 
-		OpenGlVertexBuffer(const float* vertexData, unsigned int vertexDataSize);
+		OpenGlVertexBuffer(const void* vertexData, unsigned int vertexDataSize);
 
 		~OpenGlVertexBuffer() override;
 
