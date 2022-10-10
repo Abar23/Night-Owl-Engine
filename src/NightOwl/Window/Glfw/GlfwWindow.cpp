@@ -20,7 +20,7 @@ namespace NightOwl::Window
 		#endif
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
-		graphicsContext = Graphics::RenderApi::GetInstance()->CreateContext(this);//Create context
+		graphicsContext = Graphics::RenderApi::CreateContext(this);//Create context
 
 		properties.width = width;
 		properties.height = height;

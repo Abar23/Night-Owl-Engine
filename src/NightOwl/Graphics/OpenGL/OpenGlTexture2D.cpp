@@ -21,7 +21,7 @@ namespace NightOwl::Graphics
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, textureId);
 	}
 
-	void OpenGlTexture2D::UnBind()
+	void OpenGlTexture2D::Unbind()
 	{
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
 	}

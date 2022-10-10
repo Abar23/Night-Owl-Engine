@@ -8,34 +8,37 @@ bool CheckOpenGlError(const std::string& filename, const std::uint32_t line)
 	if (glErrorCode != GL_NO_ERROR)
 	{
 		std::string errorMessage;
+		errorMessage += filename;
+		errorMessage += " ";
+		errorMessage += line;
 		switch (glErrorCode)
 		{
 		case GL_INVALID_ENUM:
-			errorMessage = "GL_INVALID_ENUM: an unacceptable value has been passed for an enumerated argument in an OpenGL function.";
+			errorMessage += "GL_INVALID_ENUM: an unacceptable value has been passed for an enumerated argument in an OpenGL function.";
 			break;
 
 		case GL_INVALID_VALUE:
-			errorMessage = "GL_INVALID_VALUE: an out of range numeric argument was passed to an OpenGL function.";
+			errorMessage += "GL_INVALID_VALUE: an out of range numeric argument was passed to an OpenGL function.";
 			break;
 
 		case GL_INVALID_OPERATION:
-			errorMessage = "GL_INVALID_OPERATION: an OpenGL function that is not allowed in the current OpenGL state was called.";
+			errorMessage += "GL_INVALID_OPERATION: an OpenGL function that is not allowed in the current OpenGL state was called.";
 			break;
 
 		case GL_INVALID_FRAMEBUFFER_OPERATION:
-			errorMessage = "GL_INVALID_FRAMEBUFFER_OPERATION: an OpenGL framer buffer object is not complete.";
+			errorMessage += "GL_INVALID_FRAMEBUFFER_OPERATION: an OpenGL framer buffer object is not complete.";
 			break;
 
 		case GL_OUT_OF_MEMORY:
-			errorMessage = "GL_OUT_OF_MEMORY: not enough memory is left to complete the called OpenGL function.";
+			errorMessage += "GL_OUT_OF_MEMORY: not enough memory is left to complete the called OpenGL function.";
 			break;
 
 		case GL_STACK_UNDERFLOW:
-			errorMessage = "GL_STACK_UNDERFLOW: an OpenGL pop operation was called at the bottom of the OpenGL stack.";
+			errorMessage += "GL_STACK_UNDERFLOW: an OpenGL pop operation was called at the bottom of the OpenGL stack.";
 			break;
 
 		case GL_STACK_OVERFLOW:
-			errorMessage = "GL_STACK_OVERFLOW: an OpenGL push operation has exceeded the maximum size of the OpenGl stack.";
+			errorMessage += "GL_STACK_OVERFLOW: an OpenGL push operation has exceeded the maximum size of the OpenGl stack.";
 			break;
 		}
 		ENGINE_LOG_ERROR(errorMessage);

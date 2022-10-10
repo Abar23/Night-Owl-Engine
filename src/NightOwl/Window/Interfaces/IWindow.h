@@ -18,7 +18,5 @@ namespace NightOwl::Window
 		virtual float GetAspectRatio() = 0;
 
 		virtual void Update() = 0;
-
-		// Set callbacks?
 	};
 }

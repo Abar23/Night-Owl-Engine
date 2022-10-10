@@ -2,7 +2,7 @@
 
 #include "glad/glad.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
-#include "NightOwl/Graphics/Interfaces/ShaderTypes.h"
+#include "NightOwl/Graphics/Types/ShaderTypes.h"
 
 namespace NightOwl::Graphics
 {
@@ -14,13 +14,19 @@ namespace NightOwl::Graphics
 		~OpenGlShader() override;
 
 		void Bind() override;
-		void UnBind() override;
+
+		void Unbind() override;
 
 		void SetUniformMat4F(const Math::Mat4F& mat4, const std::string& uniformName) override;
+
 		void SetUniformVec4F(const Math::Vec4F& vec4, const std::string& uniformName) override;
+
 		void SetUniformVec3F(const Math::Vec3F& vec3, const std::string& uniformName) override;
+
 		void SetUniformVec3UI(const Math::Vec3UI& vec3, const std::string& uniformName) override;
+
 		void SetUniformVec2F(const Math::Vec2F& vec2, const std::string& uniformName) override;
+
 		void SetUniformInt(const int id, const std::string& uniformName) override;
 
 		int GetShaderId() override;

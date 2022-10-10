@@ -10,7 +10,7 @@ namespace NightOwl::Graphics
 		virtual ~IShader() = default;
 
 		virtual void Bind() = 0;
-		virtual void UnBind() = 0;
+		virtual void Unbind() = 0;
 
 		virtual void SetUniformMat4F(const Math::Mat4F& mat4, const std::string& uniformName) = 0;
 		virtual void SetUniformVec4F(const Math::Vec4F& vec4, const std::string& uniformName) = 0;

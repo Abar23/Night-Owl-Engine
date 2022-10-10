@@ -31,7 +31,7 @@ namespace NightOwl::Graphics
 		GL_CALL(glUseProgram, programId);
 	}
 
-	void OpenGlShader::UnBind()
+	void OpenGlShader::Unbind()
 	{
 		GL_CALL(glUseProgram, 0);
 	}

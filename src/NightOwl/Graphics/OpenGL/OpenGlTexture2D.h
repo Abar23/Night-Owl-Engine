@@ -14,7 +14,7 @@ namespace NightOwl::Graphics
 
 		void Bind(unsigned int textureUnit) override;
 
-		void UnBind() override;
+		void Unbind() override;
 
 		int GetWidth() override;
 
