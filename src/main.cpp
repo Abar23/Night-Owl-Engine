@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "NightOwl/Core/Components/Mesh.h"
-#include "NightOwl/Core/Components/Transform.h"
+#include "NightOwl/Components/Mesh.h"
+#include "NightOwl/Components/Transform.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
@@ -43,17 +43,17 @@ int main()
 
 	NightOwl::Components::Transform transform;
 
-
+	NightOwl::Math::Vec4F color(0.2f, 0.3f, 0.3f, 1.0f);
 	while(!window->ShouldWindowClose())
 	{
-		GL_CALL(glClearColor, 0.2f, 0.3f, 0.3f, 1.0f);
-		GL_CALL(glClear, GL_COLOR_BUFFER_BIT);
+		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(color);
+		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 
 
 		shader->Bind();
 		shader->SetUniformMat4F(transform.GetLocalModelMatrix(), "model");
 		mesh.Bind();
-		GL_CALL(glDrawElements, GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		NightOwl::Graphics::RenderApi::GetContext()->DrawIndexed(NightOwl::Graphics::DrawType::Triangles, mesh.GetTriangles().size() * sizeof(mesh.GetTriangles()[0]));
 		mesh.Unbind();
 		shader->Unbind();
 

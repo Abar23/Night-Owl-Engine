@@ -8,7 +8,7 @@ namespace NightOwl::Utility
 {
 	class LoggerManager;
 
-	enum MessageSeverity
+	enum class MessageSeverity
 	{
 		Error,
 		Info,

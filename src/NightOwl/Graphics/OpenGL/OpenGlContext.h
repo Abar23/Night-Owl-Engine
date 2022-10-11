@@ -16,6 +16,16 @@ namespace NightOwl::Graphics
 
 		void SwapBuffers() override;
 
+		void DrawIndexed(DrawType drawType, int numberOfIndices) override;
+
+		void ClearColor(Math::Vec4F color) override;
+
+		void ClearBuffer() override;
+
+		void SetViewport(int cornerX, int cornerY, int viewWidth, int viewHeight) override;
+
+		void EnableWireframe(bool enabled) override;
+
 	private:
 		GLFWwindow* window;
 	};

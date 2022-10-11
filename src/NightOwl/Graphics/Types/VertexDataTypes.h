@@ -2,7 +2,7 @@
 
 namespace NightOwl::Graphics
 {
-	enum VertexDataType
+	enum class VertexDataType
 	{
 		None,
 		VectorFloat2,
@@ -14,11 +14,11 @@ namespace NightOwl::Graphics
 	{
 		switch (type)
 		{
-		case VectorInt2:
-		case VectorFloat2:
+		case VertexDataType::VectorInt2:
+		case VertexDataType::VectorFloat2:
 			return 2;
 
-		case VectorFloat3:
+		case VertexDataType::VectorFloat3:
 			return 3;
 
 		default:
@@ -30,13 +30,13 @@ namespace NightOwl::Graphics
 	{
 		switch (type)
 		{
-		case VectorInt2:
+		case VertexDataType::VectorInt2:
 			return 2 * sizeof(int);
 
-		case VectorFloat2:
+		case VertexDataType::VectorFloat2:
 			return 2 * sizeof(float);
 
-		case VectorFloat3:
+		case VertexDataType::VectorFloat3:
 			return 3 * sizeof(float);
 
 		default:

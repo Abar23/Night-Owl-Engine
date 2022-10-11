@@ -4,7 +4,7 @@
 namespace NightOwl::Graphics
 {
 	VertexBufferData::VertexBufferData()
-		: type(None), normalize(false), numberOfComponents(0), sizeOfData(0)
+		: type(VertexDataType::None), normalize(false), numberOfComponents(0), sizeOfData(0)
 	{
 	}
 

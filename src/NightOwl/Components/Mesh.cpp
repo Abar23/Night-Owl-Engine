@@ -5,7 +5,8 @@
 
 namespace NightOwl::Components
 {
-	Mesh::Mesh()
+	Mesh::Mesh(GameObjects::GameObject* gameObject)
+		: Component(gameObject, ComponentType::Mesh)
 	{
 		std::vector defaultDataDefinitions = {
 			Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3),
@@ -66,9 +67,9 @@ namespace NightOwl::Components
 		indexBuffer->SetSize(triangles.size() * sizeof(Math::Vec3UI));
 		indexBuffer->SetData(triangles.data());
 		vertexBuffer->SetSize(vertexBuffer->GetVertexBufferLayout().GetDataPerTriangle() * triangles.size() * sizeof(Math::Vec3UI));
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(2, uvs.data(), VertexDataTypeToDataTypeSize(Graphics::VectorFloat2) * uvs.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(1, colors.data(), VertexDataTypeToDataTypeSize(Graphics::VectorFloat3) * colors.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(0, vertices.data(), VertexDataTypeToDataTypeSize(Graphics::VectorFloat3) * vertices.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(2, uvs.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat2) * uvs.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(1, colors.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * colors.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(0, vertices.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * vertices.size());
 	}
 
 	std::vector<Math::Vec2F> Mesh::GetUVs()

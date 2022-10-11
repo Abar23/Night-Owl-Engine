@@ -4,7 +4,7 @@
 
 namespace NightOwl::Graphics
 {
-	enum ShaderType
+	enum class ShaderType
 	{
 		VERTEX,
 		TESS_CONTROL,
@@ -17,16 +17,16 @@ namespace NightOwl::Graphics
 	{
 		switch (type)
 		{
-		case VERTEX:
+		case ShaderType::VERTEX:
 			return std::string{ "Vertex" };
 
-		case TESS_CONTROL:
+		case ShaderType::TESS_CONTROL:
 			return std::string{ "Tess_control" };
 
-		case TESS_EVALUATION:
+		case ShaderType::TESS_EVALUATION:
 			return std::string{ "Tess_evaluation" };
 
-		case GEOMETRY:
+		case ShaderType::GEOMETRY:
 			return std::string{ "Geometry" };
 
 		default:
@@ -36,26 +36,26 @@ namespace NightOwl::Graphics
 
 	inline ShaderType ShaderTypeFromString(const std::string& type)
 	{
-		if(type == ShaderTypeToString(VERTEX))
+		if(type == ShaderTypeToString(ShaderType::VERTEX))
 		{
-			return VERTEX;
+			return ShaderType::VERTEX;
 		}
 
-		if (type == ShaderTypeToString(TESS_CONTROL))
+		if (type == ShaderTypeToString(ShaderType::TESS_CONTROL))
 		{
-			return TESS_EVALUATION;
+			return ShaderType::TESS_EVALUATION;
 		}
 
-		if (type == ShaderTypeToString(TESS_EVALUATION))
+		if (type == ShaderTypeToString(ShaderType::TESS_EVALUATION))
 		{
-			return TESS_EVALUATION;
+			return ShaderType::TESS_EVALUATION;
 		}
 
-		if (type == ShaderTypeToString(GEOMETRY))
+		if (type == ShaderTypeToString(ShaderType::GEOMETRY))
 		{
-			return GEOMETRY;
+			return ShaderType::GEOMETRY;
 		}
 
-		return FRAGMENT;
+		return ShaderType::FRAGMENT;
 	}
 }

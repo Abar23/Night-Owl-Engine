@@ -26,13 +26,13 @@ namespace NightOwl::Utility
 	{
 		switch (severity)
 		{
-		case Error:
+		case MessageSeverity::Error:
 			return std::string{ "Error: " };
 
-		case Assert:
+		case MessageSeverity::Assert:
 			return std::string{ "Assert: " };
 
-		case Debug:
+		case MessageSeverity::Debug:
 			return std::string{ "Debug: " };
 
 		default:

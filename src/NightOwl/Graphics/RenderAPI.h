@@ -12,6 +12,7 @@
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexBuffer.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlIndexBuffer.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
 #include <memory>
 
@@ -36,11 +37,20 @@ namespace NightOwl::Graphics
 			#endif
 		}
 
-		static std::unique_ptr<IContext> CreateContext(Window::IWindow* window)
+		static void CreateContext(Window::IWindow* window)
 		{
+			if (graphicsContext) return;
+
 			#ifdef OPEN_GL
-			return std::make_unique<OpenGlContext>(static_cast<GLFWwindow*>(window->GetWindowHandle()));
+			graphicsContext = std::make_unique<OpenGlContext>(static_cast<GLFWwindow*>(window->GetWindowHandle()));
 			#endif
+		}
+
+		static const std::unique_ptr<IContext>& GetContext()
+		{
+			ENGINE_ASSERT(graphicsContext != nullptr, "Tried to fetch graphics context before window was created!");
+
+			return graphicsContext;
 		}
 
 		template<typename... Args>
@@ -66,5 +76,8 @@ namespace NightOwl::Graphics
 			return std::make_shared<OpenGlVertexArrayObject>(std::forward<Args>(args)...);
 			#endif
 		}
+
+	private:
+		static std::unique_ptr<IContext> graphicsContext;
 	};
 }

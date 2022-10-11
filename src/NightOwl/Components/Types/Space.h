@@ -1,6 +1,6 @@
 namespace NightOwl::Components
 {
-	enum Space
+	enum class Space
 	{
 		Local,
 		World

@@ -3,25 +3,33 @@
 
 namespace NightOwl::Components
 {
-	Transform::Transform()
-		: localModelMatrix(Math::Mat4F::Identity()), localScale(1.0f), worldMatrix(Math::Mat4F::Identity()), worldScale(1.0f), root(nullptr), parent(nullptr), isLocalDirty(false), isWorldDirty(false)
+	Transform::Transform(GameObjects::GameObject* gameObject)
+		: Component(gameObject, ComponentType::Transform),
+		  localModelMatrix(Math::Mat4F::Identity()),
+		  localScale(1.0f), worldMatrix(Math::Mat4F::Identity()),
+		  worldScale(1.0f),
+		  root(this),
+		  parent(nullptr),
+		  isLocalDirty(false),
+		  isWorldDirty(false)
 	{
+
 	}
 
 	void Transform::Scale(float scaleX, float scaleY, float scaleZ, Space space)
 	{
 		const Math::Vec3F scale(scaleX, scaleY, scaleZ);
 
-		(space == Local) ? localScale += scale : worldScale += scale;
+		(space == Space::Local) ? localScale += scale : worldScale += scale;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	void Transform::Scale(const Math::Vec3F& scale, Space space)
 	{
-		(space == Local) ? localScale += scale : worldScale += worldScale;
+		(space == Space::Local) ? localScale += scale : worldScale += worldScale;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	const Math::Vec3F& Transform::GetLocalScale()
@@ -79,32 +87,32 @@ namespace NightOwl::Components
 	{
 		const Math::Vec3F eulers(angleX, angleY, angleZ);
 
-		(space == Local) ? localEulerAngles += eulers : worldEulerAngles += eulers;
+		(space == Space::Local) ? localEulerAngles += eulers : worldEulerAngles += eulers;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	void Transform::Rotate(const Math::Vec3F& eulers, Space space)
 	{
-		(space == Local) ? localEulerAngles += eulers : worldEulerAngles += eulers;
+		(space == Space::Local) ? localEulerAngles += eulers : worldEulerAngles += eulers;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	void Transform::Translate(float positionX, float positionY, float positionZ, Space space)
 	{
 		const Math::Vec3F translation(positionX, positionY, positionZ);
 
-		(space == Local) ? localPosition += translation : worldPosition += translation;
+		(space == Space::Local) ? localPosition += translation : worldPosition += translation;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	void Transform::Translate(const Math::Vec3F& translation, Space space)
 	{
-		(space == Local) ? localPosition += translation : worldPosition += translation;
+		(space == Space::Local) ? localPosition += translation : worldPosition += translation;
 
-		(space == Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
+		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
 	int Transform::GetNumberOfChildren()

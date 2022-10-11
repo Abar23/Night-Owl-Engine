@@ -2,9 +2,7 @@
 
 #include "WindowProperties.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
-#include "NightOwl/Graphics/Interfaces/IContext.h"
 #include "GLFW/glfw3.h"
-#include <memory>
 
 namespace NightOwl::Window
 {
@@ -31,8 +29,6 @@ namespace NightOwl::Window
 		GLFWwindow* windowHandle;
 
 		WindowProperties properties;
-
-		std::unique_ptr<Graphics::IContext> graphicsContext;
 
 		static void ErrorCallback(int errorCode, const char* errorMessage);
 

@@ -1,15 +1,16 @@
 #pragma once
 
+#include "Component.h"
 #include "NightOwl/Math/Math.h"
-#include "NightOwl/Core/Components/Types/Space.h"
+#include "NightOwl/Components/Types/Space.h"
 #include <vector>
 
 namespace NightOwl::Components
 {
-	class Transform
+	class Transform : public Component
 	{
 	public:
-		Transform();
+		Transform(GameObjects::GameObject* gameObject);
 
 		void Scale(float scaleX, float scaleY, float scaleZ, Space space);
 
@@ -85,7 +86,5 @@ namespace NightOwl::Components
 		void SetLocalDirtyFlag();
 
 		void SetWorldDirtyFlag();
-
-
 	};
 }

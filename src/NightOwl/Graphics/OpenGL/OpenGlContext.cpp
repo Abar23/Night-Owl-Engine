@@ -22,6 +22,20 @@ namespace NightOwl::Graphics
 
 		openGlInfo = GL_CALL(glGetString, GL_VERSION);
 		ENGINE_LOG_INFO("OpenGL vendor: {0}", reinterpret_cast<const char*>(openGlInfo));
+
+		#ifdef DEBUG
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(Utility::GlDebugOutput, nullptr);
+
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+		#endif
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_SMOOTH);
 	}
 
 	void OpenGlContext::AttachContext()
@@ -37,5 +51,38 @@ namespace NightOwl::Graphics
 	void OpenGlContext::SwapBuffers()
 	{
 		glfwSwapBuffers(window);
+	}
+
+	void OpenGlContext::DrawIndexed(DrawType drawType, int numberOfIndices)
+	{
+		int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
+		GL_CALL(glDrawElements, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, 0);
+	}
+
+	void OpenGlContext::ClearColor(Math::Vec4F color)
+	{
+		GL_CALL(glClearColor, color.x, color.y, color.z, color.w);
+	}
+
+	void OpenGlContext::ClearBuffer()
+	{
+		GL_CALL(glClear, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void OpenGlContext::SetViewport(int cornerX, int cornerY, int viewWidth, int viewHeight)
+	{
+		GL_CALL(glViewport, cornerX, cornerY, viewWidth, viewHeight);
+	}
+
+	void OpenGlContext::EnableWireframe(bool enabled)
+	{
+		if(enabled)
+		{
+			GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else
+		{
+			GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, GL_FILL);
+		}
 	}
 }

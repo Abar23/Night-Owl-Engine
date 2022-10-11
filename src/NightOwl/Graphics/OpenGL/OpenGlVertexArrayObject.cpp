@@ -60,8 +60,8 @@ namespace NightOwl::Graphics
 			// Only supporting floats for the moment
 			switch (data.GetVertexDataType())
 			{
-			case VectorFloat2:
-			case VectorFloat3:
+			case VertexDataType::VectorFloat2:
+			case VertexDataType::VectorFloat3:
 				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, attributeLocation, 0);
 				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, attributeLocation, data.GetNumberOfComponents(), GL_FLOAT, data.GetNormalize(), accumulativeOffset);
 				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, attributeLocation);

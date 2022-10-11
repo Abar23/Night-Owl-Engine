@@ -20,7 +20,7 @@ namespace NightOwl::Window
 		#endif
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
-		graphicsContext = Graphics::RenderApi::CreateContext(this);//Create context
+		Graphics::RenderApi::CreateContext(this);//Create context
 
 		properties.width = width;
 		properties.height = height;
@@ -67,7 +67,7 @@ namespace NightOwl::Window
 	void GlfwWindow::Update()
 	{
 		glfwPollEvents();
-		graphicsContext->SwapBuffers();
+		Graphics::RenderApi::GetContext()->SwapBuffers();
 	}
 
 	void GlfwWindow::ErrorCallback(int errorCode, const char* errorMessage)
