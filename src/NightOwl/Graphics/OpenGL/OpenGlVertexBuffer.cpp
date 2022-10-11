@@ -1,13 +1,19 @@
 #include "OpenGlVertexBuffer.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
 
 namespace NightOwl::Graphics
 {
+	OpenGlVertexBuffer::OpenGlVertexBuffer()
+	{
+		GL_CALL(glCreateBuffers, 1, &vertexBufferId);
+	}
+
 	OpenGlVertexBuffer::OpenGlVertexBuffer(const void* vertexData, unsigned int vertexDataSize)
 	{
-		this->vertexDataSize = vertexDataSize;
+		this->vertexBufferDataSize = vertexDataSize;
 		GL_CALL(glCreateBuffers, 1, &vertexBufferId);
-		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, vertexData, GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
+		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, vertexData, GL_DYNAMIC_DRAW);
 	}
 
 	OpenGlVertexBuffer::~OpenGlVertexBuffer()
@@ -27,9 +33,35 @@ namespace NightOwl::Graphics
 
 	void OpenGlVertexBuffer::SetData(const void* vertexData)
 	{
-		void* vertexBufferPointer = GL_CALL(glMapNamedBufferRange, vertexBufferId, 0, vertexDataSize, GL_MAP_WRITE_BIT);
-		std::memcpy(vertexBufferPointer, vertexData, vertexDataSize);
-		GL_CALL(glUnmapNamedBuffer, vertexBufferId);
+		GL_CALL(glNamedBufferSubData, vertexBufferId, 0, vertexBufferDataSize, vertexData);
+	}
+
+	void OpenGlVertexBuffer::SetSize(unsigned int vertexDataSize)
+	{
+		vertexBufferDataSize = vertexDataSize;
+		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	void Graphics::OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize)
+	{
+		ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), std::format("Vertex buffer does not contain a vertex buffer data definition at index {0}", index) );
+
+		const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
+
+		unsigned int offset = 0;
+		for(int i = 0; i < index; i++)
+		{
+			offset += layout.GetBufferDataDefinitions()[i].GetSizeofData();
+		}
+
+		const char* byteVertexDataPointer = static_cast<const char*>(vertexData);
+		const char* byteVertexDataPointerEnd = byteVertexDataPointer + vertexDataSize;
+		while(byteVertexDataPointer < byteVertexDataPointerEnd)
+		{
+			GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointer);
+			byteVertexDataPointer += data.GetSizeofData();
+			offset += layout.GetDataPerTriangle();
+		}
 	}
 
 	void OpenGlVertexBuffer::SetVertexBufferLayout(const VertexBufferLayout& layout)
@@ -49,6 +81,6 @@ namespace NightOwl::Graphics
 
 	unsigned OpenGlVertexBuffer::GetVertexBufferDataSize()
 	{
-		return vertexDataSize;
+		return vertexBufferDataSize;
 	}
 }

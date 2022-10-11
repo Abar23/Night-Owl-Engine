@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "NightOwl/Core/Components/Mesh.h"
+#include "NightOwl/Core/Components/Transform.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
@@ -15,46 +17,44 @@ int main()
 
 	auto shader = NightOwl::Graphics::RenderApi::CreateShader("Test", "./assets/Shaders/entityShader.vs", "./assets/Shaders/entityShader.fs");
 
-	float vertices[] = {
-		 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // top right
-		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
-		-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f // top left 
+	std::vector vertices = {
+		 NightOwl::Math::Vec3F(0.5f,  0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(0.5f, -0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(-0.5f, -0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(-0.5f,  0.5f, 0.0f)
 	};
 
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,  // first Triangle
-		1, 2, 3   // second Triangle
+	std::vector colors = {
+		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
+		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
+		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
+		NightOwl::Math::Vec3F(0.0f,  1.0f, 1.0f)
 	};
 
-	std::vector<NightOwl::Math::Vec3UI> triangles = {
-		{0, 1, 3},
-		{1, 2, 3}
+	std::vector triangles = {
+		NightOwl::Math::Vec3UI(0,  1, 3),  // first Triangle
+		NightOwl::Math::Vec3UI(1,  2, 3)  // second Triangle
 	};
 
-	std::vector attributesList = {
-		NightOwl::Graphics::VertexBufferData("Position", NightOwl::Graphics::VectorFloat3),
-		NightOwl::Graphics::VertexBufferData("Color", NightOwl::Graphics::VectorFloat3)
-	};
+	NightOwl::Components::Mesh mesh;
+	mesh.SetVertices(vertices);
+	mesh.SetColors(colors);
+	mesh.SetTriangles(triangles);
 
-	NightOwl::Graphics::VertexBufferLayout layout(attributesList);
+	NightOwl::Components::Transform transform;
 
-	auto vertexBuffer = NightOwl::Graphics::RenderApi::CreateVertexBuffer(vertices, sizeof(vertices));
-	vertexBuffer->SetVertexBufferLayout(layout);
-	auto indexBuffer = NightOwl::Graphics::RenderApi::CreateIndexBuffer(triangles.data(), triangles.size() * 3);
-	auto vao = NightOwl::Graphics::RenderApi::CreateVertexArrayObject();
-	vao->SetIndexBuffer(indexBuffer);
-	vao->SetVertexBuffer(vertexBuffer);
 
 	while(!window->ShouldWindowClose())
 	{
 		GL_CALL(glClearColor, 0.2f, 0.3f, 0.3f, 1.0f);
 		GL_CALL(glClear, GL_COLOR_BUFFER_BIT);
 
+
 		shader->Bind();
-		vao->Bind();
+		shader->SetUniformMat4F(transform.GetLocalModelMatrix(), "model");
+		mesh.Bind();
 		GL_CALL(glDrawElements, GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		vao->Unbind();
+		mesh.Unbind();
 		shader->Unbind();
 
 		window->Update();

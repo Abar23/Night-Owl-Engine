@@ -10,7 +10,8 @@ bool CheckOpenGlError(const std::string& filename, const std::uint32_t line)
 		std::string errorMessage;
 		errorMessage += filename;
 		errorMessage += " ";
-		errorMessage += line;
+		errorMessage += std::to_string(line);
+		errorMessage += " ";
 		switch (glErrorCode)
 		{
 		case GL_INVALID_ENUM:

@@ -15,7 +15,7 @@ namespace NightOwl::Components
 
 		void Bind();
 
-		void UnBind();
+		void Unbind();
 
 		std::vector<Math::Vec3F> GetVertices();
 
@@ -25,9 +25,9 @@ namespace NightOwl::Components
 
 		void SetColors(const std::vector<Math::Vec3F>& colors);
 
-		std::vector<unsigned int> GetTriangles();
+		std::vector<Math::Vec3UI> GetTriangles();
 
-		void SetTriangles(const std::vector<unsigned int>& triangles);
+		void SetTriangles(const std::vector<Math::Vec3UI>& triangles);
 
 		std::vector<Math::Vec2F> GetUVs();
 
@@ -38,17 +38,14 @@ namespace NightOwl::Components
 
 		std::vector<Math::Vec3F> colors;
 
-		std::vector<unsigned int> triangles;
+		std::vector<Math::Vec3UI> triangles;
 
 		std::vector<Math::Vec2F> uvs;
 
-		// IVertexArrayObject
 		std::shared_ptr<Graphics::IVertexArrayObject> vertexArrayObject;
 
-		// IVertexBuffer
 		std::shared_ptr<Graphics::IVertexBuffer> vertexBuffer;
 
-		// IIndexBuffer
 		std::shared_ptr<Graphics::IIndexBuffer> indexBuffer;
 
 		void ValidateMesh();

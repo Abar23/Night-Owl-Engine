@@ -7,7 +7,7 @@ namespace NightOwl::Graphics
 	class OpenGlIndexBuffer : public IIndexBuffer
 	{
 	public:
-		OpenGlIndexBuffer() = default;
+		OpenGlIndexBuffer();
 
 		OpenGlIndexBuffer(const void* indexData, unsigned int indexDataSize);
 
@@ -17,6 +17,10 @@ namespace NightOwl::Graphics
 
 		void Unbind() override;
 
+		void SetSize(unsigned indexDataSize) override;
+
+		void SetData(const void* indexData) override;
+
 		unsigned GetIndexBufferId() override;
 
 		unsigned GetIndexBufferDataSize() override;
@@ -24,7 +28,7 @@ namespace NightOwl::Graphics
 	private:
 		unsigned int indexBufferId;
 
-		unsigned int indexDataSize;
+		unsigned int indexBufferDataSize;
 	};
 }
 

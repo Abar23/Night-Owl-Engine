@@ -3,11 +3,17 @@
 
 namespace NightOwl::Graphics
 {
-	OpenGlIndexBuffer::OpenGlIndexBuffer(const void* indexData, unsigned int indexDataSize)
-		: indexDataSize(indexDataSize)
+	OpenGlIndexBuffer::OpenGlIndexBuffer()
+		: indexBufferDataSize(0)
 	{
 		GL_CALL(glCreateBuffers, 1, &indexBufferId);
-		GL_CALL(glNamedBufferStorage, indexBufferId, indexDataSize * sizeof(unsigned int), indexData, GL_MAP_READ_BIT);
+	}
+
+	OpenGlIndexBuffer::OpenGlIndexBuffer(const void* indexData, unsigned int indexDataSize)
+		: indexBufferDataSize(indexDataSize)
+	{
+		GL_CALL(glCreateBuffers, 1, &indexBufferId);
+		GL_CALL(glNamedBufferData, indexBufferId, indexDataSize * sizeof(unsigned int), indexData, GL_DYNAMIC_DRAW);
 	}
 
 	OpenGlIndexBuffer::~OpenGlIndexBuffer()
@@ -25,6 +31,17 @@ namespace NightOwl::Graphics
 		GL_CALL(glBindBuffer, GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	void OpenGlIndexBuffer::SetSize(unsigned indexDataSize)
+	{
+		indexBufferDataSize = indexDataSize;
+		GL_CALL(glNamedBufferData, indexBufferId, indexDataSize, nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	void OpenGlIndexBuffer::SetData(const void* indexData)
+	{
+		GL_CALL(glNamedBufferSubData, indexBufferId, 0, indexBufferDataSize, indexData);
+	}
+
 	unsigned OpenGlIndexBuffer::GetIndexBufferId()
 	{
 		return indexBufferId;
@@ -32,6 +49,6 @@ namespace NightOwl::Graphics
 
 	unsigned OpenGlIndexBuffer::GetIndexBufferDataSize()
 	{
-		return indexDataSize;
+		return indexBufferDataSize;
 	}
 }

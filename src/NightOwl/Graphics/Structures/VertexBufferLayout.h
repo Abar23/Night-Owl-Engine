@@ -8,7 +8,7 @@ namespace NightOwl::Graphics
 	class VertexBufferLayout
 	{
 	public:
-		VertexBufferLayout() = default;
+		VertexBufferLayout();
 
 		VertexBufferLayout& operator=(const VertexBufferLayout& bufferDataDefs);
 

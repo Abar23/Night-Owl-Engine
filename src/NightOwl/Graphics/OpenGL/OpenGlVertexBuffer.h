@@ -7,7 +7,7 @@ namespace NightOwl::Graphics
 	class OpenGlVertexBuffer : public IVertexBuffer
 	{
 	public:
-		OpenGlVertexBuffer() = delete;
+		OpenGlVertexBuffer();
 
 		OpenGlVertexBuffer(const void* vertexData, unsigned int vertexDataSize);
 
@@ -19,11 +19,9 @@ namespace NightOwl::Graphics
 
 		void SetData(const void* vertexData) override;
 
-		void SetSize(unsigned vertexDataSize) override;
+		void SetSize(unsigned int vertexDataSize) override;
 
-		void GetSize() override;
-
-		void OverwriteVertexBufferDataAtIndex(int index) override;
+		void OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize) override;
 
 		void SetVertexBufferLayout(const VertexBufferLayout& layout) override;
 
@@ -36,7 +34,7 @@ namespace NightOwl::Graphics
 	private:
 		unsigned int vertexBufferId;
 
-		unsigned int vertexDataSize;
+		unsigned int vertexBufferDataSize;
 
 		VertexBufferLayout layout;
 	};
