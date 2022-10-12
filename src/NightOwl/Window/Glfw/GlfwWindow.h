@@ -25,6 +25,8 @@ namespace NightOwl::Window
 
 		float GetAspectRatio() override;
 
+		const WindowProperties& GetWindowProperties();
+
 	private:
 		GLFWwindow* windowHandle;
 
@@ -32,6 +34,8 @@ namespace NightOwl::Window
 
 		static void ErrorCallback(int errorCode, const char* errorMessage);
 
-		static void ResizeCallback(GLFWwindow* window, int width, int height);
+		static void ScreenResizeCallback(GLFWwindow* window, int width, int height);
+
+		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }

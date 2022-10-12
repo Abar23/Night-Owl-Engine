@@ -439,11 +439,12 @@ namespace NightOwl::Math
 	template <typename T>
 	Mat4<T> Mat4<T>::Perspective(const T fieldOfViewInDegrees, const T aspectRatio, const T near, const T far)
 	{
-		T c = static_cast<T>(1) / std::tan(fieldOfViewInDegrees / static_cast<T>(2));
+		T yScale = static_cast<T>(1) / std::tan(DegreesToRad(fieldOfViewInDegrees) / static_cast<T>(2));
+		T xScale = yScale / aspectRatio;
 		T farMinusNear = far - near;
 
-		return Mat4<T>(c / aspectRatio, 0, 0, 0,
-			0, c, 0, 0,
+		return Mat4<T>(xScale, 0, 0, 0,
+			0, yScale, 0, 0,
 			0, 0, static_cast<T>(-1) * (far + near) / (farMinusNear), static_cast<T>(-2) * far * near / farMinusNear,
 			0, 0, -1, 0);
 	}

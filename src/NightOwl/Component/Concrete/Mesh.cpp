@@ -2,11 +2,12 @@
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
 #include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Component/Types/ComponentType.h"
 
-namespace NightOwl::Components
+namespace NightOwl::Component
 {
-	Mesh::Mesh(GameObjects::GameObject* gameObject)
-		: Component(gameObject, ComponentType::Mesh)
+	Mesh::Mesh(GameObject::GameObject& gameObject)
+		: Component(&gameObject, ComponentType::Mesh)
 	{
 		std::vector defaultDataDefinitions = {
 			Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3),

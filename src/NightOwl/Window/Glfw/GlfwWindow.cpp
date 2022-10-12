@@ -22,15 +22,17 @@ namespace NightOwl::Window
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
 		Graphics::RenderApi::CreateContext(this);//Create context
 
-		properties.width = width;
-		properties.height = height;
+		glfwGetFramebufferSize(windowHandle, &properties.pixelWidth, &properties.pixelHeight);
+		properties.screnWidth = width;
+		properties.screenHeight = height;
 		properties.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 		properties.windowName = windowName;
 
 		glfwSetWindowUserPointer(windowHandle, &properties);
 		glfwSwapInterval(1);
 
-		glfwSetWindowSizeCallback(windowHandle, ResizeCallback);
+		glfwSetWindowSizeCallback(windowHandle, ScreenResizeCallback);
+		glfwSetFramebufferSizeCallback(windowHandle, FramebufferResizeCallback);
 	}
 
 	GlfwWindow::~GlfwWindow()
@@ -46,12 +48,12 @@ namespace NightOwl::Window
 
 	unsigned GlfwWindow::GetHeight()
 	{
-		return properties.height;
+		return properties.screenHeight;
 	}
 
 	unsigned GlfwWindow::GetWidth()
 	{
-		return properties.width;
+		return properties.screnWidth;
 	}
 
 	void* GlfwWindow::GetWindowHandle()
@@ -62,6 +64,11 @@ namespace NightOwl::Window
 	float GlfwWindow::GetAspectRatio()
 	{
 		return properties.aspectRatio;
+	}
+
+	const WindowProperties& GlfwWindow::GetWindowProperties()
+	{
+		return properties;
 	}
 
 	void GlfwWindow::Update()
@@ -75,12 +82,22 @@ namespace NightOwl::Window
 		ENGINE_LOG_ERROR("GFLW error callback triggered. Error({0}): {1}", errorCode, errorMessage);
 	}
 
-	void GlfwWindow::ResizeCallback(GLFWwindow* window, int width, int height)
+	void GlfwWindow::ScreenResizeCallback(GLFWwindow* window, int width, int height)
 	{
 		WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
 
-		properties->height = height;
-		properties->width = width;
+		properties->screenHeight = height;
+		properties->screnWidth = width;
 		properties->aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	}
+
+	void GlfwWindow::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
+	{
+		WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		properties->pixelHeight = height;
+		properties->pixelWidth = width;
+
+		Graphics::RenderApi::GetContext()->SetViewport(0, 0, width, height);
 	}
 }

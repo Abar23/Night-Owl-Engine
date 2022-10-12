@@ -1,12 +1,13 @@
 #include "Transform.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 
-namespace NightOwl::Components
+namespace NightOwl::Component
 {
-	Transform::Transform(GameObjects::GameObject* gameObject)
-		: Component(gameObject, ComponentType::Transform),
+	Transform::Transform(GameObject::GameObject& gameObject)
+		: Component(&gameObject, ComponentType::Transform),
 		  localModelMatrix(Math::Mat4F::Identity()),
-		  localScale(1.0f), worldMatrix(Math::Mat4F::Identity()),
+		  localScale(1.0f),
+		  worldMatrix(Math::Mat4F::Identity()),
 		  worldScale(1.0f),
 		  root(this),
 		  parent(nullptr),
@@ -15,7 +16,6 @@ namespace NightOwl::Components
 	{
 
 	}
-
 	void Transform::Scale(float scaleX, float scaleY, float scaleZ, Space space)
 	{
 		const Math::Vec3F scale(scaleX, scaleY, scaleZ);
@@ -160,14 +160,14 @@ namespace NightOwl::Components
 	{
 		if (isWorldDirty)
 		{
-			const Math::Mat4F translationMatrix = Math::Mat4F::MakeTranslation(localPosition);
+			const Math::Mat4F translationMatrix = Math::Mat4F::MakeTranslation(worldPosition);
 
-			const Math::Mat4F rotationMatrix = Math::Mat4F::MakeRotationX(localEulerAngles.x) *
-											   Math::Mat4F::MakeRotationY(localEulerAngles.y) *
-											   Math::Mat4F::MakeRotationZ(localEulerAngles.z);
+			const Math::Mat4F rotationMatrix = Math::Mat4F::MakeRotationX(worldEulerAngles.x) *
+											   Math::Mat4F::MakeRotationY(worldEulerAngles.y) *
+											   Math::Mat4F::MakeRotationZ(worldEulerAngles.z);
 
 
-			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(localScale);
+			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(worldScale);
 
 			worldMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
@@ -192,5 +192,35 @@ namespace NightOwl::Components
 	void Transform::SetWorldDirtyFlag()
 	{
 		isWorldDirty = true;
+	}
+
+	Math::Vec3F Transform::GetWorldScale() const
+	{
+		return worldScale;
+	}
+
+	void Transform::SetWorldScale(const Math::Vec3F& worldScale)
+	{
+		this->worldScale = worldScale;
+	}
+
+	Math::Vec3F Transform::GetWorldEulerAngles() const
+	{
+		return worldEulerAngles;
+	}
+
+	void Transform::SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles)
+	{
+		this->worldEulerAngles = worldEulerAngles;
+	}
+
+	Math::Vec3F Transform::GetWorldPosition() const
+	{
+		return worldPosition;
+	}
+
+	void Transform::SetWorldPosition(const Math::Vec3F& worldPosition)
+	{
+		this->worldPosition = worldPosition;
 	}
 }

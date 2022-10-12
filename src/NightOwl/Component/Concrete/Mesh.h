@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Component.h"
+#include "NightOwl/Component/Component.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
 #include <vector>
 
-namespace NightOwl::Components
+namespace NightOwl::Component
 {
 	class Mesh : public Component
 	{
 	public:
-		Mesh(GameObjects::GameObject* gameObject);
+		Mesh(GameObject::GameObject& gameObject);
 
 		void Bind();
 

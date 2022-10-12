@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Component.h"
 #include "NightOwl/Math/Math.h"
-#include "NightOwl/Components/Types/Space.h"
+#include "NightOwl/Component/Component.h"
+#include "NightOwl/Component/Types/Space.h"
 #include <vector>
 
-namespace NightOwl::Components
+namespace NightOwl::Component
 {
 	class Transform : public Component
 	{
 	public:
-		Transform(GameObjects::GameObject* gameObject);
+		Transform(GameObject::GameObject& gameObject);
 
 		void Scale(float scaleX, float scaleY, float scaleZ, Space space);
 
@@ -55,6 +55,18 @@ namespace NightOwl::Components
 		const Math::Mat4F& GetWorldMatrix();
 
 		Transform* GetChildAtIndex(int index) const;
+
+		Math::Vec3F GetWorldScale() const;
+
+		void SetWorldScale(const Math::Vec3F& worldScale);
+
+		Math::Vec3F GetWorldEulerAngles() const;
+
+		void SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles);
+
+		Math::Vec3F GetWorldPosition() const;
+
+		void SetWorldPosition(const Math::Vec3F& worldPosition);
 
 	private:
 		Math::Mat4F localModelMatrix;

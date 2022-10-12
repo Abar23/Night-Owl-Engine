@@ -5,8 +5,15 @@
 class WindowProperties
 {
 public:
-	unsigned int height;
-	unsigned int width;
+	int pixelHeight;
+
+	int pixelWidth;
+
+	int screenHeight;
+
+	int screnWidth;
+
 	float aspectRatio;
+
 	std::string windowName;
 };

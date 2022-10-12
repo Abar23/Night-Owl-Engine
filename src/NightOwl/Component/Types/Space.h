@@ -1,4 +1,6 @@
-namespace NightOwl::Components
+#pragma once
+
+namespace NightOwl::Component
 {
 	enum class Space
 	{

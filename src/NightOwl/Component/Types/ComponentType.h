@@ -2,16 +2,18 @@
 
 #include <string>
 
-namespace NightOwl::Components
+namespace NightOwl::Component
 {
 	enum class ComponentType
 	{
 		None,
 		Transform,
-		Mesh
+		Mesh,
+		Camera,
+		OwlBehavior
 	};
 
-	const std::string& ComponentTypeToString(ComponentType type)
+	inline const std::string& ComponentTypeToString(ComponentType type)
 	{
 		switch (type)
 		{
@@ -20,6 +22,12 @@ namespace NightOwl::Components
 
 		case ComponentType::Mesh:
 			return std::string{ "Mesh" };
+
+		case ComponentType::Camera:
+			return std::string{ "Camera" };
+
+		case ComponentType::OwlBehavior:
+			return std::string{ "OwlBehavior" };
 
 		default:
 			return std::string{ "Unknown Component" };
