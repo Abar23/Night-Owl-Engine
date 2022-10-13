@@ -56,11 +56,13 @@ namespace NightOwl::GameObject
 		}
 
 		template<typename T>
-		void AddComponent()
+		T* AddComponent()
 		{
-			ENGINE_ASSERT(!CheckForComponent<T>(), std::format("Game object {0} already has component {1}", name, typeid(T).name()));
+			ENGINE_ASSERT(CheckForComponent<T>() == -1, std::format("Game object {0} already has component {1}", name, typeid(T).name()));
 
 			componentList.push_back(std::make_unique<T>(*this));
+
+			return dynamic_cast<T*>(componentList.back().get());
 		}
 
 		template <typename T>
@@ -73,25 +75,24 @@ namespace NightOwl::GameObject
 					return dynamic_cast<T*>(component.get());
 				}
 			}
+
 			return nullptr;
 		}
 
 		template <typename T>
 		void RemoveComponent()
 		{
-			ENGINE_ASSERT(CheckForComponent<T>(), std::format("Removing non-existant component {1} from game object object {0}", name, typeid(T).name()));
+			const int componentIndex = CheckForComponent<T>();
 
-			int index = 0;
-			for (const auto& component : componentList)
-			{
-				if (dynamic_cast<T*>(component.get()))
-				{
-					break;
-				}
-				index++;
-			}
+			ENGINE_ASSERT(componentIndex >= 0, std::format("Removing non-existant component {1} from game object object {0}", name, typeid(T).name()));
 
-			componentList.erase(componentList.begin() + index);
+			componentList.erase(componentList.begin() + componentIndex);
+		}
+
+		template <typename T>
+		bool HasComponent() const
+		{
+			return CheckForComponent<T>() >= 0;
 		}
 
 		void OnAwake() override;
@@ -112,15 +113,18 @@ namespace NightOwl::GameObject
 		bool active;
 
 		template <typename T>
-		bool CheckForComponent() const
+		int CheckForComponent() const
 		{
-			if (std::is_same_v<T, Component::Transform>) return true;
+			int notFound = -1;
 
-			for(const auto& component : componentList)
+			if (std::is_same_v<T, Component::Transform>) return notFound;
+
+			for (int componentIndex = 0; componentIndex < componentList.size(); componentIndex++)
 			{
-				if (dynamic_cast<T*>(component.get())) return true;
+				if (dynamic_cast<T*>(componentList[componentIndex].get())) return componentIndex;
 			}
-			return false;
+
+			return notFound;
 		}
 	};
 }

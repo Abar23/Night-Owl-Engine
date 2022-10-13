@@ -294,6 +294,13 @@ namespace NightOwl::Math
 		return GetAffineMatrix().GetInverse().GetTranspose();
 	}
 
+	template <typename T>
+	Math::Vec3F Mat4<T>::GetEulerAngles()
+	{
+		return Vec3F::Up();
+
+	}
+
 	template<typename T>
 	const T* Mat4<T>::GetValuePointer() const
 	{

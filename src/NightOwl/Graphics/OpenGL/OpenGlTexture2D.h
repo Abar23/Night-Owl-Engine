@@ -29,6 +29,8 @@ namespace NightOwl::Graphics
 
 		int width;
 
+		int numberOfChannels;
+
 		void LoadTexture(const std::string& texturePath);
 	};
 }
