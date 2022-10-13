@@ -222,9 +222,27 @@ namespace NightOwl::Component
 
 			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(worldScale);
 
-			worldMatrix = translationMatrix * rotationMatrix * scaleMatrix * parentWorldMatrix * GetLocalModelMatrix();
+			if(parent != nullptr)
+			{
+				worldMatrix = translationMatrix * rotationMatrix * scaleMatrix * parentWorldMatrix * GetLocalModelMatrix();
+			}
+			else
+			{
+				worldMatrix = translationMatrix * rotationMatrix * scaleMatrix * GetLocalModelMatrix();
+			}
 
 			isWorldDirty = false;
+		}
+		else if(isLocalDirty)
+		{
+			if (parent != nullptr)
+			{
+				worldMatrix = parentWorldMatrix * GetLocalModelMatrix();
+			}
+			else
+			{
+				worldMatrix = GetLocalModelMatrix();
+			}
 		}
 
 		return worldMatrix;
