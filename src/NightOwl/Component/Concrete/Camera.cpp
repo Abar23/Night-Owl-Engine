@@ -41,7 +41,7 @@ namespace NightOwl::Component
 
 	const Math::Mat4F& Camera::GetViewMatrix()
 	{
-		return gameObject->GetTransform().GetWorldMatrix().GetInverse();
+		return gameObject->GetTransform().GetWorldMatrix();// .GetInverse();
 	}
 
 	float Camera::GetNearClippingPlane()

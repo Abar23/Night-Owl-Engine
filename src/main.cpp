@@ -58,9 +58,6 @@ int main()
 	camera.AddComponent<NightOwl::Component::Camera>();
 
 
-
-	camera.GetTransform().Translate(NightOwl::Math::Vec3F::Back(), NightOwl::Component::Space::World);
-
 	//NightOwl::Component::Transform& trans = cube.GetTransform();
 	//trans.Translate(0, 0, 0, NightOwl::Component::Space::Local);
 
@@ -87,7 +84,7 @@ int main()
 	cube.GetTransform().Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
 	cube3.GetTransform().Translate(2, 0, 0, NightOwl::Component::Space::Local);
 
-	camera.GetTransform().Translate(0, 0, 2.5, NightOwl::Component::Space::Local);
+	camera.GetTransform().Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
 	NightOwl::Math::Vec4F color(0.2f, 0.3f, 0.3f, 1.0f);
 
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
