@@ -7,7 +7,6 @@ namespace NightOwl::Graphics
 {
 	OpenGlTexture2D::OpenGlTexture2D(const std::string& texturePath)
 	{
-		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
 		LoadTexture(texturePath);
 	}
 
@@ -44,13 +43,14 @@ namespace NightOwl::Graphics
 
 	void OpenGlTexture2D::LoadTexture(const std::string& texturePath)
 	{
-		stbi_set_flip_vertically_on_load(1);
+		stbi_set_flip_vertically_on_load(true);
 
 		stbi_uc* data = stbi_load(texturePath.c_str(), &width, &height, &numberOfChannels, 4);
 
 		ENGINE_ASSERT(data != nullptr, std::format("Failed to load texture from file path: {0}", texturePath));
 
-		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA32F, width, height);
+		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
+		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);
 
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

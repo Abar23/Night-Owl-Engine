@@ -23,7 +23,7 @@ namespace NightOwl::Graphics
 
 		virtual void SetUniformVec2F(const Math::Vec2F& vec2, const std::string& uniformName) = 0;
 
-		virtual void SetUniformInt(const int id, const std::string& uniformName) = 0;
+		virtual void SetUniformInt(unsigned int id, const std::string& uniformName) = 0;
 
 		virtual int GetShaderId() = 0;
 

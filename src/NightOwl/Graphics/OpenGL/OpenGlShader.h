@@ -27,9 +27,10 @@ namespace NightOwl::Graphics
 
 		void SetUniformVec2F(const Math::Vec2F& vec2, const std::string& uniformName) override;
 
-		void SetUniformInt(const int id, const std::string& uniformName) override;
+		void SetUniformInt(unsigned int id, const std::string& uniformName) override;
 
 		int GetShaderId() override;
+
 		const std::string& GetShaderName() override;
 
 	private:
@@ -37,11 +38,11 @@ namespace NightOwl::Graphics
 
 		std::string name;
 
-		// Compile Shader
 		unsigned int CompileShaderSource(const std::string& sourcePath, GLenum shaderType);
 
 		unsigned int GetUniformLocation(const std::string& uniformName) const;
 
 		static std::string GetShaderSource(const std::string& sourcePath);
+
 	};
 }

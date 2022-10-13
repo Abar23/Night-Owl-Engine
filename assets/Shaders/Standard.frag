@@ -9,12 +9,17 @@ in vertexData
     vec2 materialUvs;
 } inVertexData;
 
-in vec4 outputColor;
-
+uniform bool isInputTextureSet = false;
 uniform sampler2D inputTexture;
 
 void main(void)
 {
-    vec4 texelColor = texture(inputTexture, inVertexData.materialUvs);
-	FragColor = vec4(texelColor.x, texelColor.y, texelColor.z, 1.0);
+    vec4 outputColor = vec4(inVertexData.materialColor, 1.0);
+
+    if(isInputTextureSet)
+    {
+        outputColor = texture(inputTexture, inVertexData.materialUvs);
+    }
+
+	FragColor = outputColor;
 } 

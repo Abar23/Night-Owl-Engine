@@ -61,7 +61,7 @@ namespace NightOwl::Graphics
 		GL_CALL(glUniform2fv, GetUniformLocation(uniformName), 1, vec2.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformInt(const int id, const std::string& uniformName)
+	void OpenGlShader::SetUniformInt(unsigned int id, const std::string& uniformName)
 	{
 		GL_CALL(glUniform1i, GetUniformLocation(uniformName), id);
 	}
@@ -123,6 +123,7 @@ namespace NightOwl::Graphics
 
 	unsigned int OpenGlShader::GetUniformLocation(const std::string& uniformName) const
 	{
+		int i = glGetUniformLocation(programId, uniformName.c_str());
 		return GL_CALL(glGetUniformLocation, programId, uniformName.c_str());
 	}
 }

@@ -16,7 +16,8 @@ int main()
 
 	auto shader = NightOwl::Graphics::RenderApi::CreateShader("Test", "./assets/Shaders/Standard.vert", "./assets/Shaders/Standard.frag");
 
-	auto texture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/The_Last_Of_Us.jpg");
+	auto texture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
+	auto texture2 = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/The_Last_Of_Us.jpg");
 
 	const std::vector vertices = {
 		 NightOwl::Math::Vec3F(0.5f,  0.5f, 0.0f),
@@ -26,10 +27,10 @@ int main()
 	};
 
 	const std::vector colors = {
-		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
-		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
-		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f),
-		NightOwl::Math::Vec3F(0.0f,  1.0f, 1.0f)
+		NightOwl::Math::Vec3F(1.0f,  0.0f, 0.0f),
+		NightOwl::Math::Vec3F(0.0f,  0.0f, 1.0f),
+		NightOwl::Math::Vec3F(1.0f,  0.0f, 1.0f),
+		NightOwl::Math::Vec3F(0.0f,  1.0f, 0.0f)
 	};
 
 	const std::vector triangles = {
@@ -38,10 +39,10 @@ int main()
 	};
 
 	const std::vector uvs = {
-		 NightOwl::Math::Vec2F(0.0f,  0.0f),
-		 NightOwl::Math::Vec2F(0.0f, 1.0f),
+		 NightOwl::Math::Vec2F(1.0f,  1.0f),
 		 NightOwl::Math::Vec2F(1.0f, 0.0f),
-		 NightOwl::Math::Vec2F(1.0f,  1.0f)
+		 NightOwl::Math::Vec2F(0.0f, 0.0f),
+		 NightOwl::Math::Vec2F(0.0f,  1.0f)
 	};
 
 	NightOwl::GameObject::GameObject cube("Cube");
@@ -72,6 +73,7 @@ int main()
 	mesh = cube2.GetComponent<NightOwl::Component::Mesh>();
 	mesh->SetVertices(vertices);
 	mesh->SetColors(colors);
+	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
 
 	mesh = cube3.GetComponent<NightOwl::Component::Mesh>();
@@ -90,9 +92,9 @@ int main()
 
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
-		cube.GetTransform().Rotate(0, 0, 0, NightOwl::Component::Space::Local);
-		cube3.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::World);
-		cube2.GetTransform().Rotate(0, 0, 0, NightOwl::Component::Space::Local);
+		cube.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		cube3.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		cube2.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(color);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
@@ -101,8 +103,9 @@ int main()
 		shader->Bind();
 		shader->SetUniformMat4F(cube.GetTransform().GetWorldMatrix(), "modelMatrix");
 		shader->SetUniformMat4F(camera.GetComponent<NightOwl::Component::Camera>()->ViewProjectionMatrix(), "viewProjectionMatrix");
+		shader->SetUniformInt(0, "inputTexture");
+		shader->SetUniformInt(1, "isInputTextureSet");
 		texture->Bind(0);
-		shader->SetUniformInt(texture->GetTextureId(), "inputTexture");
 		cube.GetComponent<NightOwl::Component::Mesh>()->Bind();
 		NightOwl::Graphics::RenderApi::GetContext()->DrawIndexed(NightOwl::Graphics::DrawType::Triangles, cube.GetComponent<NightOwl::Component::Mesh>()->GetTriangles().size() * sizeof(mesh->GetTriangles()[0]));
 		cube.GetComponent<NightOwl::Component::Mesh>()->Unbind();
@@ -112,14 +115,19 @@ int main()
 		shader->Bind();
 		shader->SetUniformMat4F(cube2.GetTransform().GetWorldMatrix(), "modelMatrix");
 		shader->SetUniformMat4F(camera.GetComponent<NightOwl::Component::Camera>()->ViewProjectionMatrix(), "viewProjectionMatrix");
+		shader->SetUniformInt(0, "inputTexture");
+		shader->SetUniformInt(1, "isInputTextureSet");
+		texture2->Bind(0);
 		cube2.GetComponent<NightOwl::Component::Mesh>()->Bind();
 		NightOwl::Graphics::RenderApi::GetContext()->DrawIndexed(NightOwl::Graphics::DrawType::Triangles, cube2.GetComponent<NightOwl::Component::Mesh>()->GetTriangles().size() * sizeof(mesh->GetTriangles()[0]));
 		cube2.GetComponent<NightOwl::Component::Mesh>()->Unbind();
+		texture->Unbind();
 		shader->Unbind();
 
 		shader->Bind();
 		shader->SetUniformMat4F(cube3.GetTransform().GetWorldMatrix(), "modelMatrix");
 		shader->SetUniformMat4F(camera.GetComponent<NightOwl::Component::Camera>()->ViewProjectionMatrix(), "viewProjectionMatrix");
+		shader->SetUniformInt(0, "isInputTextureSet");
 		cube2.GetComponent<NightOwl::Component::Mesh>()->Bind();
 		NightOwl::Graphics::RenderApi::GetContext()->DrawIndexed(NightOwl::Graphics::DrawType::Triangles, cube3.GetComponent<NightOwl::Component::Mesh>()->GetTriangles().size() * sizeof(mesh->GetTriangles()[0]));
 		cube2.GetComponent<NightOwl::Component::Mesh>()->Unbind();
