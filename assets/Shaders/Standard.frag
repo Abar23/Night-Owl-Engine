@@ -16,5 +16,5 @@ uniform sampler2D inputTexture;
 void main(void)
 {
     vec4 texelColor = texture(inputTexture, inVertexData.materialUvs);
-	FragColor = vec4(texelColor.x, texelColor.y, texelColor.z, 0.0, 1.0);
+	FragColor = vec4(texelColor.x, texelColor.y, texelColor.z, 1.0);
 } 
