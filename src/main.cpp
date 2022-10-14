@@ -18,11 +18,18 @@ int main()
 	auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
 	auto theLastOfUsTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/The_Last_Of_Us.jpg");
 
-	const std::vector vertices = {
+	const std::vector smallQuad = {
 		 NightOwl::Math::Vec3F(0.5f,  0.5f, 0.0f),
 		 NightOwl::Math::Vec3F(0.5f, -0.5f, 0.0f),
 		 NightOwl::Math::Vec3F(-0.5f, -0.5f, 0.0f),
 		 NightOwl::Math::Vec3F(-0.5f,  0.5f, 0.0f)
+	};
+
+	const std::vector largerQuad = {
+		 NightOwl::Math::Vec3F(0.75f,  0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(0.75f, -0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(-0.75f, -0.5f, 0.0f),
+		 NightOwl::Math::Vec3F(-0.75f,  0.5f, 0.0f)
 	};
 
 	const std::vector colors = {
@@ -52,7 +59,7 @@ int main()
 	auto cubeMeshRenderer = cube.AddComponent<NightOwl::Component::MeshRenderer>();
 	cubeMeshRenderer->GetMaterial()->SetTexture(ofMonstersAndMenTexture);
 	auto mesh = cubeMeshRenderer->GetMesh();
-	mesh->SetVertices(vertices);
+	mesh->SetVertices(smallQuad);
 	mesh->SetColors(colors);
 	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
@@ -61,7 +68,7 @@ int main()
 	auto cube2MeshRenderer = cube2.AddComponent<NightOwl::Component::MeshRenderer>();
 	cube2MeshRenderer->GetMaterial()->SetTexture(theLastOfUsTexture);
 	mesh = cube2MeshRenderer->GetMesh();
-	mesh->SetVertices(vertices);
+	mesh->SetVertices(largerQuad);
 	mesh->SetColors(colors);
 	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
@@ -70,7 +77,7 @@ int main()
 	NightOwl::GameObject::GameObject cube3("Cube3");
 	auto cube3MeshRenderer = cube3.AddComponent<NightOwl::Component::MeshRenderer>();
 	mesh = cube3MeshRenderer->GetMesh();
-	mesh->SetVertices(vertices);
+	mesh->SetVertices(smallQuad);
 	mesh->SetColors(colors);
 	mesh->SetTriangles(triangles);
 
