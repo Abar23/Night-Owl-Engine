@@ -1,6 +1,5 @@
 #pragma once
 
-#include "NightOwl/Component/Component.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
@@ -9,10 +8,10 @@
 
 namespace NightOwl::Component
 {
-	class Mesh : public Component
+	class Mesh
 	{
 	public:
-		Mesh(GameObject::GameObject& gameObject);
+		Mesh();
 
 		void Bind();
 

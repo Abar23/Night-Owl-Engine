@@ -1,18 +1,35 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/Mesh.h"
+#include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Component/Component.h"
-#include <memory>
 
 namespace NightOwl::Component
 {
+	class IMaterial;
+
 	class MeshRenderer : public Component
 	{
 	public:
-		MeshRenderer(const GameObject::GameObject& gameObject);
+		MeshRenderer(GameObject::GameObject& gameObject);
+
+		void Draw();
+
+		Mesh* GetMesh();
+
+		void SetVisible(bool isVisible);
+
+		bool IsVisible();
+
+		const std::shared_ptr<IMaterial> GetMaterial();
+
+		void SetMaterial(std::shared_ptr<IMaterial> material);
 
 	private:
-		
+		Mesh mesh;
+
+		std::shared_ptr<IMaterial> material;
+
+		bool isVisible;
 
 	};
 }

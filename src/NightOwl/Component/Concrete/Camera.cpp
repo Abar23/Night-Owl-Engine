@@ -1,10 +1,11 @@
 #include "Camera.h"
-
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Window/WindowApi.h"
 
 namespace NightOwl::Component
 {
+	Camera* Camera::mainCamera{ nullptr };
+
 	Camera::Camera(GameObject::GameObject& gameObject)
 		: Component(&gameObject, ComponentType::Camera), isPerspectiveProjection(true),
 	    clippingPlanes(0.01f, 1000.0f),
@@ -13,14 +14,15 @@ namespace NightOwl::Component
 		isProjectionDirty(false)
 	{
 		projectionMatrix = projectionMatrix = Math::Mat4F::Perspective(fieldOfView, Window::WindowApi::GetWindow()->GetAspectRatio(), clippingPlanes.near, clippingPlanes.far);
+		mainCamera = this;
 	}
 
 	void Camera::LookAt(Math::Vec3F pointToLookAt)
 	{
-		Math::Mat4F::LookAt(gameObject->GetTransform().GetWorldPosition(), pointToLookAt, Math::Vec3F::Up());
+		Math::Mat4F::LookAt(gameObject->GetTransform()->GetWorldPosition(), pointToLookAt, Math::Vec3F::Up());
 	}
 
-	const Math::Mat4F Camera::ViewProjectionMatrix()
+	Math::Mat4F Camera::ViewProjectionMatrix()
 	{
 
 		if (isPerspectiveProjection)
@@ -41,7 +43,12 @@ namespace NightOwl::Component
 
 	const Math::Mat4F& Camera::GetViewMatrix()
 	{
-		return gameObject->GetTransform().GetWorldMatrix();// .GetInverse();
+		return gameObject->GetTransform()->GetWorldMatrix();// .GetInverse();
+	}
+
+	const Math::Mat4F& Camera::GetViewMatrix() const
+	{
+		return gameObject->GetTransform()->GetWorldMatrix();
 	}
 
 	float Camera::GetNearClippingPlane()
@@ -108,5 +115,10 @@ namespace NightOwl::Component
 	void Camera::SetPerspectiveMode(bool enablePerspectiveProjection)
 	{
 		this->isPerspectiveProjection = enablePerspectiveProjection;
+	}
+
+	Camera* Camera::GetMainCamera()
+	{
+		return mainCamera;
 	}
 }

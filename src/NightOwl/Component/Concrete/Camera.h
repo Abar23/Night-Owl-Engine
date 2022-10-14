@@ -13,9 +13,11 @@ namespace NightOwl::Component
 
 		void LookAt(Math::Vec3F pointToLookAt);
 
-		const Math::Mat4F ViewProjectionMatrix();
+		Math::Mat4F ViewProjectionMatrix();
 
 		const Math::Mat4F& GetViewMatrix();
+
+		const Math::Mat4F& GetViewMatrix() const;
 
 		float GetNearClippingPlane();
 
@@ -47,7 +49,11 @@ namespace NightOwl::Component
 
 		void SetPerspectiveMode(bool enablePerspectiveProjection);
 
+		static Camera* GetMainCamera();
+
 	private:
+		static Camera* mainCamera;
+
 		Math::Mat4F projectionMatrix;
 
 		float fieldOfView;

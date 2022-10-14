@@ -50,9 +50,9 @@ namespace NightOwl::GameObject
 			this->name = name;
 		}
 
-		Component::Transform& GetTransform()
+		Component::Transform* GetTransform()
 		{
-			return transform;
+			return &transform;
 		}
 
 		template<typename T>

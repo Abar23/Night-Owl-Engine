@@ -6,8 +6,7 @@
 
 namespace NightOwl::Component
 {
-	Mesh::Mesh(GameObject::GameObject& gameObject)
-		: Component(&gameObject, ComponentType::Mesh)
+	Mesh::Mesh()
 	{
 		std::vector defaultDataDefinitions = {
 			Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3),

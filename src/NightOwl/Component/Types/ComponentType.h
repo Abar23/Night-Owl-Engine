@@ -8,7 +8,7 @@ namespace NightOwl::Component
 	{
 		None,
 		Transform,
-		Mesh,
+		MeshRenderer,
 		Camera,
 		OwlBehavior
 	};
@@ -20,8 +20,8 @@ namespace NightOwl::Component
 		case ComponentType::Transform:
 			return std::string{"Transform"};
 
-		case ComponentType::Mesh:
-			return std::string{ "Mesh" };
+		case ComponentType::MeshRenderer:
+			return std::string{ "MeshRenderer" };
 
 		case ComponentType::Camera:
 			return std::string{ "Camera" };
