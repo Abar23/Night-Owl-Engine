@@ -4,7 +4,6 @@
 #include <cmath>
 #include <cstdint>
 #include "MathFunctions.h"
-#include "Mat4.h"
 
 namespace NightOwl::Math
 {
@@ -292,13 +291,6 @@ namespace NightOwl::Math
 	Mat4<T> Mat4<T>::GetNormalMatrix() const
 	{
 		return GetAffineMatrix().GetInverse().GetTranspose();
-	}
-
-	template <typename T>
-	Math::Vec3F Mat4<T>::GetEulerAngles()
-	{
-		return Vec3F::Up();
-
 	}
 
 	template<typename T>

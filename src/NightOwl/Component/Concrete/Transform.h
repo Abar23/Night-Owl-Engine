@@ -48,19 +48,21 @@ namespace NightOwl::Component
 
 		void SetParent(Transform& parentTransform);
 
+		Transform* RemoveParent();
+
 		void SetChild(Transform& childTransform);
 
-		const Math::Mat4F& GetLocalModelMatrix();
+		const Math::Mat4F& GetLocalModelMatrix(bool overrideDirtyFlag = false);
 
 		const Math::Mat4F& GetWorldMatrix();
 
 		Transform* GetChildAtIndex(int index) const;
 
-		Math::Vec3F GetWorldScale() const;
+		Math::Vec3F GetWorldScale();
 
 		void SetWorldScale(const Math::Vec3F& worldScale);
 
-		Math::Vec3F GetWorldEulerAngles() const;
+		Math::Vec3F GetWorldEulerAngles();
 
 		void SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles);
 
@@ -73,7 +75,7 @@ namespace NightOwl::Component
 
 		Math::Mat4F worldMatrix;
 
-		Math::Mat4F parentWorldMatrix;
+		Math::Mat4F parentLocalMatrix;
 
 		std::vector<Transform*> children;
 
@@ -103,7 +105,7 @@ namespace NightOwl::Component
 
 		void SetFlagBasedOnSpace(Space space);
 
-		void PropagateParentWorldTransform(const Math::Mat4F& parentWorldTransform);
+		void PropagateParentLocalTransform(const Math::Mat4F& parentLocalTransform);
 
 		void RestrictEulerAngles(Math::Vec3F& eulerAngles);
 	};

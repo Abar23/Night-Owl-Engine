@@ -45,7 +45,6 @@ namespace NightOwl::Math
 		void SetTranslation(const Vec3<T>& translation);
 		Mat4<T> GetAffineMatrix() const;
 		Mat4<T> GetNormalMatrix() const;
-		Math::Vec3F GetEulerAngles();
 		const T* GetValuePointer() const;
 
 		static Mat4<T> MakeRotationX(const T angleInDegrees);

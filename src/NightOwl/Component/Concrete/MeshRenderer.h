@@ -1,5 +1,8 @@
 #pragma once
+
+#include "NightOwl/Component/Concrete/Mesh.h"
 #include "NightOwl/Component/Component.h"
+#include <memory>
 
 namespace NightOwl::Component
 {
@@ -9,6 +12,7 @@ namespace NightOwl::Component
 		MeshRenderer(const GameObject::GameObject& gameObject);
 
 	private:
+		
 
 	};
 }

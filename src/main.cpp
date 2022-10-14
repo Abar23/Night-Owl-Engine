@@ -82,16 +82,19 @@ int main()
 	cube3.GetTransform().SetParent(cube.GetTransform());
 
 	cube.GetTransform().Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
+	//cube.GetTransform().Scale(1, 1, 1, NightOwl::Component::Space::World);
 	cube3.GetTransform().Translate(2, 0, 0, NightOwl::Component::Space::Local);
 
 	camera.GetTransform().Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
 	NightOwl::Math::Vec4F color(0.2f, 0.3f, 0.3f, 1.0f);
-
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
+		//cube.GetTransform().Translate(0, 0.01, 0, NightOwl::Component::Space::World);
+		//cube.GetTransform().Scale(0.01, 0.01, 0.01, NightOwl::Component::Space::Local);
+
 		cube.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		cube3.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		cube2.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		cube3.GetTransform().Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(color);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
