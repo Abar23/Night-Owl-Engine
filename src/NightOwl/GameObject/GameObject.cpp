@@ -2,19 +2,19 @@
 
 namespace NightOwl::GameObject
 {
-	void GameObject::OnAwake()
-	{
-	}
+	//void GameObject::OnAwake()
+	//{
+	//}
 
-	void GameObject::OnUpdate()
-	{
-	}
+	//void GameObject::OnUpdate()
+	//{
+	//}
 
-	void GameObject::OnEnable()
-	{
-	}
+	//void GameObject::OnEnable()
+	//{
+	//}
 
-	void GameObject::OnDisable()
-	{
-	}
+	//void GameObject::OnDisable()
+	//{
+	//}
 }

@@ -7,9 +7,8 @@
 namespace NightOwl::Component
 {
 	Mesh::Mesh()
+		: isValid(false)
 	{
-		Graphics::VertexBufferLayout defaultLayout();
-
 		vertexBuffer = Graphics::RenderApi::CreateVertexBuffer();
 
 		indexBuffer = Graphics::RenderApi::CreateIndexBuffer();

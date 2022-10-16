@@ -12,10 +12,40 @@ namespace NightOwl::Component
 	class Component
 	{
 	public:
-		Component() = delete;
+		Component(const Component& other) = default;
 
-		Component(GameObject::GameObject* gameObject, ComponentType type)
-			: gameObject(gameObject), type(type)
+		Component(Component&& other) noexcept
+			: gameObject(other.gameObject),
+			  type(other.type)
+		{
+		}
+
+		Component& operator=(const Component& other)
+		{
+			if (this == &other)
+				return *this;
+			gameObject = other.gameObject;
+			type = other.type;
+			return *this;
+		}
+
+		Component& operator=(Component&& other) noexcept
+		{
+			if (this == &other)
+				return *this;
+			gameObject = other.gameObject;
+			type = other.type;
+			return *this;
+		}
+
+		Component()
+			: gameObject(nullptr), type(ComponentType::None)
+		{
+			
+		}
+
+		Component(ComponentType type)
+			: gameObject(nullptr), type(type)
 		{
 
 		}
@@ -36,6 +66,8 @@ namespace NightOwl::Component
 		GameObject::GameObject* gameObject;
 
 		ComponentType type;
+
+		friend class GameObject::GameObject;
 
 	};
 }

@@ -4,8 +4,8 @@
 // NEED TO CLEAN UP LOGIC, KINDA NASTY
 namespace NightOwl::Component
 {
-	Transform::Transform(GameObject::GameObject& gameObject)
-		: Component(&gameObject, ComponentType::Transform),
+	Transform::Transform()
+		: Component(ComponentType::Transform),
 		  localModelMatrix(1.0f),
 	      worldMatrix(1.0f),
 		  parentLocalMatrix(1.0f),
@@ -16,8 +16,8 @@ namespace NightOwl::Component
 		  isLocalDirty(false),
 		  isWorldDirty(false)
 	{
-
 	}
+
 	void Transform::Scale(float scaleX, float scaleY, float scaleZ, Space space)
 	{
 		const Math::Vec3F scale(scaleX, scaleY, scaleZ);
@@ -30,11 +30,6 @@ namespace NightOwl::Component
 		if (parent == nullptr || space == Space::Local)
 		{
 			localScale += scale;
-
-			for (const auto& childTransform : children)
-			{
-				childTransform->PropagateParentLocalTransform(parentLocalMatrix * this->GetLocalModelMatrix(true));
-			}
 
 			SetLocalDirtyFlag();
 		}
@@ -58,11 +53,6 @@ namespace NightOwl::Component
 		if (parent == nullptr || space == Space::Local)
 		{
 			localEulerAngles += eulers;
-
-			for (const auto& childTransform : children)
-			{
-				childTransform->PropagateParentLocalTransform(parentLocalMatrix * this->GetLocalModelMatrix(true));
-			}
 
 			SetLocalDirtyFlag();
 
@@ -89,11 +79,6 @@ namespace NightOwl::Component
 		if(parent == nullptr || space == Space::Local)
 		{
 			localPosition += translation;
-
-			for (const auto& childTransform : children)
-			{
-				childTransform->PropagateParentLocalTransform(parentLocalMatrix * this->GetLocalModelMatrix(true));
-			}
 
 			SetLocalDirtyFlag();
 
@@ -173,12 +158,12 @@ namespace NightOwl::Component
 		return *parent;
 	}
 
-	void Transform::SetParent(Transform& parentTransform)
+	void Transform::SetParent(Transform* parentTransform)
 	{
-		parent = &parentTransform;
+		parent = parentTransform;
 		parent->SetChild(*this);
 		
-		for (const auto& childTransform : parentTransform.children)
+		for (const auto& childTransform : parentTransform->children)
 		{
 			childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
 		}
@@ -354,5 +339,15 @@ namespace NightOwl::Component
 	void Transform::SetWorldPosition(const Math::Vec3F& worldPosition)
 	{
 		this->worldPosition = worldPosition;
+	}
+
+	bool Transform::HasParent()
+	{
+		return parent != nullptr;
+	}
+
+	bool Transform::HasChildren()
+	{
+		return !children.empty();
 	}
 }

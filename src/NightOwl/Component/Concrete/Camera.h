@@ -9,7 +9,7 @@ namespace NightOwl::Component
 	class Camera : public Component
 	{
 	public:
-		Camera(GameObject::GameObject& gameObject);
+		Camera(GameObject::GameObject* gameObject);
 
 		void LookAt(Math::Vec3F pointToLookAt);
 

@@ -5,12 +5,17 @@
 #include "NightOwl/Component/Types/Space.h"
 #include <vector>
 
+namespace NightOwl::Core
+{
+	class Scene;
+}
+
 namespace NightOwl::Component
 {
 	class Transform : public Component
 	{
 	public:
-		Transform(GameObject::GameObject& gameObject);
+		Transform();
 
 		void Scale(float scaleX, float scaleY, float scaleZ, Space space);
 
@@ -46,7 +51,7 @@ namespace NightOwl::Component
 
 		const Transform& GetParent();
 
-		void SetParent(Transform& parentTransform);
+		void SetParent(Transform* parentTransform);
 
 		Transform* RemoveParent();
 
@@ -69,6 +74,10 @@ namespace NightOwl::Component
 		Math::Vec3F GetWorldPosition() const;
 
 		void SetWorldPosition(const Math::Vec3F& worldPosition);
+
+		bool HasParent();
+
+		bool HasChildren();
 
 	private:
 		Math::Mat4F localModelMatrix;
@@ -105,8 +114,10 @@ namespace NightOwl::Component
 
 		void SetFlagBasedOnSpace(Space space);
 
+		void RestrictEulerAngles(Math::Vec3F& eulerAngles);
+
 		void PropagateParentLocalTransform(const Math::Mat4F& parentLocalTransform);
 
-		void RestrictEulerAngles(Math::Vec3F& eulerAngles);
+		friend class Core::Scene;
 	};
 }

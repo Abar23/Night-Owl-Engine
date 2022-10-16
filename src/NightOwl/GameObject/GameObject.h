@@ -6,7 +6,11 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <algorithm>
+
+namespace NightOwl::Core
+{
+	class Scene;
+}
 
 namespace NightOwl::Component
 {
@@ -15,18 +19,26 @@ namespace NightOwl::Component
 
 namespace NightOwl::GameObject
 {
-	class GameObject : private Behavior::IBehavior
+	class GameObject //: public Behavior::IBehavior
 	{
 	public:
-		GameObject()
-			: transform(*this), active(true)
+		GameObject(Core::Scene* scene, unsigned int id)
+			: scene(scene),
+		      id(id),
+		      active(true)
 		{
+			transform.gameObject = this;
 		}
 
-		GameObject(const std::string& name)
-			: transform(*this), name(name), active(true)
+		GameObject(const std::string& name, Core::Scene* scene, unsigned int id)
+			: scene(scene),
+		      name(name),
+		      id(id),
+		      active(true)
 		{
+			transform.gameObject = this;
 		}
+
 
 		bool IsEnabled() const
 		{
@@ -39,7 +51,7 @@ namespace NightOwl::GameObject
 			{
 				this->active = active;
 
-				active ? OnEnable() : OnDisable();
+				//active ? OnEnable() : OnDisable();
 			}
 		}
 
@@ -58,12 +70,17 @@ namespace NightOwl::GameObject
 			return &transform;
 		}
 
+		unsigned int GetId() const
+		{
+			return id;
+		}
+
 		template<typename T>
 		T* AddComponent()
 		{
 			ENGINE_ASSERT(CheckForComponent<T>() == -1, std::format("Game object {0} already has component {1}", name, typeid(T).name()));
 
-			componentList.push_back(std::make_unique<T>(*this));
+			componentList.push_back(std::make_shared<T>(this));
 
 			return dynamic_cast<T*>(componentList.back().get());
 		}
@@ -98,20 +115,24 @@ namespace NightOwl::GameObject
 			return CheckForComponent<T>() >= 0;
 		}
 
-		void OnAwake() override;
+		//void OnAwake() override;
 
-		void OnUpdate() override;
+		//void OnUpdate() override;
 
-		void OnEnable() override;
+		//void OnEnable() override;
 
-		void OnDisable() override;
+		//void OnDisable() override;
 
 	protected:
-		std::vector<std::unique_ptr<Component::Component>> componentList;
+		std::vector<std::shared_ptr<Component::Component>> componentList;
 
 		Component::Transform transform;
 
+		Core::Scene* scene;
+
 		std::string name;
+
+		unsigned int id;
 
 		bool active;
 
