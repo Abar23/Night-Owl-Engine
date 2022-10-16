@@ -8,16 +8,9 @@ namespace NightOwl::Component
 {
 	Mesh::Mesh()
 	{
-		std::vector defaultDataDefinitions = {
-			Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3),
-			Graphics::VertexBufferData("Color", Graphics::VertexDataType::VectorFloat3),
-			Graphics::VertexBufferData("UV", Graphics::VertexDataType::VectorFloat2)
-		};
-
-		Graphics::VertexBufferLayout defaultLayout(defaultDataDefinitions);
+		Graphics::VertexBufferLayout defaultLayout();
 
 		vertexBuffer = Graphics::RenderApi::CreateVertexBuffer();
-		vertexBuffer->SetVertexBufferLayout(defaultLayout);
 
 		indexBuffer = Graphics::RenderApi::CreateIndexBuffer();
 
@@ -28,6 +21,8 @@ namespace NightOwl::Component
 
 	void Mesh::Bind()
 	{
+		ENGINE_ASSERT(isValid, "Mesh with invalid data has been bound!"); // get name to be apart of mesh for better debugging
+
 		vertexArrayObject->Bind();
 	}
 
@@ -63,13 +58,35 @@ namespace NightOwl::Component
 
 	void Mesh::SetTriangles(const std::vector<Math::Vec3UI>& triangles)
 	{
+		ENGINE_ASSERT(!triangles.empty(), "Must call clear data before reassigning triangles of mesh.");
+
 		this->triangles = triangles;
+
+		ValidateMesh();
+
+		ENGINE_ASSERT(isValid, std::format("Triangle indices reference out of bounds vertices."));
+
 		indexBuffer->SetSize(triangles.size() * sizeof(Math::Vec3UI));
 		indexBuffer->SetData(triangles.data());
-		vertexBuffer->SetSize(vertexBuffer->GetVertexBufferLayout().GetDataPerTriangle() * triangles.size() * sizeof(Math::Vec3UI));
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(2, uvs.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat2) * uvs.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(1, colors.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * colors.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(0, vertices.data(), Graphics::VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * vertices.size());
+
+		Graphics::VertexBufferLayout layout;
+		layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3));
+		if(!colors.empty())
+		{
+			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Color", Graphics::VertexDataType::VectorFloat3));
+		}
+		if(!uvs.empty())
+		{
+			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("UV", Graphics::VertexDataType::VectorFloat2));
+		}
+
+		vertexBuffer->SetVertexBufferLayout(layout);
+		vertexBuffer->SetSize(layout.GetDataPerVertex() * triangles.size() * 3);
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(0, vertices.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * vertices.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(1, colors.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * colors.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(2, uvs.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat2) * uvs.size());
+
+		vertexArrayObject->SetupVertexBufferAttributes();
 	}
 
 	std::vector<Math::Vec2F> Mesh::GetUVs()
@@ -82,8 +99,27 @@ namespace NightOwl::Component
 		this->uvs = uvs;
 	}
 
+	void Mesh::Clear()
+	{
+		triangles.clear();
+		vertices.clear();
+		uvs.clear();
+		colors.clear();
+
+		isValid = false;
+	}
+
 	void Mesh::ValidateMesh()
 	{
+		auto expectedNumberOfVerticesPerTriangle = 3 * triangles.size();
 
+		if(expectedNumberOfVerticesPerTriangle <= vertices.size() * VertexDataTypeToNumberOfComponents(Graphics::VertexDataType::VectorFloat3))
+		{
+			isValid = true;
+		}
+		else
+		{
+			isValid = false;
+		}
 	}
 }

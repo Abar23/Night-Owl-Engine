@@ -35,9 +35,12 @@ namespace NightOwl::GameObject
 
 		void SetActive(bool active)
 		{
-			this->active = active;
+			if(this->active != active)
+			{
+				this->active = active;
 
-			active ? OnEnable() : OnDisable() ;
+				active ? OnEnable() : OnDisable();
+			}
 		}
 
 		const std::string& GetName()

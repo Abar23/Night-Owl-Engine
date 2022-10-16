@@ -44,23 +44,26 @@ namespace NightOwl::Graphics
 
 	void Graphics::OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize)
 	{
-		ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), std::format("Vertex buffer does not contain a vertex buffer data definition at index {0}", index) );
-
-		const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
-
-		unsigned int offset = 0;
-		for(int i = 0; i < index; i++)
+		if(vertexDataSize != 0)
 		{
-			offset += layout.GetBufferDataDefinitions()[i].GetSizeofData();
-		}
+			ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), std::format("Vertex buffer does not contain a vertex buffer data definition at index {0}", index));
 
-		const char* byteVertexDataPointer = static_cast<const char*>(vertexData);
-		const char* byteVertexDataPointerEnd = byteVertexDataPointer + vertexDataSize;
-		while(byteVertexDataPointer < byteVertexDataPointerEnd)
-		{
-			GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointer);
-			byteVertexDataPointer += data.GetSizeofData();
-			offset += layout.GetDataPerTriangle();
+			const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
+
+			unsigned int offset = 0;
+			for (int i = 0; i < index; i++)
+			{
+				offset += layout.GetBufferDataDefinitions()[i].GetSizeofData();
+			}
+
+			const char* byteVertexDataPointer = static_cast<const char*>(vertexData);
+			const char* byteVertexDataPointerEnd = byteVertexDataPointer + vertexDataSize;
+			while (byteVertexDataPointer < byteVertexDataPointerEnd)
+			{
+				GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointer);
+				byteVertexDataPointer += data.GetSizeofData();
+				offset += layout.GetDataPerVertex();
+			}
 		}
 	}
 

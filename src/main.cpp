@@ -84,6 +84,14 @@ int main()
 	cube.GetTransform()->SetParent(*cube2.GetTransform());
 	cube3.GetTransform()->SetParent(*cube.GetTransform());
 
+	std::vector<std::shared_ptr<NightOwl::GameObject::GameObject>> objects;
+	for (size_t i = 0; i < 100; i++)
+	{
+		auto newobj = std::make_shared<NightOwl::GameObject::GameObject>("Test");
+		newobj->GetTransform()->SetParent(*cube2.GetTransform());
+		objects.push_back(newobj);
+	}
+
 	cube.GetTransform()->Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
 	cube.GetTransform()->Scale(1, 1, 1, NightOwl::Component::Space::World);
 	cube3.GetTransform()->Translate(2, 0, 0, NightOwl::Component::Space::Local);

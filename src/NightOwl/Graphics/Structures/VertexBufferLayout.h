@@ -20,11 +20,11 @@ namespace NightOwl::Graphics
 
 		void SetBufferDataDefinitions(std::vector<VertexBufferData>& bufferDataDefs);
 
-		int GetDataPerTriangle() const;
+		int GetDataPerVertex() const;
 
 	private:
 		std::vector<VertexBufferData> bufferDataDefinitions;
 
-		int dataPerTriangle;
+		int dataPerVertex;
 	};
 }

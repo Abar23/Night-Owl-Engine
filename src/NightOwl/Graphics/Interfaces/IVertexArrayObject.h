@@ -24,5 +24,7 @@ namespace NightOwl::Graphics
 		virtual std::shared_ptr<IIndexBuffer>& GetIndexBuffer() = 0;
 
 		virtual unsigned int GetVertexArrayObjectId() = 0;
+
+		virtual void SetupVertexBufferAttributes() = 0;
 	};
 }

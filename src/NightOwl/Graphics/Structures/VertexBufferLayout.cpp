@@ -3,7 +3,7 @@
 namespace NightOwl::Graphics
 {
 	VertexBufferLayout::VertexBufferLayout()
-		: dataPerTriangle(0)
+		: dataPerVertex(0)
 	{
 	}
 
@@ -12,24 +12,24 @@ namespace NightOwl::Graphics
 		bufferDataDefinitions = bufferDataDefs.bufferDataDefinitions;
 		for(const VertexBufferData& data : bufferDataDefinitions)
 		{
-			dataPerTriangle += data.GetSizeofData();
+			dataPerVertex += data.GetSizeofData();
 		}
 		return *this;
 	}
 
 	VertexBufferLayout::VertexBufferLayout(std::vector<VertexBufferData>& bufferDataDefs)
-		: bufferDataDefinitions(bufferDataDefs), dataPerTriangle(0)
+		: bufferDataDefinitions(bufferDataDefs), dataPerVertex(0)
 	{
 		for (const VertexBufferData& data : bufferDataDefinitions)
 		{
-			dataPerTriangle += data.GetSizeofData();
+			dataPerVertex += data.GetSizeofData();
 		}
 	}
 
 	void VertexBufferLayout::AddVertexBufferDataDefinition(const VertexBufferData& vertexBufferDataDef)
 	{
 		bufferDataDefinitions.push_back(vertexBufferDataDef);
-		dataPerTriangle += vertexBufferDataDef.GetSizeofData();
+		dataPerVertex += vertexBufferDataDef.GetSizeofData();
 	}
 
 	const std::vector<VertexBufferData>& VertexBufferLayout::GetBufferDataDefinitions() const
@@ -42,9 +42,9 @@ namespace NightOwl::Graphics
 		bufferDataDefinitions = bufferDataDefs;
 	}
 
-	int VertexBufferLayout::GetDataPerTriangle() const
+	int VertexBufferLayout::GetDataPerVertex() const
 	{
-		return dataPerTriangle;
+		return dataPerVertex;
 	}
 }
 

@@ -33,6 +33,8 @@ namespace NightOwl::Component
 
 		void SetUVs(const std::vector<Math::Vec2F>& uvs);
 
+		void Clear();
+
 	private:
 		std::vector<Math::Vec3F> vertices;
 
@@ -47,6 +49,8 @@ namespace NightOwl::Component
 		std::shared_ptr<Graphics::IVertexBuffer> vertexBuffer;
 
 		std::shared_ptr<Graphics::IIndexBuffer> indexBuffer;
+
+		bool isValid;
 
 		void ValidateMesh();
 

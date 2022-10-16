@@ -4,6 +4,7 @@
 namespace NightOwl::Graphics
 {
 	OpenGlVertexArrayObject::OpenGlVertexArrayObject()
+		: vertexArrayObjectId(0)
 	{
 		GL_CALL(glCreateVertexArrays, 1, &vertexArrayObjectId);
 	}
@@ -26,7 +27,6 @@ namespace NightOwl::Graphics
 	void OpenGlVertexArrayObject::SetVertexBuffer(const std::shared_ptr<IVertexBuffer>& vertexBuffer)
 	{
 		this->vertexBuffer = vertexBuffer;
-		SetupVertexBufferAttributes();
 	}
 
 	std::shared_ptr<IVertexBuffer>& OpenGlVertexArrayObject::GetVertexBuffer()
@@ -67,8 +67,12 @@ namespace NightOwl::Graphics
 				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, attributeLocation);
 				attributeLocation++;
 				accumulativeOffset += data.GetSizeofData();
+				break;
+
+			default:
+				break;
 			}
 		}
-		GL_CALL(glVertexArrayVertexBuffer, vertexArrayObjectId, 0, vertexBuffer->GetVertexBufferId(), 0, layout.GetDataPerTriangle());
+		GL_CALL(glVertexArrayVertexBuffer, vertexArrayObjectId, 0, vertexBuffer->GetVertexBufferId(), 0, layout.GetDataPerVertex());
 	}
 }
