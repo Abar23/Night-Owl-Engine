@@ -11,14 +11,18 @@
 
 int main()
 {
-	NightOwl::Math::Vec3F a(1, 2, 3);
+	// Standup necessary systems
 	NightOwl::Utility::LoggerManager::Init();
-
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
 
-	auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
-	auto theLastOfUsTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/The_Last_Of_Us.jpg");
+	// Create textures
+	const auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
+	const auto theLastOfUsTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/The_Last_Of_Us.jpg");
 
+	// Create scene for game objects
+	NightOwl::Core::Scene scene;
+
+	// Create mesh data for game object meshes (Will be moved out of main in next iteration)
 	const std::vector smallQuad = {
 		 NightOwl::Math::Vec3F(0.5f,  0.5f, 0.0f),
 		 NightOwl::Math::Vec3F(0.5f, -0.5f, 0.0f),
@@ -52,25 +56,25 @@ int main()
 		 NightOwl::Math::Vec2F(0.0f,  1.0f)
 	};
 
-	NightOwl::Core::Scene scene;
-	//NightOwl::GameObject::GameObject obj("test", nullptr, 3);
-	//NightOwl::GameObject::GameObject obj2("test2", nullptr, 3);
-	//obj = obj2;
-	NightOwl::GameObject::GameObject& camera = scene.AddGameObject("Camera");
-	camera.AddComponent<NightOwl::Component::Camera>();
-	camera.GetTransform()->Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
 
-	NightOwl::GameObject::GameObject& cube = scene.AddGameObject("Cube");
-	auto cubeMeshRenderer = cube.AddComponent<NightOwl::Component::MeshRenderer>();
-	cubeMeshRenderer->GetMaterial()->SetTexture(ofMonstersAndMenTexture);
-	auto mesh = cubeMeshRenderer->GetMesh();
+	//Add camera to scene
+	NightOwl::GameObject::GameObject& camera = scene.AddGameObject("Camera");
+	NightOwl::Component::Camera *cameraComponent = camera.AddComponent<NightOwl::Component::Camera>();
+	cameraComponent->SetPerspectiveMode(false);
+	cameraComponent->SetOrthographicSize(4);
+
+	// Add quads to scene with corresponding mesh data
+	NightOwl::GameObject::GameObject& quad = scene.AddGameObject("Cube");
+	auto quadMeshRenderer = quad.AddComponent<NightOwl::Component::MeshRenderer>();
+	quadMeshRenderer->GetMaterial()->SetTexture(ofMonstersAndMenTexture);
+	auto mesh = quadMeshRenderer->GetMesh();
 	mesh->SetVertices(smallQuad);
 	mesh->SetColors(colors);
 	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
 
-	NightOwl::GameObject::GameObject& cube2 = scene.AddGameObject("Cube2");
-	auto cube2MeshRenderer = cube2.AddComponent<NightOwl::Component::MeshRenderer>();
+	NightOwl::GameObject::GameObject& quad2 = scene.AddGameObject("Cube2");
+	auto cube2MeshRenderer = quad2.AddComponent<NightOwl::Component::MeshRenderer>();
 	cube2MeshRenderer->GetMaterial()->SetTexture(theLastOfUsTexture);
 	mesh = cube2MeshRenderer->GetMesh();
 	mesh->SetVertices(largerQuad);
@@ -79,37 +83,44 @@ int main()
 	mesh->SetTriangles(triangles);
 
 
-	NightOwl::GameObject::GameObject& cube3 = scene.AddGameObject("Cube3");
-	auto cube3MeshRenderer = cube3.AddComponent<NightOwl::Component::MeshRenderer>();
-	mesh = cube3MeshRenderer->GetMesh();
+	NightOwl::GameObject::GameObject& quad3 = scene.AddGameObject("Cube3");
+	auto quad3MeshRenderer = quad3.AddComponent<NightOwl::Component::MeshRenderer>();
+	mesh = quad3MeshRenderer->GetMesh();
 	mesh->SetVertices(smallQuad);
 	mesh->SetColors(colors);
 	mesh->SetTriangles(triangles);
 
-	cube.GetTransform()->Scale(1, 1, 1, NightOwl::Component::Space::World);
+	// Position objects in the scene
+	//quad.GetTransform()->SetParent(quad2.GetTransform());
+	quad3.GetTransform()->SetParent(quad.GetTransform());
+
+	camera.GetTransform()->Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
 
 
-	//cube.GetTransform()->SetParent(cube2.GetTransform());
-	cube3.GetTransform()->SetParent(cube.GetTransform());
+	quad.GetTransform()->Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
+	quad.GetTransform()->Scale(1, 1, 1, NightOwl::Component::Space::World);
+	quad3.GetTransform()->Translate(2, 0, 0, NightOwl::Component::Space::Local);
 
-	cube.GetTransform()->Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
-	cube3.GetTransform()->Translate(2, 0, 0, NightOwl::Component::Space::Local);
+	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-	NightOwl::Math::Vec4F color(0.2f, 0.3f, 0.3f, 1.0f);
+	quad.GetTransform()->Rotate(0, 0, 45, NightOwl::Component::Space::Local);
+
+
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
-		cube.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		cube2.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		cube3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		//quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		//quad2.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		quad3.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
 
-		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(color);
+		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 
+		// Update scene graph
 		scene.Update();
 
-		cubeMeshRenderer->Draw();
+		quadMeshRenderer->Draw();
 		cube2MeshRenderer->Draw();
-		cube3MeshRenderer->Draw();
+		quad3MeshRenderer->Draw();
 
 		NightOwl::Window::WindowApi::GetWindow()->Update();
 	}

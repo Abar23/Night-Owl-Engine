@@ -207,6 +207,11 @@ namespace NightOwl::Component
 
 			localModelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
+			if(parent == nullptr)
+			{
+				worldMatrix = localModelMatrix;
+			}
+
 			isLocalDirty = false;
 		}
 
@@ -228,7 +233,9 @@ namespace NightOwl::Component
 
 			if(parent != nullptr)
 			{
-				worldMatrix = parentLocalMatrix * GetLocalModelMatrix() * translationMatrix * rotationMatrix * scaleMatrix;
+				Math::Mat4F parentChildCombined = parentLocalMatrix * GetLocalModelMatrix();
+				const Math::Mat4F parentChildCombinedTranslation = Math::Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
+				worldMatrix = parentChildCombinedTranslation * translationMatrix * rotationMatrix * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
 			}
 			else
 			{
@@ -333,7 +340,7 @@ namespace NightOwl::Component
 
 	Math::Vec3F Transform::GetWorldPosition() const
 	{
-		return worldPosition + localPosition;
+		return worldMatrix.GetTranslation();
 	}
 
 	void Transform::SetWorldPosition(const Math::Vec3F& worldPosition)

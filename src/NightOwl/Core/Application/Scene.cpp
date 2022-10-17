@@ -15,7 +15,6 @@ namespace NightOwl::Core
 		{
 			for(int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
 			{
-				parent->GetTransform()->GetWorldMatrix();
 				Component::Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
 				childTransform->PropagateParentLocalTransform(parent->GetTransform()->GetLocalModelMatrix());
 			}

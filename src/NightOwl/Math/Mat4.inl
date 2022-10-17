@@ -118,7 +118,7 @@ namespace NightOwl::Math
 		Vec3<T> u = a * y - b * x;
 		Vec3<T> v = c * w - d * z;
 
-		T inverseDet = static_cast<T>(1) / Vec3<T>::Dot(s, v) - Vec3<T>::Dot(t, u);
+		T inverseDet = static_cast<T>(1) / (Vec3<T>::Dot(s, v) + Vec3<T>::Dot(t, u));
 		s *= inverseDet;
 		t *= inverseDet;
 		u *= inverseDet;
@@ -153,7 +153,7 @@ namespace NightOwl::Math
 		Vec3<T> u = a * y - b * x;
 		Vec3<T> v = c * w - d * z;
 
-		T inverseDet = static_cast<T>(1) / Vec3<T>::Dot(s, v) - Vec3<T>::Dot(t, u);
+		T inverseDet = static_cast<T>(1) / (Vec3<T>::Dot(s, v) + Vec3<T>::Dot(t, u));
 		s *= inverseDet;
 		t *= inverseDet;
 		u *= inverseDet;
@@ -172,7 +172,7 @@ namespace NightOwl::Math
 		data[0][1] = secondRow.x;
 		data[1][1] = secondRow.y;
 		data[2][1] = secondRow.z;
-		data[3][1] = -Vec3<T>::Dot(a, t);
+		data[3][1] = Vec3<T>::Dot(a, t);
 
 		data[0][2] = thirdRow.x;
 		data[1][2] = thirdRow.y;
@@ -182,7 +182,7 @@ namespace NightOwl::Math
 		data[0][3] = fourthRow.x;
 		data[1][3] = fourthRow.y;
 		data[2][3] = fourthRow.z;
-		data[3][3] = -Vec3<T>::Dot(c, s);
+		data[3][3] = Vec3<T>::Dot(c, s);
 
 		return *this;
 	}
@@ -269,7 +269,7 @@ namespace NightOwl::Math
 	template <typename T>
 	Vec3<T> Mat4<T>::GetTranslation() const
 	{
-		return columns[3];
+		return columns[3].xyz;
 	}
 
 	template <typename T>

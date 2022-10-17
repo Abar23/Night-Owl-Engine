@@ -3,10 +3,14 @@
 #include <ostream>
 #include <initializer_list>
 #include <array>
+#include "Swizzle.h"
 #include "MathFunctions.h"
 
 namespace NightOwl::Math
 {
+	template <typename T> class Vec3;
+	template <typename T> class Vec4;
+
 	template <typename T>
 	class Vec2
 	{
@@ -19,6 +23,37 @@ namespace NightOwl::Math
 			{
 				T x, y;
 			};
+
+			Swizzle<Vec2, T, 2, 0, 0> xx;
+			Swizzle<Vec2, T, 2, 0, 1> xy;
+			Swizzle<Vec2, T, 2, 1, 0> yx;
+			Swizzle<Vec2, T, 2, 1, 1> yy;
+
+			Swizzle<Vec3, T, 2, 0, 0, 0> xxx;
+			Swizzle<Vec3, T, 2, 0, 0, 1> xxy;
+			Swizzle<Vec3, T, 2, 0, 1, 0> xyx;
+			Swizzle<Vec3, T, 2, 0, 1, 1> xyy;
+			Swizzle<Vec3, T, 2, 1, 0, 0> yxx;
+			Swizzle<Vec3, T, 2, 1, 0, 1> yxy;
+			Swizzle<Vec3, T, 2, 1, 1, 0> yyx;
+			Swizzle<Vec3, T, 2, 1, 1, 1> yyy;
+
+			Swizzle<Vec4, T, 2, 0, 0, 0, 0> xxxx;
+			Swizzle<Vec4, T, 2, 0, 0, 0, 1> xxxy;
+			Swizzle<Vec4, T, 2, 0, 0, 1, 0> xxyx;
+			Swizzle<Vec4, T, 2, 0, 0, 1, 1> xxyy;
+			Swizzle<Vec4, T, 2, 0, 1, 0, 0> xyxx;
+			Swizzle<Vec4, T, 2, 0, 1, 0, 1> xyxy;
+			Swizzle<Vec4, T, 2, 0, 1, 1, 0> xyyx;
+			Swizzle<Vec4, T, 2, 0, 1, 1, 1> xyyy;
+			Swizzle<Vec4, T, 2, 1, 0, 0, 0> yxxx;
+			Swizzle<Vec4, T, 2, 1, 0, 0, 1> yxxy;
+			Swizzle<Vec4, T, 2, 1, 0, 1, 0> yxyx;
+			Swizzle<Vec4, T, 2, 1, 0, 1, 1> yxyy;
+			Swizzle<Vec4, T, 2, 1, 1, 0, 0> yyxx;
+			Swizzle<Vec4, T, 2, 1, 1, 0, 1> yyxy;
+			Swizzle<Vec4, T, 2, 1, 1, 1, 0> yyyx;
+			Swizzle<Vec4, T, 2, 1, 1, 1, 1> yyyy;
 		};
 
 		Vec2();
