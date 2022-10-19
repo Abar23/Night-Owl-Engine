@@ -289,13 +289,8 @@ namespace NightOwl::Component
 
 	Math::Vec3F Transform::GetWorldScale()
 	{
-		GetWorldMatrix();
-
-		const Math::Vec3F worldXScale = worldMatrix.GetColumn(0).xyz;
-		const Math::Vec3F worldYScale = worldMatrix.GetColumn(1).xyz;
-		const Math::Vec3F worldZScale = worldMatrix.GetColumn(2).xyz;
-
-		return {worldXScale.Magnitude(), worldZScale.Magnitude(), worldYScale.Magnitude() };
+		Math::Vec3F combinedScale(localScale.x * worldScale.x, localScale.y * worldScale.y, localScale.z * worldScale.z);
+		return combinedScale;
 	}
 
 	void Transform::SetWorldScale(const Math::Vec3F& worldScale)
