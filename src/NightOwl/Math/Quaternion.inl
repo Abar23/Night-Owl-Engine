@@ -51,7 +51,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::Normalized() const
+	Quaternion<T> Quaternion<T>::GetNormalize() const
 	{
 		T norm = Norm();
 		return Quaternion<T>(x / norm, y / norm, z / norm, w / norm);
@@ -69,28 +69,28 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::Renormalized() const
+	Quaternion<T> Quaternion<T>::GetRenormalize() const
 	{
-		T inverseNorm = FastInverseSqurRootAroundOne(SqrNorm());
+		T inverseNorm = FastInverseSquareRootAroundOne(SqrNorm());
 		return Quaternion<T>(x * inverseNorm, y * inverseNorm, z * inverseNorm, w * inverseNorm);
 	}
 
 	template <typename T>
 	Quaternion<T>& Quaternion<T>::Renormalize()
 	{
-		T inverseNorm = FastInverseSqurRootAroundOne(SqrNorm());
+		T inverseNorm = FastInverseSquareRootAroundOne(SqrNorm());
 		*this *= inverseNorm;
 		return *this;
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::Inverted() const
+	Quaternion<T> Quaternion<T>::GetInverse() const
 	{
-		return Conjugate();
+		return GetConjugate();
 	}
 
 	template <typename T>
-	Quaternion<T>& Quaternion<T>::Invert()
+	Quaternion<T>& Quaternion<T>::Inverse()
 	{
 		x = -x;
 		y = -y;
@@ -99,7 +99,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::Conjugate() const
+	Quaternion<T> Quaternion<T>::GetConjugate() const
 	{
 		return Quaternion<T>(-x, -y, -z, w);
 	}
@@ -181,22 +181,60 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Vec3<T> Quaternion<T>::TransformVector(const Quaternion<T>& quaterion, const Vec3<T>& vector)
+	Vec3<T> Quaternion<T>::GetEulerAngles()
 	{
-		Vec3<T> vectorPart(quaterion.x, quaterion.y, quaterion.z);
+		Vec3<T> angles;
 
-		return (vector * (quaterion.w * quaterion.w - vectorPart.SqrMagnitude())) +
-			vectorPart * (Vec3<T>::Dot(vector, vectorPart) * static_cast<T>(2)) +
-			Vec3<T>::Cross(vectorPart, vector) * (quaterion.w * static_cast<T>(2));
+		T singularityTest = x * y + z * w;
+
+		T one = static_cast<T>(1);
+		T two = static_cast<T>(2);
+
+		if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
+		{
+			angles.y = two * std::atan2(x, w);
+			angles.z = static_cast<T>(F_PI) / two;
+		}
+		else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
+		{
+			angles.y = -two * std::atan2(x, w);
+			angles.z = -static_cast<T>(F_PI) / two;
+		}
+		else
+		{
+			T xSquared = x * x;
+			T ySquared = y * y;
+			T zSquared = z * z;
+
+			angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
+			angles.z = std::asin(two * singularityTest);
+			angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
+		}
+
+		angles.x = RadToDegrees(angles.x);
+		angles.y = RadToDegrees(angles.y);
+		angles.z = RadToDegrees(angles.z);
+
+		return angles;
 	}
 
 	template <typename T>
-	T Quaternion<T>::Dot(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion)
+	Vec3<T> Quaternion<T>::TransformVector(const Quaternion<T>& quaternion, const Vec3<T>& vector)
 	{
-		return leftQuaterion.x * rightQuaterion.x +
-			leftQuaterion.y * rightQuaterion.y +
-			leftQuaterion.z * rightQuaterion.z +
-			leftQuaterion.w * rightQuaterion.w;
+		Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
+
+		return (vector * (quaternion.w * quaternion.w - vectorPart.SqrMagnitude())) +
+			vectorPart * (Vec3<T>::Dot(vector, vectorPart) * static_cast<T>(2)) +
+			Vec3<T>::Cross(vectorPart, vector) * (quaternion.w * static_cast<T>(2));
+	}
+
+	template <typename T>
+	T Quaternion<T>::Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
+	{
+		return leftQuaternion.x * rightQuaternion.x +
+			leftQuaternion.y * rightQuaternion.y +
+			leftQuaternion.z * rightQuaternion.z +
+			leftQuaternion.w * rightQuaternion.w;
 	}
 
 	template <typename T>
@@ -221,10 +259,41 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::MakeRotation(const Vec3<T>& unitVector, const T angleInDegrees)
+	Quaternion<T> Quaternion<T>::MakeRotationAxisAngle(const Vec3<T>& unitVector, const T angleInDegrees)
 	{
 		return Quaternion<T>(unitVector, angleInDegrees);
 	}
+
+	template <typename T>
+	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(Vec3<T> angles)
+	{
+		T two = static_cast<T>(2);
+
+		T xHalfAngle = DegreesToRad(angles.x / two);
+		T yHalfAngle = DegreesToRad(angles.y / two);
+		T zHalfAngle = DegreesToRad(angles.z / two);
+
+		T xCos = std::cos(xHalfAngle);
+		T yCos = std::cos(yHalfAngle);
+		T zCos = std::cos(zHalfAngle);
+
+		T xSin = std::sin(xHalfAngle);
+		T ySin = std::sin(yHalfAngle);
+		T zSin = std::sin(zHalfAngle);
+
+		T zCosXCos = zCos * xCos;
+		T zSinXSin = zSin * xSin;
+		T zSinXCos = zSin * xCos;
+		T zCosXSin = zCos * xSin;
+
+		T w = zCosXCos * yCos + zSinXSin * ySin;
+		T x = zCosXSin * yCos - zSinXCos * ySin;
+		T y = zCosXCos * ySin + zSinXSin * yCos;
+		T z = zSinXCos * yCos - zCosXSin * ySin;
+
+		return Quaternion(x, y, z, w);
+	}
+
 
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Lerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
@@ -235,7 +304,7 @@ namespace NightOwl::Math
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		return Lerp(leftQuaternion, rightQuaternion, t).Normalized();
+		return Lerp(leftQuaternion, rightQuaternion, t).GetNormalize();
 	}
 
 	template <typename T>
@@ -243,7 +312,7 @@ namespace NightOwl::Math
 	{
 		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
-		if (dot > dotThreshhold)
+		if (dot > DOT_THRESHHOLD)
 		{
 			return Nlerp(leftQuaternion, rightQuaternion, t);
 		}

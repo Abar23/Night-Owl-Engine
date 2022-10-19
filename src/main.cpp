@@ -57,6 +57,13 @@ int main()
 	};
 
 
+	NightOwl::Math::QuatF quat(NightOwl::Math::Vec3F::Right(), 90);
+	quat *= NightOwl::Math::QuatF::MakeRotationY(90);
+	quat.Normalize();
+	quat.GetEulerAngles();
+	quat *= NightOwl::Math::QuatF::MakeRotationZ(90);
+	quat.Normalize();
+	quat.GetEulerAngles();
 	//Add camera to scene
 	NightOwl::GameObject::GameObject& camera = scene.AddGameObject("Camera");
 	NightOwl::Component::Camera *cameraComponent = camera.AddComponent<NightOwl::Component::Camera>();
@@ -91,7 +98,7 @@ int main()
 	mesh->SetTriangles(triangles);
 
 	// Position objects in the scene
-	//quad.GetTransform()->SetParent(quad2.GetTransform());
+	quad.GetTransform()->SetParent(quad2.GetTransform());
 	quad3.GetTransform()->SetParent(quad.GetTransform());
 
 	camera.GetTransform()->Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
@@ -103,15 +110,19 @@ int main()
 
 	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-	quad.GetTransform()->Rotate(0, 0, 45, NightOwl::Component::Space::Local);
+	quad.GetTransform()->Rotate(10, 10, 0, NightOwl::Component::Space::Local);
+	quad.GetTransform()->Rotate(0, -11, 0, NightOwl::Component::Space::Local);
+	quad.GetTransform()->Rotate(0, 0, 0, NightOwl::Component::Space::Local);
 
 
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
-		//quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		//quad2.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		quad3.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
-
+		quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+		quad2.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
+		std::cout << quad3.GetTransform()->GetWorldScale() << std::endl;
+		std::cout << quad3.GetTransform()->GetWorldEulerAngles() << std::endl;
+		std::cout << quad3.GetTransform()->GetWorldPosition() << std::endl;
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 

@@ -54,6 +54,10 @@ namespace NightOwl::Component
 		{
 			localEulerAngles += eulers;
 
+			localRotation = Math::QuatF::MakeRotationFromEulers(eulers) * localRotation;
+
+			localRotation.Renormalize();
+
 			SetLocalDirtyFlag();
 
 		}
@@ -61,7 +65,7 @@ namespace NightOwl::Component
 		{
 			worldEulerAngles += eulers;
 
-			RestrictEulerAngles(worldEulerAngles);
+			worldRotation = Math::QuatF::MakeRotationFromEulers(eulers) * worldRotation;
 
 			SetWorldDirtyFlag();
 		}
@@ -198,14 +202,9 @@ namespace NightOwl::Component
 		{
 			const Math::Mat4F translationMatrix = Math::Mat4F::MakeTranslation(localPosition);
 
-			const Math::Mat4F rotationMatrix = Math::Mat4F::MakeRotationX(localEulerAngles.x) *
-											   Math::Mat4F::MakeRotationY(localEulerAngles.y) *
-											   Math::Mat4F::MakeRotationZ(localEulerAngles.z);
-
-
 			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(localScale);
 
-			localModelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+			localModelMatrix = translationMatrix * localRotation.GetRotationMatrix() * scaleMatrix;
 
 			if(parent == nullptr)
 			{
@@ -220,40 +219,27 @@ namespace NightOwl::Component
 
 	const Math::Mat4F& Transform::GetWorldMatrix()
 	{
-		if (isWorldDirty)
+		if (isWorldDirty || isLocalDirty)
 		{
 			const Math::Mat4F translationMatrix = Math::Mat4F::MakeTranslation(worldPosition);
-
-			const Math::Mat4F rotationMatrix = Math::Mat4F::MakeRotationX(worldEulerAngles.x) *
-											   Math::Mat4F::MakeRotationY(worldEulerAngles.y) *
-											   Math::Mat4F::MakeRotationZ(worldEulerAngles.z);
-
 
 			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(worldScale);
 
 			if(parent != nullptr)
 			{
-				Math::Mat4F parentChildCombined = parentLocalMatrix * GetLocalModelMatrix();
+				const Math::Mat4F parentChildCombined = parentLocalMatrix * GetLocalModelMatrix();
+
 				const Math::Mat4F parentChildCombinedTranslation = Math::Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
-				worldMatrix = parentChildCombinedTranslation * translationMatrix * rotationMatrix * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+
+				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse()* parentChildCombined;
 			}
 			else
 			{
-				worldMatrix =  GetLocalModelMatrix() * worldMatrix;
+				worldMatrix =  GetLocalModelMatrix() * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix;
 			}
 
 			isWorldDirty = false;
-		}
-		else if(isLocalDirty)
-		{
-			if (parent != nullptr)
-			{
-				worldMatrix = parentLocalMatrix * GetLocalModelMatrix();
-			}
-			else
-			{
-				worldMatrix = GetLocalModelMatrix();
-			}
+			isLocalDirty = false;
 		}
 
 		return worldMatrix;
@@ -297,15 +283,7 @@ namespace NightOwl::Component
 	{
 		for (float& angle : eulerAngles.data)
 		{
-			if (angle > Math::THREE_HUNDRED_SIXTY_DEGREES)
-			{
-				angle -= Math::THREE_HUNDRED_SIXTY_DEGREES;
-			}
-
-			if (angle < -Math::THREE_HUNDRED_SIXTY_DEGREES) 
-			{
-				angle += Math::THREE_HUNDRED_SIXTY_DEGREES;
-			}
+			
 		}
 	}
 
@@ -313,9 +291,9 @@ namespace NightOwl::Component
 	{
 		GetWorldMatrix();
 
-		const Math::Vec3F worldXScale{ worldMatrix(0, 0), worldMatrix(1, 0), worldMatrix(2, 0) };
-		const Math::Vec3F worldYScale{ worldMatrix(0, 1), worldMatrix(1, 1), worldMatrix(2, 1) };
-		const Math::Vec3F worldZScale{ worldMatrix(0, 2), worldMatrix(1, 2), worldMatrix(2, 2) };
+		const Math::Vec3F worldXScale = worldMatrix.GetColumn(0).xyz;
+		const Math::Vec3F worldYScale = worldMatrix.GetColumn(1).xyz;
+		const Math::Vec3F worldZScale = worldMatrix.GetColumn(2).xyz;
 
 		return {worldXScale.Magnitude(), worldZScale.Magnitude(), worldYScale.Magnitude() };
 	}
@@ -325,17 +303,15 @@ namespace NightOwl::Component
 		this->worldScale = worldScale;
 	}
 
-	// BROKEN - CONVERT TO QUATERNION FOR ROTATION
-	Math::Vec3F Transform::GetWorldEulerAngles()
+	Math::Vec3F Transform::GetWorldEulerAngles() const
 	{
-		GetWorldMatrix();
-
-		return worldEulerAngles;
+		return worldEulerAngles + localEulerAngles;
 	}
 
 	void Transform::SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles)
 	{
 		this->worldEulerAngles = worldEulerAngles;
+		worldRotation = Math::QuatF::MakeRotationFromEulers(worldEulerAngles);
 	}
 
 	Math::Vec3F Transform::GetWorldPosition() const
@@ -348,12 +324,12 @@ namespace NightOwl::Component
 		this->worldPosition = worldPosition;
 	}
 
-	bool Transform::HasParent()
+	bool Transform::HasParent() const
 	{
 		return parent != nullptr;
 	}
 
-	bool Transform::HasChildren()
+	bool Transform::HasChildren() const
 	{
 		return !children.empty();
 	}

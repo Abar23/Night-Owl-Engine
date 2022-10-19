@@ -68,6 +68,7 @@ namespace NightOwl::Math
 		T& operator()(const int rowIndex, const int columnIndex);
 
 		Mat4<T>& operator*=(const Mat4<T>& matrix);
+		Mat4<T>& operator*=(const Mat3<T>& matrix);
 		Mat4<T>& operator*=(const T scalar);
 
 		friend Vec4<T> operator*(const Mat4<T>& matrix, const Vec4<T>& vector)
@@ -81,6 +82,9 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Mat4<T> operator*(const Mat4<T>& leftMatrix, const Mat4<T>& rightMatrix);
+
+	template <typename T>
+	Mat4<T> operator*(const Mat4<T>& leftMatrix, const Mat3<T>& rotationMatrix);
 
 	template <typename T>
 	Mat4<T> operator*(const Mat4<T>& matrix, const T scalar);

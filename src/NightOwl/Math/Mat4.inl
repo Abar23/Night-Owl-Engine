@@ -502,6 +502,34 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
+	Mat4<T>& Mat4<T>::operator*=(const Mat3<T>& matrix)
+	{
+		Mat4<T> temp = *this;
+
+		data[0][0] = temp.data[0][0] * matrix.data[0][0] + temp.data[1][0] * matrix.data[0][1] + temp.data[2][0] * matrix.data[0][2];
+		data[1][0] = temp.data[0][0] * matrix.data[1][0] + temp.data[1][0] * matrix.data[1][1] + temp.data[2][0] * matrix.data[1][2];
+		data[2][0] = temp.data[0][0] * matrix.data[2][0] + temp.data[1][0] * matrix.data[2][1] + temp.data[2][0] * matrix.data[2][2];
+		data[3][0] = temp.data[3][0];
+
+		data[0][1] = temp.data[0][1] * matrix.data[0][0] + temp.data[1][1] * matrix.data[0][1] + temp.data[2][1] * matrix.data[0][2];
+		data[1][1] = temp.data[0][1] * matrix.data[1][0] + temp.data[1][1] * matrix.data[1][1] + temp.data[2][1] * matrix.data[1][2];
+		data[2][1] = temp.data[0][1] * matrix.data[2][0] + temp.data[1][1] * matrix.data[2][1] + temp.data[2][1] * matrix.data[2][2];
+		data[3][1] = temp.data[3][1];
+
+		data[0][2] = temp.data[0][2] * matrix.data[0][0] + temp.data[1][2] * matrix.data[0][1] + temp.data[2][2] * matrix.data[0][2];
+		data[1][2] = temp.data[0][2] * matrix.data[1][0] + temp.data[1][2] * matrix.data[1][1] + temp.data[2][2] * matrix.data[1][2];
+		data[2][2] = temp.data[0][2] * matrix.data[2][0] + temp.data[1][2] * matrix.data[2][1] + temp.data[2][2] * matrix.data[2][2];
+		data[3][2] = temp.data[3][2];
+
+		data[0][3] = temp.data[0][3] * matrix.data[0][0] + temp.data[1][3] * matrix.data[0][1] + temp.data[2][3] * matrix.data[0][2];
+		data[1][3] = temp.data[0][3] * matrix.data[1][0] + temp.data[1][3] * matrix.data[1][1] + temp.data[2][3] * matrix.data[1][2];
+		data[2][3] = temp.data[0][3] * matrix.data[2][0] + temp.data[1][3] * matrix.data[2][1] + temp.data[2][3] * matrix.data[2][2];
+		data[3][3] = temp.data[3][3];
+
+		return *this;
+	}
+
+	template <typename T>
 	Mat4<T>& Mat4<T>::operator*=(const T scalar)
 	{
 		columns[0] *= scalar;
@@ -517,6 +545,13 @@ namespace NightOwl::Math
 	{
 		Mat4<T> leftMatrixCopy = leftMatrix;
 		return leftMatrixCopy *= rightMatrix;
+	}
+
+	template <typename T>
+	Mat4<T> operator*(const Mat4<T>& leftMatrix, const Mat3<T>& rotationMatrix)
+	{
+		Mat4<T> leftMatrixCopy = leftMatrix;
+		return leftMatrixCopy *= rotationMatrix;
 	}
 
 	template <typename T>

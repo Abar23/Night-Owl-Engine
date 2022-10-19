@@ -1,10 +1,13 @@
 #pragma once
 
 #include <initializer_list>
+
 #include "Vec3.h"
 
 namespace NightOwl::Math
 {
+	template <typename T> class Mat4;
+
 	template <typename T>
 	class Mat3
 	{
@@ -66,6 +69,9 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Mat3<T> operator*(const Mat3<T>& leftMatrix, const Mat3<T>& rightMatrix);
+
+	template <typename T>
+	Mat4<T> operator*(const Mat3<T>& rotationMatrix, const Mat4<T>& rightMatrix);
 
 	template <typename T>
 	Mat3<T> operator*(const Mat3<T>& matrix, const T scalar);

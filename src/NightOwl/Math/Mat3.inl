@@ -334,6 +334,30 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
+	Mat4<T> operator*(const Mat3<T>& rotationMatrix, const Mat4<T>& rightMatrix)
+	{
+		Mat4<T> result;
+
+		result.data[0][0] = rotationMatrix.data[0][0] * rightMatrix.data[0][0] + rotationMatrix.data[1][0] * rightMatrix.data[0][1] + rotationMatrix.data[2][0] * rightMatrix.data[0][2];
+		result.data[1][0] = rotationMatrix.data[0][0] * rightMatrix.data[1][0] + rotationMatrix.data[1][0] * rightMatrix.data[1][1] + rotationMatrix.data[2][0] * rightMatrix.data[1][2];
+		result.data[2][0] = rotationMatrix.data[0][0] * rightMatrix.data[2][0] + rotationMatrix.data[1][0] * rightMatrix.data[2][1] + rotationMatrix.data[2][0] * rightMatrix.data[2][2];
+		result.data[3][0] = rightMatrix.data[3][0];
+
+
+		result.data[0][1] = rotationMatrix.data[0][1] * rightMatrix.data[0][0] + rotationMatrix.data[1][1] * rightMatrix.data[0][1] + rotationMatrix.data[2][1] * rightMatrix.data[0][2];
+		result.data[1][1] = rotationMatrix.data[0][1] * rightMatrix.data[1][0] + rotationMatrix.data[1][1] * rightMatrix.data[1][1] + rotationMatrix.data[2][1] * rightMatrix.data[1][2];
+		result.data[2][1] = rotationMatrix.data[0][1] * rightMatrix.data[2][0] + rotationMatrix.data[1][1] * rightMatrix.data[2][1] + rotationMatrix.data[2][1] * rightMatrix.data[2][2];
+		result.data[3][1] = rightMatrix.data[3][1];
+
+		result.data[0][2] = rotationMatrix.data[0][2] * rightMatrix.data[0][0] + rotationMatrix.data[1][2] * rightMatrix.data[0][1] + rotationMatrix.data[2][2] * rightMatrix.data[0][2];
+		result.data[1][2] = rotationMatrix.data[0][2] * rightMatrix.data[1][0] + rotationMatrix.data[1][2] * rightMatrix.data[1][1] + rotationMatrix.data[2][2] * rightMatrix.data[1][2];
+		result.data[2][2] = rotationMatrix.data[0][2] * rightMatrix.data[2][0] + rotationMatrix.data[1][2] * rightMatrix.data[2][1] + rotationMatrix.data[2][2] * rightMatrix.data[2][2];
+		result.data[3][2] = rightMatrix.data[3][2];
+
+		return result;
+	}
+
+	template <typename T>
 	Mat3<T> operator*(const Mat3<T>& matrix, const T scalar)
 	{
 		Mat3<T> matrixCopy = matrix;

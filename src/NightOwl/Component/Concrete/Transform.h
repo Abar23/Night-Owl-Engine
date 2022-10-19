@@ -67,7 +67,7 @@ namespace NightOwl::Component
 
 		void SetWorldScale(const Math::Vec3F& worldScale);
 
-		Math::Vec3F GetWorldEulerAngles();
+		Math::Vec3F GetWorldEulerAngles() const;
 
 		void SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles);
 
@@ -75,9 +75,9 @@ namespace NightOwl::Component
 
 		void SetWorldPosition(const Math::Vec3F& worldPosition);
 
-		bool HasParent();
+		bool HasParent() const;
 
-		bool HasChildren();
+		bool HasChildren() const;
 
 	private:
 		Math::Mat4F localModelMatrix;
@@ -92,11 +92,15 @@ namespace NightOwl::Component
 
 		Math::Vec3F localEulerAngles;
 
+		Math::QuatF localRotation;
+
 		Math::Vec3F localPosition;
 
 		Math::Vec3F worldScale;
 
 		Math::Vec3F worldEulerAngles;
+
+		Math::QuatF worldRotation;
 
 		Math::Vec3F worldPosition;
 

@@ -11,7 +11,10 @@ namespace NightOwl::Math
 	public:
 		union
 		{
-			T x, y, z, w;
+			struct
+			{
+				T x, y, z, w;
+			};
 
 			Vec4<T> components;
 		};
@@ -25,22 +28,24 @@ namespace NightOwl::Math
 
 		T Norm() const;
 		T SqrNorm() const;
-		Quaternion<T> Normalized() const;
+		Quaternion<T> GetNormalize() const;
 		Quaternion<T>& Normalize();
-		Quaternion<T> Renormalized() const;
+		Quaternion<T> GetRenormalize() const;
 		Quaternion<T>& Renormalize();
-		Quaternion<T> Inverted() const;
-		Quaternion<T>& Invert();
-		Quaternion<T> Conjugate() const;
+		Quaternion<T> GetInverse() const;
+		Quaternion<T>& Inverse();
+		Quaternion<T> GetConjugate() const;
 		Mat3<T> GetRotationMatrix() const;
 		void SetRotationMatrix(const Mat3<T>& matrix);
+		Vec3<T> GetEulerAngles();
 
-		static Vec3<T> TransformVector(const Quaternion<T>& quaterion, const Vec3<T>& vector);
-		static T Dot(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion);
+		static Vec3<T> TransformVector(const Quaternion<T>& quaternion, const Vec3<T>& vector);
+		static T Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 		static Quaternion<T> MakeRotationX(const T angleInDegrees);
 		static Quaternion<T> MakeRotationY(const T angleInDegrees);
 		static Quaternion<T> MakeRotationZ(const T angleInDegrees);
-		static Quaternion<T> MakeRotation(const Vec3<T>& unitVector, const T angleInDegrees);
+		static Quaternion<T> MakeRotationAxisAngle(const Vec3<T>& unitVector, const T angleInDegrees);
+		static Quaternion<T> MakeRotationFromEulers(Vec3<T> angles);
 		static Quaternion<T> Lerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 		static Quaternion<T> Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 		static Quaternion<T> Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
