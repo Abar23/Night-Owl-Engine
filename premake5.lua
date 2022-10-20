@@ -43,9 +43,9 @@ workspace "Night-Owl-Engine"
             "GLFW_INCLUDE_NONE",
             "STB_IMAGE_IMPLEMENTATION",
             "OPEN_GL",
-            "ENGINE_LOG_FILE=\"./src/NightOwl/Core/Utitlity/Logging/Logs/EngineLogs.txt\"",
-            "CLIENT_LOG_FILE=\"./src/NightOwl/Core/Utitlity/Logging/Logs/ClientLogs.txt\"",
-            "LOG_FILE_DIR=\"./src/NightOwl/Core/Utitlity/Logging/Logs/\""
+            "ENGINE_LOG_FILE=\"./Logs/EngineLogs.txt\"",
+            "CLIENT_LOG_FILE=\"./Logs/ClientLogs.txt\"",
+            "LOG_FILE_DIR=\"./Logs/\""
         }
 
         includedirs
