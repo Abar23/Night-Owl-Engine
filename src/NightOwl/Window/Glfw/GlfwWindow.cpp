@@ -33,6 +33,10 @@ namespace NightOwl::Window
 
 		glfwSetWindowSizeCallback(windowHandle, ScreenResizeCallback);
 		glfwSetFramebufferSizeCallback(windowHandle, FramebufferResizeCallback);
+		glfwSetKeyCallback(windowHandle, KeyCallback);
+		glfwSetCursorPosCallback(windowHandle, MousePositionCallback);
+		glfwSetMouseButtonCallback(windowHandle, MouseButtonCallback);
+		glfwSetScrollCallback(windowHandle, MouseScrollCallback);
 	}
 
 	GlfwWindow::~GlfwWindow()
@@ -71,6 +75,26 @@ namespace NightOwl::Window
 		return properties;
 	}
 
+	void GlfwWindow::SetKeyCallback(std::function<void(int, int, int, int)> keyCallback)
+	{
+		properties.keyCallback = keyCallback;
+	}
+
+	void GlfwWindow::SetMouseButtonCallback(std::function<void(int, int, int)> mouseButtonCallback)
+	{
+		properties.mouseButtonCallback = mouseButtonCallback;
+	}
+
+	void GlfwWindow::SetMousePositionCallback(std::function<void(double, double)> mousePositionCallback)
+	{
+		properties.mousePositionCallback = mousePositionCallback;
+	}
+
+	void GlfwWindow::SetMouseScrollCallback(std::function<void(double, double)> mouseScrollCallback)
+	{
+		properties.mouseScrollCallback = mouseScrollCallback;
+	}
+
 	void GlfwWindow::Update()
 	{
 		glfwPollEvents();
@@ -99,5 +123,45 @@ namespace NightOwl::Window
 		properties->pixelWidth = width;
 
 		Graphics::RenderApi::GetContext()->SetViewport(0, 0, width, height);
+	}
+
+	void GlfwWindow::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		if(properties->keyCallback != nullptr)
+		{
+			properties->keyCallback(key, scancode, action, mods);
+		}
+	}
+
+	void GlfwWindow::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	{
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		if (properties->mouseButtonCallback != nullptr)
+		{
+			properties->mouseButtonCallback(button, action, mods);
+		}
+	}
+
+	void GlfwWindow::MousePositionCallback(GLFWwindow* window, double xPosition, double yPosition)
+	{
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		if (properties->mousePositionCallback != nullptr)
+		{
+			properties->mousePositionCallback(xPosition, yPosition);
+		}
+	}
+
+	void GlfwWindow::MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+	{
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		if (properties->mouseScrollCallback != nullptr)
+		{
+			properties->mouseScrollCallback(xOffset, yOffset);
+		}
 	}
 }

@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <string>
 #include "MathFunctions.h"
 #include "Vec3.h"
 
@@ -98,6 +99,13 @@ namespace NightOwl::Math
 	const T* Vec3<T>::GetValuePointer() const
 	{
 		return data.data();
+	}
+
+	template <typename T>
+	std::string Vec3<T>::ToString() const
+	{
+		std::string vectorString = "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
+		return vectorString;
 	}
 
 	template <typename T>

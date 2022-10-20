@@ -157,6 +157,7 @@ namespace NightOwl::Math
 		Vec3<T> GetNegate() const;
 		Vec3<T>& Negate();
 		const T* GetValuePointer() const;
+		std::string ToString() const;
 
 		static T Dot(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 		static Vec3<T> Cross(const Vec3<T>& leftVector, const Vec3<T>& rightVector);

@@ -375,6 +375,7 @@ namespace NightOwl::Math
 		Vec4<T> GetNegate() const;
 		Vec4<T>& Negate();
 		const T* GetValuePointer() const;
+		std::string ToString() const;
 
 		static T Dot(const Vec4<T>& leftVector, const Vec4<T>& rightVector);
 		static Vec4<T> Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t);

@@ -148,6 +148,7 @@ namespace NightOwl::Math
 	};
 
 	using Vec2F = Vec2<float>;
+	using Vec2D = Vec2<double>;
 }
 
 #include "Vec2.inl"

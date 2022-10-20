@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <string>
 #include "MathFunctions.h"
 #include "Vec4.h"
 
@@ -110,6 +111,13 @@ namespace NightOwl::Math
 	const T* Vec4<T>::GetValuePointer() const
 	{
 		return data.data();
+	}
+
+	template <typename T>
+	std::string Vec4<T>::ToString() const
+	{
+		std::string vectorString = "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ", " + std::to_string(w) + ")";
+		return vectorString;
 	}
 
 	template <typename T>

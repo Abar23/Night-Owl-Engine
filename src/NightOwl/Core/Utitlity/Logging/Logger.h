@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include <iostream>
 
 namespace NightOwl::Utility
 {
@@ -32,13 +33,15 @@ namespace NightOwl::Utility
 				std::string fileName = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
 				#endif
 				
-				const std::string time = std::format("[{0:%H:%M:%S}] {1}({2}) ", now, fileName, line);
+				const std::string preamble = std::format("[{0:%H:%M:%S}] {1}({2}) ", now, fileName, line);
 
 				const std::string userMessage = std::vformat(message, std::make_format_args(args...));
 
 				const std::string severityName = SeverityToString(severity);
 
-				logFile << time << severityName << userMessage << std::endl;
+				logFile << preamble << severityName << userMessage << std::endl;
+
+				std::cout << preamble << severityName << userMessage << std::endl;
 			}
 		}
 

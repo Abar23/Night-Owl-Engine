@@ -8,12 +8,15 @@
 #include "NightOwl/Graphics/RenderApi.h"
 #include "NightOwl/Window/WindowApi.h"
 #include "NightOwl/GameObject/GameObject.h"
+#include "NightOwl/Input/Input.h"
 
 int main()
 {
 	// Standup necessary systems
 	NightOwl::Utility::LoggerManager::Init();
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
+
+	NightOwl::Input::Input input;
 
 	// Create textures
 	const auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
@@ -120,14 +123,17 @@ int main()
 		quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		quad2.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
-		std::cout << quad3.GetTransform()->GetWorldScale() << std::endl;
-		std::cout << quad3.GetTransform()->GetWorldEulerAngles() << std::endl;
-		std::cout << quad3.GetTransform()->GetWorldPosition() << std::endl;
+		//std::cout << quad3.GetTransform()->GetWorldScale() << std::endl;
+		//std::cout << quad3.GetTransform()->GetWorldEulerAngles() << std::endl;
+		//std::cout << quad3.GetTransform()->GetWorldPosition() << std::endl;
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 
+		std::cout << input.GetScrollDelta() << std::endl;
+		ENGINE_LOG_INFO("{0}", NightOwl::Math::Vec4F(2).ToString());
 		// Update scene graph
 		scene.Update();
+		input.Update();
 
 		quadMeshRenderer->Draw();
 		cube2MeshRenderer->Draw();
