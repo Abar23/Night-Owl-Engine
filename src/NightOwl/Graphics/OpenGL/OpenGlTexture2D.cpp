@@ -47,7 +47,7 @@ namespace NightOwl::Graphics
 
 		stbi_uc* data = stbi_load(texturePath.c_str(), &width, &height, &numberOfChannels, 4);
 
-		ENGINE_ASSERT(data != nullptr, std::format("Failed to load texture from file path: {0}", texturePath));
+		ENGINE_ASSERT(data != nullptr, "Failed to load texture from file path: {0}", texturePath);
 
 		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
 		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);

@@ -78,7 +78,7 @@ namespace NightOwl::GameObject
 		template<typename T>
 		T* AddComponent()
 		{
-			ENGINE_ASSERT(CheckForComponent<T>() == -1, std::format("Game object {0} already has component {1}", name, typeid(T).name()));
+			ENGINE_ASSERT(CheckForComponent<T>() == -1, "Game object {0} already has component {1}", name, typeid(T).name());
 
 			componentList.push_back(std::make_shared<T>(this));
 
@@ -104,7 +104,7 @@ namespace NightOwl::GameObject
 		{
 			const int componentIndex = CheckForComponent<T>();
 
-			ENGINE_ASSERT(componentIndex >= 0, std::format("Removing non-existant component {1} from game object object {0}", name, typeid(T).name()));
+			ENGINE_ASSERT(componentIndex >= 0, "Removing non-existant component {1} from game object object {0}", name, typeid(T).name());
 
 			componentList.erase(componentList.begin() + componentIndex);
 		}

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cerrno>
-#include <format>
 #include <cstdarg>
 #include "Logger.h"
 

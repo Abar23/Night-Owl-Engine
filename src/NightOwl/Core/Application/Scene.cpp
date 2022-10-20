@@ -41,7 +41,7 @@ namespace NightOwl::Core
 	{
 		unsigned int id = gameObject.GetId();
 		
-		ENGINE_ASSERT(gameObjectsList.contains(id), std::format("Trying to remove game object with id {0} that is not in the scene", id));
+		ENGINE_ASSERT(gameObjectsList.contains(id), "Trying to remove game object with id {0} that is not in the scene", id);
 
 		gameObjectsList.erase(id);
 	}

@@ -63,7 +63,7 @@ namespace NightOwl::Component
 
 		ValidateMesh();
 
-		ENGINE_ASSERT(isValid, std::format("Triangle indices reference out of bounds vertices."));
+		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");
 
 		indexBuffer->SetSize(triangles.size() * sizeof(Math::Vec3UI));
 		indexBuffer->SetData(triangles.data());

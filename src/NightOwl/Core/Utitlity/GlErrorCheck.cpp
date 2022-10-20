@@ -10,10 +10,13 @@ namespace NightOwl::Utility
 		if (glErrorCode != GL_NO_ERROR)
 		{
 			std::string errorMessage;
-			errorMessage += filename;
-			errorMessage += " ";
-			errorMessage += std::to_string(line);
-			errorMessage += " ";
+
+			#ifdef _WIN64
+			const std::string fileNameStripped = (strrchr(filename.c_str(), '\\') ? strrchr(filename.c_str(), '\\') + 1 : filename.c_str());
+			#else
+			std::string fileName = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
+			#endif
+
 			switch (glErrorCode)
 			{
 			case GL_INVALID_ENUM:
@@ -44,7 +47,8 @@ namespace NightOwl::Utility
 				errorMessage += "GL_STACK_OVERFLOW: an OpenGL push operation has exceeded the maximum size of the OpenGl stack.";
 				break;
 			}
-			ENGINE_LOG_ERROR(errorMessage);
+
+			ENGINE_LOG_ERROR("OpenGL error from file {0}({1}): {2}", fileNameStripped, std::to_string(line), errorMessage);
 			return false;
 		}
 		return true;
@@ -60,96 +64,98 @@ namespace NightOwl::Utility
 	{
 		if (id == 131185 || id == 131218) return;
 
-		std::string debugMessage("OpenGL debug message\n. Source is ");
+		std::string sourceMessage;
+		std::string severityMessage;
+		std::string typeMessage;
+
 		switch (source)
 		{
 		case GL_DEBUG_SOURCE_API:
-			debugMessage += "OpenGL API.";
+			sourceMessage = "OpenGL API.";
 			break;
 
 		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-			debugMessage += "Windowing System API.";
+			sourceMessage = "Windowing System API.";
 			break;
 
 		case GL_DEBUG_SOURCE_SHADER_COMPILER:
-			debugMessage += "Shader Compiler.";
+			sourceMessage = "Shader Compiler.";
 			break;
 
 		case GL_DEBUG_SOURCE_THIRD_PARTY:
-			debugMessage += "Third Party Application associated with OpenGL.";
+			sourceMessage = "Third Party Application associated with OpenGL.";
 			break;
 
 		case GL_DEBUG_SOURCE_APPLICATION:
-			debugMessage += "User of this Application.";
+			sourceMessage = "User of this Application.";
 			break;
 
 		case GL_DEBUG_SOURCE_OTHER:
-			debugMessage += "Other.";
+			sourceMessage = "Other.";
 			break;
 		}
 
-		debugMessage += "\nType is ";
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			debugMessage += "API Error.";
+			typeMessage = "API Error.";
 			break;
 
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			debugMessage += "Deprecated Behavior Used.";
+			typeMessage = "Deprecated Behavior Used.";
 			break;
 
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			debugMessage += "Undefined Behavior.";
+			typeMessage = "Undefined Behavior.";
 			break;
 
 		case GL_DEBUG_TYPE_PORTABILITY:
-			debugMessage += "Non-Portable Functionality Used.";
+			typeMessage = "Non-Portable Functionality Used.";
 			break;
 
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			debugMessage += "Code Performance Issue.";
+			typeMessage = "Code Performance Issue.";
 			break;
 
 		case GL_DEBUG_TYPE_MARKER:
-			debugMessage += "Marker.";
+			typeMessage = "Marker.";
 			break;
 
 		case GL_DEBUG_TYPE_PUSH_GROUP:
-			debugMessage += "Group Pushing.";
+			typeMessage = "Group Pushing.";
 			break;
 
 		case GL_DEBUG_TYPE_POP_GROUP:
-			debugMessage += "Group Popping";
+			typeMessage = "Group Popping";
 			break;
 
 		case GL_DEBUG_TYPE_OTHER:
-			debugMessage += "Other.";
+			typeMessage = "Other.";
 			break;
 		}
 
-		debugMessage += "\nSeverity is ";
 		switch (severity)
 		{
 		case GL_DEBUG_SEVERITY_HIGH:
-			debugMessage += "High.";
+			severityMessage = "High.";
 			break;
 
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			debugMessage += "Medium.";
+			severityMessage = "Medium.";
 			break;
 
 		case GL_DEBUG_SEVERITY_LOW:
-			debugMessage += "Low.";
+			severityMessage = "Low.";
 			break;
 
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
-			debugMessage += "Notification.";
+			severityMessage = "Notification.";
 			break;
 		}
 
-		ENGINE_LOG_DEBUG(debugMessage);
-		ENGINE_LOG_DEBUG(message);
+		ENGINE_LOG_DEBUG("OpenGL debug message: Source is {0}. Type is {1}. Severity is {2}", sourceMessage, typeMessage, severityMessage);
+		ENGINE_LOG_DEBUG("OpenGL debug message: {0}", message);
+		ENGINE_LOG_DEBUG("OpenGL debug message: User params are {0}", message);
 	}
 
 	void CheckOpenGlShaderCompilerErrors(const unsigned int shaderId)

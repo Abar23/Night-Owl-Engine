@@ -46,7 +46,7 @@ namespace NightOwl::Graphics
 	{
 		if(vertexDataSize != 0)
 		{
-			ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), std::format("Vertex buffer does not contain a vertex buffer data definition at index {0}", index));
+			ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), "Vertex buffer does not contain a vertex buffer data definition at index {0}", index);
 
 			const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
 

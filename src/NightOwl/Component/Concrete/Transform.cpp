@@ -247,7 +247,7 @@ namespace NightOwl::Component
 
 	Transform* Transform::GetChildAtIndex(int index) const
 	{
-		ENGINE_ASSERT(index < children.size(), std::format("Transform does not have child at index {0}", index));
+		ENGINE_ASSERT(index < children.size(), "Transform does not have child at index {0}", index);
 
 		return children[index];
 	}
