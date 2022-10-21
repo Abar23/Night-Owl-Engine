@@ -15,8 +15,7 @@ int main()
 	// Standup necessary systems
 	NightOwl::Utility::LoggerManager::Init();
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
-
-	NightOwl::Input::Input input;
+	NightOwl::Input::Input::Init();
 
 	// Create textures
 	const auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
@@ -129,11 +128,10 @@ int main()
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 
-		std::cout << input.GetScrollDelta() << std::endl;
-		ENGINE_LOG_INFO("{0}", NightOwl::Math::Vec4F(2).ToString());
 		// Update scene graph
 		scene.Update();
-		input.Update();
+
+		NightOwl::Input::Input::Update();
 
 		quadMeshRenderer->Draw();
 		cube2MeshRenderer->Draw();
