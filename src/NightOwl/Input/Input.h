@@ -5,6 +5,7 @@
 #include "NightOwl/Input/InputAction.h"
 #include "NightOwl/Input/MouseButton.h"
 #include <mutex>
+#include <memory>
 
 namespace NightOwl::Input
 {
@@ -16,8 +17,6 @@ namespace NightOwl::Input
 		void operator=(const Input& other) = delete;
 
 		static void Update();
-
-		static Input* GetInstance();
 
 		static void Init();
 
@@ -42,7 +41,9 @@ namespace NightOwl::Input
 	private:
 		Input();
 
-		static Input* inputInstance;
+		static Input* GetInstance();
+
+		static std::unique_ptr<Input> inputInstance;
 
 		static std::mutex mutexLock;
 

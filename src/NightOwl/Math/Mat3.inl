@@ -92,14 +92,14 @@ namespace NightOwl::Math
 		const Vec3<T> c = reinterpret_cast<const Vec3<T>&>(data[2]);
 
 		Vec3<T> bCrossC = Vec3<T>::Cross(b, c);
-		Vec3<T> cCrossa = Vec3<T>::Cross(c, a);
-		Vec3<T> aCrossb = Vec3<T>::Cross(a, b);
+		Vec3<T> cCrossA = Vec3<T>::Cross(c, a);
+		Vec3<T> aCrossB = Vec3<T>::Cross(a, b);
 
-		T inverseDet = static_cast<T>(1) / Vec3<T>::Dot(aCrossb, c);
+		T inverseDet = static_cast<T>(1) / Vec3<T>::Dot(aCrossB, c);
 
 		return Mat3<T>(bCrossC.x * inverseDet, bCrossC.y * inverseDet, bCrossC.z * inverseDet,
-			cCrossa.x * inverseDet, cCrossa.y * inverseDet, cCrossa.z * inverseDet,
-			aCrossb.x * inverseDet, aCrossb.y * inverseDet, aCrossb.z * inverseDet);
+			cCrossA.x * inverseDet, cCrossA.y * inverseDet, cCrossA.z * inverseDet,
+			aCrossB.x * inverseDet, aCrossB.y * inverseDet, aCrossB.z * inverseDet);
 	}
 
 	template <typename T>

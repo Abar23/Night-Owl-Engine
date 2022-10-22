@@ -6,7 +6,7 @@ namespace NightOwl::Input
 {
 	using namespace std::placeholders;
 
-	Input* Input::inputInstance{ nullptr };
+	std::unique_ptr<Input> Input::inputInstance{nullptr};
 	std::mutex Input::mutexLock;
 
 	Input::Input()
@@ -28,9 +28,9 @@ namespace NightOwl::Input
 		std::lock_guard lock(mutexLock);
 		if(inputInstance == nullptr)
 		{
-			inputInstance = new Input();
+			inputInstance = std::unique_ptr<Input>(new Input());
 		}
-		return inputInstance;
+		return inputInstance.get();
 	}
 
 	void Input::Init()
