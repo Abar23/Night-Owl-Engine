@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 // NEED TO CLEAN UP LOGIC, KINDA NASTY
 namespace NightOwl::Component
@@ -9,6 +10,7 @@ namespace NightOwl::Component
 		  localModelMatrix(1.0f),
 	      worldMatrix(1.0f),
 		  parentLocalMatrix(1.0f),
+		  inverseOfOriginalParentLocalModelMatrix(1.0f),
 		  localScale(1.0f),
 		  worldScale(1.0f),
 		  root(this),
@@ -54,6 +56,8 @@ namespace NightOwl::Component
 		{
 			localEulerAngles += eulers;
 
+			RestrictEulerAngles(localEulerAngles);
+
 			localRotation = Math::QuatF::MakeRotationFromEulers(eulers) * localRotation;
 
 			localRotation.Renormalize();
@@ -64,6 +68,8 @@ namespace NightOwl::Component
 		else if (space == Space::World)
 		{
 			worldEulerAngles += eulers;
+
+			RestrictEulerAngles(localEulerAngles);
 
 			worldRotation = Math::QuatF::MakeRotationFromEulers(eulers) * worldRotation;
 
@@ -164,30 +170,53 @@ namespace NightOwl::Component
 
 	void Transform::SetParent(Transform* parentTransform)
 	{
-		parent = parentTransform;
-		parent->SetChild(*this);
-		
-		for (const auto& childTransform : parentTransform->children)
+		if(parentTransform != nullptr && parentTransform != parent)
 		{
-			childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
+			parent = parentTransform;
+			parent->SetChild(*this);
+			inverseOfOriginalParentLocalModelMatrix = parent->GetWorldMatrix().GetInverse();
+			for (const auto& childTransform : parentTransform->children)
+			{
+				childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
+			}
 		}
+
+		// What to do when parent exists and parenting to new object
 	}
 
 	Transform* Transform::RemoveParent()
 	{
-		Transform* parentBeingRemoved = parent;
+		Transform* parentBeingRemoved = nullptr;
 
-		int indexOfChildToRemove;
-		for (indexOfChildToRemove = 0; indexOfChildToRemove < parent->children.size(); indexOfChildToRemove++)
+		if(parent != nullptr)
 		{
-			if (this == parent->children[indexOfChildToRemove]) break;
+			parentBeingRemoved = parent;
+
+			// Remove this object from parent children list and null out parent pointer
+			int indexOfChildToRemove;
+			for (indexOfChildToRemove = 0; indexOfChildToRemove < parent->children.size(); indexOfChildToRemove++)
+			{
+				if (this == parent->children[indexOfChildToRemove]) break;
+			}
+			parent->children.erase(parent->children.begin() + indexOfChildToRemove);
+			parent = nullptr;
+
+			// Since parent is being removed, save off the current rotation, scale, and position that as been given to the object
+			localPosition = worldMatrix.GetTranslation();
+			localScale = worldMatrix.GetScale();
+			localRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+			localRotation.Normalize();
+			localEulerAngles = localRotation.GetEulerAngles();
+			isLocalDirty = true;
+
+			// Reset world data since parent has been lost. In this case Local = World
+			worldPosition = Math::Vec3F();
+			worldScale = Math::Vec3F(1.0);
+			worldEulerAngles = Math::Vec3F();
+			worldRotation = Math::QuatF();
+			parentLocalMatrix = Math::Mat4F::Identity();
+			inverseOfOriginalParentLocalModelMatrix = Math::Mat4F::Identity();
 		}
-		parent->children.erase(parent->children.begin() + indexOfChildToRemove);
-
-		parent = nullptr;
-
-		parentLocalMatrix = Math::Mat4F::Identity();
-
 		return parentBeingRemoved;
 	}
 
@@ -227,15 +256,15 @@ namespace NightOwl::Component
 
 			if(parent != nullptr)
 			{
-				const Math::Mat4F parentChildCombined = parentLocalMatrix * GetLocalModelMatrix();
+				const Math::Mat4F parentChildCombined = parentLocalMatrix * inverseOfOriginalParentLocalModelMatrix * GetLocalModelMatrix();
 
 				const Math::Mat4F parentChildCombinedTranslation = Math::Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
 
-				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse()* parentChildCombined;
+				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
 			}
 			else
 			{
-				worldMatrix =  GetLocalModelMatrix() * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix;
+				worldMatrix =  translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * GetLocalModelMatrix();
 			}
 
 			isWorldDirty = false;
@@ -283,14 +312,13 @@ namespace NightOwl::Component
 	{
 		for (float& angle : eulerAngles.data)
 		{
-			
+			angle = std::min(std::max(angle, 360.0f), -360.0f);
 		}
 	}
 
 	Math::Vec3F Transform::GetWorldScale()
 	{
-		Math::Vec3F combinedScale(localScale.x * worldScale.x, localScale.y * worldScale.y, localScale.z * worldScale.z);
-		return combinedScale;
+		return worldMatrix.GetScale();
 	}
 
 	void Transform::SetWorldScale(const Math::Vec3F& worldScale)
@@ -300,7 +328,9 @@ namespace NightOwl::Component
 
 	Math::Vec3F Transform::GetWorldEulerAngles() const
 	{
-		return worldEulerAngles + localEulerAngles;
+		Math::QuatF rotation;
+		rotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+		return rotation.GetEulerAngles();
 	}
 
 	void Transform::SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles)

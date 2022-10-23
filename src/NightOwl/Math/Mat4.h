@@ -43,8 +43,10 @@ namespace NightOwl::Math
 		void SetRow(const int rowIndex, const Vec4<T>& vector);
 		Vec3<T> GetTranslation() const;
 		void SetTranslation(const Vec3<T>& translation);
+		Vec3<T> GetScale();
 		Mat4<T> GetAffineMatrix() const;
 		Mat4<T> GetNormalMatrix() const;
+		Mat3<T> GetRotationMatrix() const;
 		const T* GetValuePointer() const;
 
 		static Mat4<T> MakeRotationX(const T angleInDegrees);

@@ -275,7 +275,19 @@ namespace NightOwl::Math
 	template <typename T>
 	void Mat4<T>::SetTranslation(const Vec3<T>& translation)
 	{
-		columns[3] = translation;
+		columns[3].x = translation.x;
+		columns[3].y = translation.y;
+		columns[3].z = translation.z;
+	}
+
+	template <typename T>
+	Vec3<T> Mat4<T>::GetScale()
+	{
+		T xScale = std::sqrt(data[0][0] * data[0][0] + data[1][0] * data[1][0] + data[2][0] * data[2][0]);
+		T yScale = std::sqrt(data[0][1] * data[0][1] + data[1][1] * data[1][1] + data[2][1] * data[2][1]);
+		T zScale = std::sqrt(data[0][2] * data[0][2] + data[1][2] * data[1][2] + data[2][2] * data[2][2]);
+
+		return Vec3<T>(xScale, yScale, zScale);
 	}
 
 	template <typename T>
@@ -291,6 +303,26 @@ namespace NightOwl::Math
 	Mat4<T> Mat4<T>::GetNormalMatrix() const
 	{
 		return GetAffineMatrix().GetInverse().GetTranspose();
+	}
+
+	template <typename T>
+	Mat3<T> Mat4<T>::GetRotationMatrix() const
+	{
+		Mat3<T> rotationMatrix;
+
+		rotationMatrix.data[0][0] = data[0][0];
+		rotationMatrix.data[1][0] = data[1][0];
+		rotationMatrix.data[2][0] = data[2][0];
+
+		rotationMatrix.data[0][1] = data[0][1];
+		rotationMatrix.data[1][1] = data[1][1];
+		rotationMatrix.data[2][1] = data[2][1];
+
+		rotationMatrix.data[0][2] = data[0][2];
+		rotationMatrix.data[1][2] = data[1][2];
+		rotationMatrix.data[2][2] = data[2][2];
+
+		return rotationMatrix;
 	}
 
 	template<typename T>

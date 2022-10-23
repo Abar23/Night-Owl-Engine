@@ -3,6 +3,7 @@
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/Component/Materials/IMaterial.h"
 #include "NightOwl/Core/Application/Scene.h"
+#include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 #include "NightOwl/Graphics/RenderApi.h"
@@ -16,6 +17,7 @@ int main()
 	NightOwl::Utility::LoggerManager::Init();
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
 	NightOwl::Input::Input::Init();
+	NightOwl::Core::Time::Init();
 
 	// Create textures
 	const auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
@@ -68,9 +70,8 @@ int main()
 	quat.GetEulerAngles();
 	//Add camera to scene
 	NightOwl::GameObject::GameObject& camera = scene.AddGameObject("Camera");
-	NightOwl::Component::Camera *cameraComponent = camera.AddComponent<NightOwl::Component::Camera>();
-	cameraComponent->SetPerspectiveMode(false);
-	cameraComponent->SetOrthographicSize(4);
+	NightOwl::Component::Camera* cameraComponent = camera.AddComponent<NightOwl::Component::Camera>();
+	camera.GetTransform()->Translate(0, 0, -10, NightOwl::Component::Space::World);
 
 	// Add quads to scene with corresponding mesh data
 	NightOwl::GameObject::GameObject& quad = scene.AddGameObject("Cube");
@@ -101,32 +102,49 @@ int main()
 
 	// Position objects in the scene
 	quad.GetTransform()->SetParent(quad2.GetTransform());
+	quad.GetTransform()->Scale(3, 3, 3, NightOwl::Component::Space::Local);
 	quad3.GetTransform()->SetParent(quad.GetTransform());
 
 	camera.GetTransform()->Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
 
 
-	quad.GetTransform()->Translate(2.5, 0, 0, NightOwl::Component::Space::Local);
-	quad.GetTransform()->Scale(1, 1, 1, NightOwl::Component::Space::World);
+	quad.GetTransform()->Translate(4.5, 0, 0, NightOwl::Component::Space::Local);
 	quad3.GetTransform()->Translate(2, 0, 0, NightOwl::Component::Space::Local);
 
 	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-	quad.GetTransform()->Rotate(10, 10, 0, NightOwl::Component::Space::Local);
-	quad.GetTransform()->Rotate(0, -11, 0, NightOwl::Component::Space::Local);
-	quad.GetTransform()->Rotate(0, 0, 0, NightOwl::Component::Space::Local);
-
-
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
+		std::cout << NightOwl::Core::Time::GetElapsedTime() << std::endl;
+		std::cout << "Delta: " << NightOwl::Core::Time::GetDeltaTime() << std::endl;
+		std::cout << NightOwl::Core::Time::GetFrameCount() << std::endl;
 		quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		quad2.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
+		//quad2.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
 		//std::cout << quad3.GetTransform()->GetWorldScale() << std::endl;
 		//std::cout << quad3.GetTransform()->GetWorldEulerAngles() << std::endl;
 		//std::cout << quad3.GetTransform()->GetWorldPosition() << std::endl;
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
+
+		if(NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyUp))
+		{
+			quad3.GetTransform()->Translate(0, 0.01, 0, NightOwl::Component::Space::Local);
+		}
+
+		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyDown))
+		{
+			quad3.GetTransform()->Translate(0, 0.01, 0, NightOwl::Component::Space::World);
+		}
+
+		if (NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeyP))
+		{
+			quad3.GetTransform()->SetParent(quad.GetTransform());
+		}
+
+		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyU))
+		{
+			quad3.GetTransform()->RemoveParent();
+		}
 
 		// Update scene graph
 		scene.Update();
@@ -138,6 +156,7 @@ int main()
 		quad3MeshRenderer->Draw();
 
 		NightOwl::Window::WindowApi::GetWindow()->Update();
+		NightOwl::Core::Time::Update();
 	}
 		
 	return 0;

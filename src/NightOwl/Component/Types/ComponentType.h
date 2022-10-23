@@ -10,10 +10,11 @@ namespace NightOwl::Component
 		Transform,
 		MeshRenderer,
 		Camera,
+		RigidBody2D,
 		OwlBehavior
 	};
 
-	inline const std::string& ComponentTypeToString(ComponentType type)
+	inline const std::string ComponentTypeToString(ComponentType type)
 	{
 		switch (type)
 		{
@@ -25,6 +26,9 @@ namespace NightOwl::Component
 
 		case ComponentType::Camera:
 			return std::string{ "Camera" };
+
+		case ComponentType::RigidBody2D:
+			return std::string{ "RigidBody2D" };
 
 		case ComponentType::OwlBehavior:
 			return std::string{ "OwlBehavior" };

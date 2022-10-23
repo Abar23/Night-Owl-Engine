@@ -86,6 +86,8 @@ namespace NightOwl::Component
 
 		Math::Mat4F parentLocalMatrix;
 
+		Math::Mat4F inverseOfOriginalParentLocalModelMatrix;
+
 		std::vector<Transform*> children;
 
 		Math::Vec3F localScale;
