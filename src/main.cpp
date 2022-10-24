@@ -10,6 +10,10 @@
 #include "NightOwl/Window/WindowApi.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Input/Input.h"
+#include "NightOwl/Physics/2D/PhysicsEngine2D.h"
+#include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
+#include "NightOwl/Physics/2D/Collider/AABBBoxCollider2D.h"
+#include "NightOwl/Physics/2D/Collider/CircleCollider2D.h"
 
 int main()
 {
@@ -18,6 +22,8 @@ int main()
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
 	NightOwl::Input::Input::Init();
 	NightOwl::Core::Time::Init();
+	NightOwl::Physics::PhysicsEngine2D engine;
+	NightOwl::Core::PhysicsEngine2DLocator::Provide(&engine);
 
 	// Create textures
 	const auto ofMonstersAndMenTexture = NightOwl::Graphics::RenderApi::CreateTexture2D("./assets/Textures/Of_Monsters_And_Men.jpg");
@@ -82,7 +88,11 @@ int main()
 	mesh->SetColors(colors);
 	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
-
+	auto quadRigidBody2D = quad.AddComponent<NightOwl::Component::RigidBody2D>();
+	quadRigidBody2D->SetMass(1.0f);
+	NightOwl::Physics::Collider2D* aabbCollider = new NightOwl::Physics::AABBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(0.5, 0.5));
+	quadRigidBody2D->SetCollider(aabbCollider);
+	
 	NightOwl::GameObject::GameObject& quad2 = scene.AddGameObject("Cube2");
 	auto cube2MeshRenderer = quad2.AddComponent<NightOwl::Component::MeshRenderer>();
 	cube2MeshRenderer->GetMaterial()->SetTexture(theLastOfUsTexture);
@@ -99,41 +109,49 @@ int main()
 	mesh->SetVertices(smallQuad);
 	mesh->SetColors(colors);
 	mesh->SetTriangles(triangles);
+	auto quad3RigidBody2D = quad3.AddComponent<NightOwl::Component::RigidBody2D>();
+	quad3RigidBody2D->SetMass(1.0f);
+	aabbCollider = new NightOwl::Physics::CircleCollider2D(NightOwl::Math::Vec2F(0, 0), 2.5);
+	quad3RigidBody2D->SetCollider(aabbCollider);
 
 	// Position objects in the scene
 	quad.GetTransform()->SetParent(quad2.GetTransform());
 	quad.GetTransform()->Scale(3, 3, 3, NightOwl::Component::Space::Local);
 	quad3.GetTransform()->SetParent(quad.GetTransform());
 
-	camera.GetTransform()->Translate(0, 0, -3.5, NightOwl::Component::Space::Local);
-
+	camera.GetTransform()->Translate(0, 0, 20, NightOwl::Component::Space::Local);
 
 	quad.GetTransform()->Translate(4.5, 0, 0, NightOwl::Component::Space::Local);
-	quad3.GetTransform()->Translate(2, 0, 0, NightOwl::Component::Space::Local);
+	quad3.GetTransform()->Translate(4, 0, 0, NightOwl::Component::Space::Local);
 
 	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
-		std::cout << NightOwl::Core::Time::GetElapsedTime() << std::endl;
-		std::cout << "Delta: " << NightOwl::Core::Time::GetDeltaTime() << std::endl;
-		std::cout << NightOwl::Core::Time::GetFrameCount() << std::endl;
-		quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
-		//quad2.GetTransform()->Rotate(0, 1, 0, NightOwl::Component::Space::World);
-		//std::cout << quad3.GetTransform()->GetWorldScale() << std::endl;
-		//std::cout << quad3.GetTransform()->GetWorldEulerAngles() << std::endl;
-		//std::cout << quad3.GetTransform()->GetWorldPosition() << std::endl;
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
 
 		if(NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyUp))
 		{
-			quad3.GetTransform()->Translate(0, 0.01, 0, NightOwl::Component::Space::Local);
+			//quad3.GetTransform()->Translate(-0.01, 0, 0, NightOwl::Component::Space::Local);
+			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Up() * 1000.0f);
 		}
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyDown))
 		{
-			quad3.GetTransform()->Translate(0, 0.01, 0, NightOwl::Component::Space::World);
+			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
+			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Down() * 1000.0f);
+		}
+
+		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyRight))
+		{
+			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
+			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Right() * 1000.0f);
+		}
+
+		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyLeft))
+		{
+			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
+			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Left() * 1000.0f);
 		}
 
 		if (NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeyP))
@@ -146,8 +164,14 @@ int main()
 			quad3.GetTransform()->RemoveParent();
 		}
 
+		if (NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeySpace))
+		{
+			quad3.GetTransform()->SetRotation(NightOwl::Math::QuatF::MakeRotationY(0));
+		}
+
 		// Update scene graph
 		scene.Update();
+		engine.Update();
 
 		NightOwl::Input::Input::Update();
 

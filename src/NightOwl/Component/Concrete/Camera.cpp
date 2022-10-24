@@ -21,7 +21,7 @@ namespace NightOwl::Component
 
 	void Camera::LookAt(Math::Vec3F pointToLookAt)
 	{
-		Math::Mat4F::LookAt(gameObject->GetTransform()->GetWorldPosition(), pointToLookAt, Math::Vec3F::Up());
+		Math::Mat4F::LookAt(gameObject->GetTransform()->GetPosition(), pointToLookAt, Math::Vec3F::Up());
 	}
 
 	Math::Mat4F Camera::ViewProjectionMatrix()
@@ -45,7 +45,7 @@ namespace NightOwl::Component
 
 	const Math::Mat4F& Camera::GetViewMatrix()
 	{
-		return gameObject->GetTransform()->GetWorldMatrix();// .GetInverse();
+		return gameObject->GetTransform()->GetWorldMatrix().GetInverse();
 	}
 
 	const Math::Mat4F& Camera::GetViewMatrix() const

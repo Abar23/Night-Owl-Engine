@@ -2,7 +2,7 @@
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/GameObject/GameObject.h"
 
-// NEED TO CLEAN UP LOGIC, KINDA NASTY
+// NEED TO CLEAN UP LOGIC, KINDA NASTY!!!!!!!!!!
 namespace NightOwl::Component
 {
 	Transform::Transform()
@@ -12,7 +12,7 @@ namespace NightOwl::Component
 		  parentLocalMatrix(1.0f),
 		  inverseOfOriginalParentLocalModelMatrix(1.0f),
 		  localScale(1.0f),
-		  worldScale(1.0f),
+		  worldScaleOffset(1.0f),
 		  root(this),
 		  parent(nullptr),
 		  isLocalDirty(false),
@@ -37,7 +37,7 @@ namespace NightOwl::Component
 		}
 		else if (space == Space::World)
 		{
-			worldScale += scale;
+			worldScaleOffset += scale;
 
 			SetWorldDirtyFlag();
 		}
@@ -54,10 +54,6 @@ namespace NightOwl::Component
 	{
 		if (parent == nullptr || space == Space::Local)
 		{
-			localEulerAngles += eulers;
-
-			RestrictEulerAngles(localEulerAngles);
-
 			localRotation = Math::QuatF::MakeRotationFromEulers(eulers) * localRotation;
 
 			localRotation.Renormalize();
@@ -67,11 +63,7 @@ namespace NightOwl::Component
 		}
 		else if (space == Space::World)
 		{
-			worldEulerAngles += eulers;
-
-			RestrictEulerAngles(localEulerAngles);
-
-			worldRotation = Math::QuatF::MakeRotationFromEulers(eulers) * worldRotation;
+			worldRotationOffset = Math::QuatF::MakeRotationFromEulers(eulers) * worldRotationOffset;
 
 			SetWorldDirtyFlag();
 		}
@@ -122,19 +114,19 @@ namespace NightOwl::Component
 
 	const Math::Vec3F& Transform::GetLocalEulerAngles()
 	{
-		return localEulerAngles;
+		return localRotation.GetEulerAngles();
 	}
 
 	void Transform::SetLocalEulerAngles(float angleX, float angleY, float angleZ)
 	{
-		localEulerAngles = Math::Vec3F(angleX, angleY, angleZ);
+		localRotation = Math::QuatF::MakeRotationFromEulers(Math::Vec3F(angleX, angleY, angleZ));
 
 		SetLocalDirtyFlag();
 	}
 
 	void Transform::SetLocalEulerAngles(const Math::Vec3F& eulers)
 	{
-		localEulerAngles = eulers;
+		localRotation = Math::QuatF::MakeRotationFromEulers(eulers);
 
 		SetLocalDirtyFlag();
 	}
@@ -202,18 +194,16 @@ namespace NightOwl::Component
 			parent = nullptr;
 
 			// Since parent is being removed, save off the current rotation, scale, and position that as been given to the object
-			localPosition = worldMatrix.GetTranslation();
+ 			localPosition = worldMatrix.GetTranslation();
 			localScale = worldMatrix.GetScale();
 			localRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
 			localRotation.Normalize();
-			localEulerAngles = localRotation.GetEulerAngles();
 			isLocalDirty = true;
 
 			// Reset world data since parent has been lost. In this case Local = World
 			worldPosition = Math::Vec3F();
-			worldScale = Math::Vec3F(1.0);
-			worldEulerAngles = Math::Vec3F();
-			worldRotation = Math::QuatF();
+			worldScaleOffset = Math::Vec3F(1.0);
+			worldRotationOffset = Math::QuatF();
 			parentLocalMatrix = Math::Mat4F::Identity();
 			inverseOfOriginalParentLocalModelMatrix = Math::Mat4F::Identity();
 		}
@@ -235,6 +225,7 @@ namespace NightOwl::Component
 
 			localModelMatrix = translationMatrix * localRotation.GetRotationMatrix() * scaleMatrix;
 
+			// CLean up tomorrow
 			if(parent == nullptr)
 			{
 				worldMatrix = localModelMatrix;
@@ -252,7 +243,7 @@ namespace NightOwl::Component
 		{
 			const Math::Mat4F translationMatrix = Math::Mat4F::MakeTranslation(worldPosition);
 
-			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(worldScale);
+			const Math::Mat4F scaleMatrix = Math::Mat4F::MakeScale(worldScaleOffset);
 
 			if(parent != nullptr)
 			{
@@ -260,11 +251,12 @@ namespace NightOwl::Component
 
 				const Math::Mat4F parentChildCombinedTranslation = Math::Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
 
-				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotationOffset.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
 			}
 			else
 			{
-				worldMatrix =  translationMatrix * worldRotation.GetRotationMatrix() * scaleMatrix * GetLocalModelMatrix();
+				// Clean up tomorrow!
+				worldMatrix =  GetLocalModelMatrix() * translationMatrix * worldRotationOffset.GetRotationMatrix() * scaleMatrix;
 			}
 
 			isWorldDirty = false;
@@ -308,45 +300,43 @@ namespace NightOwl::Component
 		SetWorldDirtyFlag();
 	}
 
-	void Transform::RestrictEulerAngles(Math::Vec3F& eulerAngles)
+	Math::QuatF Transform::GetRotation() const
 	{
-		for (float& angle : eulerAngles.data)
-		{
-			angle = std::min(std::max(angle, 360.0f), -360.0f);
-		}
+		Math::QuatF currentWorldRotation;
+		currentWorldRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+		return currentWorldRotation;
 	}
 
-	Math::Vec3F Transform::GetWorldScale()
+	void Transform::SetRotation(const Math::QuatF& newRotation)
 	{
-		return worldMatrix.GetScale();
+		Math::QuatF currentWorldRotation;
+		currentWorldRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+		// Apply current world rotation offset to the inverse of the total rotations on the object, then apply desired rotation.
+		// Need to multiply by the world rotation offset since it will have the inverse of all rotation in it once this function has run.
+		this->worldRotationOffset = newRotation * currentWorldRotation.Inverse() * worldRotationOffset;
+		this->worldRotationOffset.Normalize();
+		isWorldDirty = true;
 	}
 
-	void Transform::SetWorldScale(const Math::Vec3F& worldScale)
-	{
-		this->worldScale = worldScale;
-	}
-
-	Math::Vec3F Transform::GetWorldEulerAngles() const
-	{
-		Math::QuatF rotation;
-		rotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
-		return rotation.GetEulerAngles();
-	}
-
-	void Transform::SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles)
-	{
-		this->worldEulerAngles = worldEulerAngles;
-		worldRotation = Math::QuatF::MakeRotationFromEulers(worldEulerAngles);
-	}
-
-	Math::Vec3F Transform::GetWorldPosition() const
+	Math::Vec3F Transform::GetPosition() const
 	{
 		return worldMatrix.GetTranslation();
 	}
 
-	void Transform::SetWorldPosition(const Math::Vec3F& worldPosition)
+	void Transform::SetPosition(const Math::Vec3F& worldPosition)
 	{
-		this->worldPosition = worldPosition;
+		if(parent != nullptr)
+		{
+			// Add to the local position the world offset of the desired position coming in
+			Math::Vec3F worldOffset = worldPosition - GetPosition();
+			// Apply rotation to the offset so that it is aligned with the local position axes
+			localPosition += GetWorldMatrix().GetRotationMatrix() * localModelMatrix.GetRotationMatrix().Inverted() * worldOffset;
+		}
+		else
+		{
+			localPosition = worldPosition;
+		}
+		isLocalDirty = true;
 	}
 
 	bool Transform::HasParent() const

@@ -11,6 +11,7 @@ namespace NightOwl::Component
 		MeshRenderer,
 		Camera,
 		RigidBody2D,
+		AABBBoxCollider2D,
 		OwlBehavior
 	};
 
@@ -29,6 +30,9 @@ namespace NightOwl::Component
 
 		case ComponentType::RigidBody2D:
 			return std::string{ "RigidBody2D" };
+
+		case ComponentType::AABBBoxCollider2D:
+			return std::string{ "AABBBoxCollider2D" };
 
 		case ComponentType::OwlBehavior:
 			return std::string{ "OwlBehavior" };

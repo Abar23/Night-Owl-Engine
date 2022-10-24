@@ -116,6 +116,16 @@ namespace NightOwl::Math
 			return leftVectorCopy -= rightVector;
 		}
 
+		friend Vec2<T> operator*(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
+		{
+			Vec2<T> result;
+
+			result.x = leftVector.x * rightVector.x;
+			result.y = leftVector.y * rightVector.y;
+
+			return result;
+		}
+
 		friend Vec2<T> operator*(const Vec2<T>& vector, const T scalar)
 		{
 			Vec2<T> vectorCopy = vector;

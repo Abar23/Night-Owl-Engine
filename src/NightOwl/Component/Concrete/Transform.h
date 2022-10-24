@@ -63,17 +63,13 @@ namespace NightOwl::Component
 
 		Transform* GetChildAtIndex(int index) const;
 
-		Math::Vec3F GetWorldScale();
+		Math::QuatF GetRotation() const;
 
-		void SetWorldScale(const Math::Vec3F& worldScale);
+		void SetRotation(const Math::QuatF& newRotation);
 
-		Math::Vec3F GetWorldEulerAngles() const;
+		Math::Vec3F GetPosition() const;
 
-		void SetWorldEulerAngles(const Math::Vec3F& worldEulerAngles);
-
-		Math::Vec3F GetWorldPosition() const;
-
-		void SetWorldPosition(const Math::Vec3F& worldPosition);
+		void SetPosition(const Math::Vec3F& worldPosition);
 
 		bool HasParent() const;
 
@@ -92,17 +88,13 @@ namespace NightOwl::Component
 
 		Math::Vec3F localScale;
 
-		Math::Vec3F localEulerAngles;
-
 		Math::QuatF localRotation;
 
 		Math::Vec3F localPosition;
 
-		Math::Vec3F worldScale;
+		Math::Vec3F worldScaleOffset;
 
-		Math::Vec3F worldEulerAngles;
-
-		Math::QuatF worldRotation;
+		Math::QuatF worldRotationOffset;
 
 		Math::Vec3F worldPosition;
 

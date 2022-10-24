@@ -1,4 +1,5 @@
 #include "RigidBody2D.h"
+#include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
 
 namespace NightOwl::Component
 {
@@ -6,9 +7,24 @@ namespace NightOwl::Component
 		:	Component(ComponentType::RigidBody2D),
 			rotation(0.0f),
 			mass(0.0f),
-			inverseMass(0.0f)
+			inverseMass(0.0f),
+			position(0.0f),
+			linearVelocity(0.0f),
+			accumulatedForces(0.0f),
+			collider(nullptr)
 	{
 		this->gameObject = gameObject;
+		Core::PhysicsEngine2DLocator::GetPhysicsEngine2D()->AddRigidBody2D(this);
+	}
+
+	RigidBody2D::~RigidBody2D()
+	{
+		Core::PhysicsEngine2DLocator::GetPhysicsEngine2D()->RemoveRigidBody2D(this);
+	}
+
+	void RigidBody2D::AddForce(Math::Vec2F forceVector)
+	{
+		accumulatedForces += forceVector;
 	}
 
 	Math::Vec2F RigidBody2D::GetVelocity() const
@@ -39,6 +55,7 @@ namespace NightOwl::Component
 	void RigidBody2D::SetMass(float mass)
 	{
 		this->mass = mass;
+		this->inverseMass = 1.0f / mass;
 	}
 
 	float RigidBody2D::GetInverseMass() const
@@ -46,8 +63,34 @@ namespace NightOwl::Component
 		return inverseMass;
 	}
 
-	void RigidBody2D::SetInverseMass(float inverseMass)
+	Math::Vec2F RigidBody2D::GetPosition() const
 	{
-		this->inverseMass = inverseMass;
+		return position;
+	}
+
+	void RigidBody2D::SetPosition(const Math::Vec2F& position)
+	{
+		this->position = position;
+	}
+
+	Math::Vec2F RigidBody2D::GetAccumulatedForces() const
+	{
+		return accumulatedForces;
+	}
+
+	void RigidBody2D::ClearForces()
+	{
+		accumulatedForces = Math::Vec2F(0.0f);
+	}
+
+	Physics::Collider2D* RigidBody2D::GetCollider()
+	{
+		return collider.get();
+	}
+
+	void RigidBody2D::SetCollider(Physics::Collider2D* collider)
+	{
+		this->collider = std::shared_ptr<Physics::Collider2D>(collider);
+		this->collider->rigidBody2D = this;
 	}
 }

@@ -2,6 +2,8 @@
 
 #include "NightOwl/Component/Component.h"
 #include "NightOwl/Math/Vec2.h"
+#include "NightOwl/Physics/2D/Collider/Collider2D.h"
+#include <memory>
 
 namespace NightOwl::Component
 {
@@ -9,6 +11,10 @@ namespace NightOwl::Component
 	{
 	public:
 		RigidBody2D(GameObject::GameObject* gameObject);
+
+		~RigidBody2D() override;
+
+		void AddForce(Math::Vec2F forceVector);
 
 		Math::Vec2F GetVelocity() const;
 
@@ -24,7 +30,17 @@ namespace NightOwl::Component
 
 		float GetInverseMass() const;
 
-		void SetInverseMass(float inverseMass);
+		Math::Vec2F GetPosition() const;
+
+		void SetPosition(const Math::Vec2F& position);
+
+		Math::Vec2F GetAccumulatedForces() const;
+
+		void ClearForces();
+
+		Physics::Collider2D* GetCollider();
+
+		void SetCollider(Physics::Collider2D* collider);
 
 	private:
 		Math::Vec2F velocity;
@@ -34,5 +50,13 @@ namespace NightOwl::Component
 		float mass;
 
 		float inverseMass;
+
+		Math::Vec2F position;
+
+		Math::Vec2F linearVelocity;
+
+		Math::Vec2F accumulatedForces;
+
+		std::shared_ptr<Physics::Collider2D> collider;
 	};
 }
