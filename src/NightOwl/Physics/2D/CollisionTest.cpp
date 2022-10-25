@@ -104,17 +104,26 @@ namespace NightOwl::Physics
 		Math::Mat3F colliderRotationMatrix = collider->GetOrientation().GetRotationMatrix();
 		Math::Vec2F colliderCenter = collider->GetCenterOfBoundingBox();
 		Math::Vec2F colliderHalfWidths = collider->GetHalfWidths();
-		Math::Vec2F rotateColliderHalfWidthsDifference = colliderHalfWidths - (colliderRotationMatrix * Math::Vec3F(colliderHalfWidths.x, colliderHalfWidths.y, 0.0f)).xy;
-		std::cout << rotateColliderHalfWidthsDifference << std::endl;
+		Math::Vec2F colliderNormals[2] = {
+			colliderRotationMatrix.GetColumn(0).xy * colliderHalfWidths,
+			colliderRotationMatrix.GetColumn(1).xy* colliderHalfWidths
+		};
+
+		colliderHalfWidths = Math::Vec2F(colliderRotationMatrix.GetColumn(0).x * colliderHalfWidths.x, colliderRotationMatrix.GetColumn(0).y * colliderHalfWidths.y);
+
 		Math::Mat3F otherColliderRotationMatrix = otherCollider->GetOrientation().GetRotationMatrix();
 		Math::Vec2F otherColliderCenter = otherCollider->GetCenterOfBoundingBox();
 		Math::Vec2F otherColliderHalfWidths = otherCollider->GetHalfWidths();
-		Math::Vec2F rotateOtherColliderHalfWidthsDifference = otherColliderHalfWidths - (otherColliderRotationMatrix * Math::Vec3F(otherColliderHalfWidths.x, otherColliderHalfWidths.y, 1.0f)).xy;
+		otherColliderHalfWidths = Math::Vec2F(otherColliderRotationMatrix.GetColumn(0).x * otherColliderHalfWidths.x, otherColliderRotationMatrix.GetColumn(0).y * otherColliderHalfWidths.y);
+		Math::Vec2F otherColliderNormals[2] = {
+			otherColliderRotationMatrix.GetColumn(0).xy * otherColliderHalfWidths,
+			otherColliderRotationMatrix.GetColumn(1).xy * otherColliderHalfWidths
+		};
 
 		// Test object 1 normals
 		for (int axisIndex = 0; axisIndex < 2; axisIndex++)
 		{
-			Math::Vec2F axisOfRotation = colliderRotationMatrix.GetColumn(axisIndex).xy;
+			Math::Vec2F axisOfRotation = colliderNormals[axisIndex];
 
 			float colliderMinPoint = std::numeric_limits<float>::max();
 			float colliderMaxPoint = -std::numeric_limits<float>::min();
@@ -165,7 +174,7 @@ namespace NightOwl::Physics
 		// test object 2 normals
 		for (int axisIndex = 0; axisIndex < 2; axisIndex++)
 		{
-			Math::Vec2F axisOfRotation = otherColliderRotationMatrix.GetColumn(axisIndex).xy;
+			Math::Vec2F axisOfRotation = otherColliderNormals[axisIndex];
 
 			float colliderMinPoint = std::numeric_limits<float>::max();
 			float colliderMaxPoint = -std::numeric_limits<float>::max();
