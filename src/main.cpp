@@ -118,7 +118,7 @@ int main()
 	// Position objects in the scene
 	quad.GetTransform()->SetParent(quad2.GetTransform());
 	quad.GetTransform()->Scale(3, 3, 3, NightOwl::Component::Space::Local);
-	quad3.GetTransform()->SetParent(quad.GetTransform());
+	//quad3.GetTransform()->SetParent(quad.GetTransform());
 
 	camera.GetTransform()->Translate(0, 0, 20, NightOwl::Component::Space::Local);
 
@@ -153,7 +153,8 @@ int main()
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyA))
 		{
-			quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+			//quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
+			quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		}
 
 		if (NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeyP))

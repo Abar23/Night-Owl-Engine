@@ -135,7 +135,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	void Quaternion<T>::SetRotationMatrix(const Mat3<T>& matrix)
+	void Quaternion<T>::SetOrthogonalRotationMatrix(const Mat3<T>& matrix)
 	{
 		T m00 = matrix(0, 0);
 		T m11 = matrix(1, 1);
@@ -144,40 +144,59 @@ namespace NightOwl::Math
 
 		if (diagonalSum > static_cast<T>(0))
 		{
-			w = std::sqrt(diagonalSum + static_cast<T>(1)) * static_cast<T>(0.5);
-			T fraction = static_cast<T>(0.25) / w;
+			T fraction = static_cast<T>(0.5) / std::sqrt(diagonalSum + static_cast<T>(1));
 
 			x = (matrix(2, 1) - matrix(1, 2)) * fraction;
 			y = (matrix(0, 2) - matrix(2, 0)) * fraction;
 			z = (matrix(1, 0) - matrix(0, 1)) * fraction;
+			w = static_cast<T>(0.25) / fraction;
 		}
 		else if (m00 > m11 && m00 > m22)
 		{
-			x = std::sqrt(m00 - m11 - m22 + static_cast<T>(1)) * static_cast<T>(0.5);
-			T fraction = static_cast<T>(0.25) / x;
+			T fraction = std::sqrt(m00 - m11 - m22 + static_cast<T>(1)) * static_cast<T>(2);
 
-			y = (matrix(1, 0) + matrix(0, 1)) * fraction;
-			z = (matrix(0, 2) + matrix(2, 0)) * fraction;
-			w = (matrix(2, 1) - matrix(1, 2)) * fraction;
+			x = static_cast<T>(0.25) * fraction;
+			y = (matrix(0, 1) + matrix(1, 0)) / fraction;
+			z = (matrix(0, 2) + matrix(2, 0)) / fraction;
+			w = (matrix(2, 1) - matrix(1, 2)) / fraction;
 		}
 		else if (m11 > m22)
 		{
-			y = std::sqrt(m11 - m00 - m22 + static_cast<T>(1)) * static_cast<T>(0.5);
-			T fraction = static_cast<T>(0.25) / y;
+			T fraction = std::sqrt(m11 - m00 - m22 + static_cast<T>(1)) * static_cast<T>(2);
 
-			x = (matrix(1, 0) + matrix(0, 1)) * fraction;
-			z = (matrix(2, 1) + matrix(1, 2)) * fraction;
-			w = (matrix(0, 2) - matrix(2, 0)) * fraction;
+			x = (matrix(0, 1) + matrix(1, 0)) / fraction;
+			y = static_cast<T>(0.25) * fraction;
+			z = (matrix(1, 2) + matrix(2, 1)) / fraction;
+			w = (matrix(0, 2) - matrix(2, 0)) / fraction;
 		}
 		else
 		{
-			z = std::sqrt(m22 - m00 - m11 + static_cast<T>(1)) * static_cast<T>(0.5);
-			T fraction = static_cast<T>(0.25) / z;
+			T fraction = std::sqrt(m22 - m00 - m11 + static_cast<T>(1)) * static_cast<T>(2);
 
-			x = (matrix(0, 2) + matrix(2, 0)) * fraction;
-			y = (matrix(2, 1) + matrix(1, 2)) * fraction;
-			w = (matrix(1, 0) - matrix(0, 1)) * fraction;
+			x = (matrix(0, 2) + matrix(2, 0)) / fraction;
+			y = (matrix(1, 2) + matrix(2, 1)) / fraction;
+			z = static_cast<T>(0.25) * fraction;
+			w = (matrix(1, 0) - matrix(0, 1)) / fraction;
 		}
+	}
+
+	template <typename T>
+	void Quaternion<T>::SetNonOrthogonalRotationMatrix(const Mat3<T>& matrix)
+	{
+		T m00 = matrix(0, 0);
+		T m11 = matrix(1, 1);
+		T m22 = matrix(2, 2);
+
+		float absQ2 = std::pow(matrix.Determinant(), static_cast<T>(1) / static_cast<T>(3));
+
+		w = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 + m11 + m22)) / static_cast<T>(2);
+		x = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 - m11 - m22)) / static_cast<T>(2);
+		y = std::sqrt(std::max(static_cast<T>(0), absQ2 - m00 + m11 - m22)) / static_cast<T>(2);
+		z = std::sqrt(std::max(static_cast<T>(0), absQ2 - m00 - m11 + m22)) / static_cast<T>(2);
+
+		x = std::copysign(x, matrix(2, 1) - matrix(1, 2));
+		y = std::copysign(y, matrix(0, 2) - matrix(2, 0));
+		z = std::copysign(z, matrix(1, 0) - matrix(0, 1));
 	}
 
 	template <typename T>

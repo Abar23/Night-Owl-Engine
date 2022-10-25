@@ -36,7 +36,8 @@ namespace NightOwl::Math
 		Quaternion<T>& Inverse();
 		Quaternion<T> GetConjugate() const;
 		Mat3<T> GetRotationMatrix() const;
-		void SetRotationMatrix(const Mat3<T>& matrix);
+		void SetOrthogonalRotationMatrix(const Mat3<T>& matrix);
+		void SetNonOrthogonalRotationMatrix(const Mat3<T>& matrix);
 		Vec3<T> GetEulerAngles();
 
 		static Vec3<T> TransformVector(const Quaternion<T>& quaternion, const Vec3<T>& vector);

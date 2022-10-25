@@ -196,7 +196,7 @@ namespace NightOwl::Component
 			// Since parent is being removed, save off the current rotation, scale, and position that as been given to the object
  			localPosition = worldMatrix.GetTranslation();
 			localScale = worldMatrix.GetScale();
-			localRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+			localRotation.SetOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
 			localRotation.Normalize();
 			isLocalDirty = true;
 
@@ -303,14 +303,14 @@ namespace NightOwl::Component
 	Math::QuatF Transform::GetRotation() const
 	{
 		Math::QuatF currentWorldRotation;
-		currentWorldRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
-		return currentWorldRotation;
+		currentWorldRotation.SetNonOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
+		return currentWorldRotation.Normalize();
 	}
 
 	void Transform::SetRotation(const Math::QuatF& newRotation)
 	{
 		Math::QuatF currentWorldRotation;
-		currentWorldRotation.SetRotationMatrix(worldMatrix.GetRotationMatrix());
+		currentWorldRotation.SetOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
 		// Apply current world rotation offset to the inverse of the total rotations on the object, then apply desired rotation.
 		// Need to multiply by the world rotation offset since it will have the inverse of all rotation in it once this function has run.
 		this->worldRotationOffset = newRotation * currentWorldRotation.Inverse() * worldRotationOffset;
