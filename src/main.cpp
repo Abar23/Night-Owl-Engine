@@ -14,6 +14,7 @@
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
 #include "NightOwl/Physics/2D/Collider/AABBBoxCollider2D.h"
 #include "NightOwl/Physics/2D/Collider/CircleCollider2D.h"
+#include "NightOwl/Physics/2D/Collider/OBBBoxCollider2D.h"
 
 int main()
 {
@@ -90,7 +91,7 @@ int main()
 	mesh->SetTriangles(triangles);
 	auto quadRigidBody2D = quad.AddComponent<NightOwl::Component::RigidBody2D>();
 	quadRigidBody2D->SetMass(1.0f);
-	NightOwl::Physics::Collider2D* aabbCollider = new NightOwl::Physics::AABBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(0.5, 0.5));
+	NightOwl::Physics::Collider2D* aabbCollider = new NightOwl::Physics::OBBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(2, 2), NightOwl::Math::QuatF());
 	quadRigidBody2D->SetCollider(aabbCollider);
 	
 	NightOwl::GameObject::GameObject& quad2 = scene.AddGameObject("Cube2");
@@ -111,7 +112,7 @@ int main()
 	mesh->SetTriangles(triangles);
 	auto quad3RigidBody2D = quad3.AddComponent<NightOwl::Component::RigidBody2D>();
 	quad3RigidBody2D->SetMass(1.0f);
-	aabbCollider = new NightOwl::Physics::CircleCollider2D(NightOwl::Math::Vec2F(0, 0), 2.5);
+	aabbCollider = new NightOwl::Physics::OBBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(0.5, 0.5), NightOwl::Math::QuatF());
 	quad3RigidBody2D->SetCollider(aabbCollider);
 
 	// Position objects in the scene
@@ -132,26 +133,27 @@ int main()
 
 		if(NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyUp))
 		{
-			//quad3.GetTransform()->Translate(-0.01, 0, 0, NightOwl::Component::Space::Local);
 			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Up() * 1000.0f);
 		}
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyDown))
 		{
-			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
 			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Down() * 1000.0f);
 		}
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyRight))
 		{
-			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
 			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Right() * 1000.0f);
 		}
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyLeft))
 		{
-			//quad3.GetTransform()->Translate(0.01, 0, 0, NightOwl::Component::Space::Local);
 			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Left() * 1000.0f);
+		}
+
+		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyA))
+		{
+			quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		}
 
 		if (NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeyP))

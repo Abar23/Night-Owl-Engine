@@ -7,7 +7,7 @@ namespace NightOwl::Physics
 	AABBBoxCollider2D::AABBBoxCollider2D(const Math::Vec2F& offsetFromCenterOfObject, const Math::Vec2F& halfWidthsOfBoundingBox)
 		:	offsetFromCenterOfObject(offsetFromCenterOfObject),
 			halfWidths(halfWidthsOfBoundingBox)
-	{}
+	{ }
 
 	Math::Vec2F AABBBoxCollider2D::GetCenterOfBoundingBox() const
 	{

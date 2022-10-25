@@ -2,7 +2,7 @@
 
 namespace NightOwl::Math
 {
-	constexpr float MAX_EPSILON_DIFF = 1.0e-5f;
+	constexpr float EPSILON = 1.0e-5f;
 
 	constexpr float F_PI = (float)M_PI;
 

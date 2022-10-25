@@ -1,6 +1,7 @@
 #include "CollisionTest.h"
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/GameObject/GameObject.h"
+#include <limits>
 #include <algorithm>
 #include <cmath>
 
@@ -34,6 +35,14 @@ namespace NightOwl::Physics
 			}
 		}
 
+		if(dynamic_cast<OBBBoxCollider2D*>(collider))
+		{
+			if (dynamic_cast<OBBBoxCollider2D*>(otherCollider))
+			{
+				return TestOBBOBB(dynamic_cast<OBBBoxCollider2D*>(collider), dynamic_cast<OBBBoxCollider2D*>(otherCollider));
+			}
+		}
+
 		return false;
 	}
 
@@ -54,6 +63,8 @@ namespace NightOwl::Physics
 		{
 			return false;
 		}
+
+		ENGINE_LOG_INFO("Collision between game object {0} and {1}", collider->GetRigidBody()->GetGameObject().GetName(), otherCollider->GetRigidBody()->GetGameObject().GetName());
 
 		return true;
 	}
@@ -85,5 +96,124 @@ namespace NightOwl::Physics
 		distanceTopRightCornerToCircle.y = std::max(distanceTopRightCornerToCircle.y, 0.0f);
 
 		return Math::Vec2F::Dot(distanceTopRightCornerToCircle, distanceTopRightCornerToCircle) < otherCollider->GetRadius() * otherCollider->GetRadius();
+	}
+
+	// Needs to be cleaned up
+	bool CollisionTest::TestOBBOBB(OBBBoxCollider2D* collider, OBBBoxCollider2D* otherCollider)
+	{
+		Math::Mat3F colliderRotationMatrix = collider->GetOrientation().GetRotationMatrix();
+		Math::Vec2F colliderCenter = collider->GetCenterOfBoundingBox();
+		Math::Vec2F colliderHalfWidths = collider->GetHalfWidths();
+		Math::Vec2F rotateColliderHalfWidthsDifference = colliderHalfWidths - (colliderRotationMatrix * Math::Vec3F(colliderHalfWidths.x, colliderHalfWidths.y, 0.0f)).xy;
+		std::cout << rotateColliderHalfWidthsDifference << std::endl;
+		Math::Mat3F otherColliderRotationMatrix = otherCollider->GetOrientation().GetRotationMatrix();
+		Math::Vec2F otherColliderCenter = otherCollider->GetCenterOfBoundingBox();
+		Math::Vec2F otherColliderHalfWidths = otherCollider->GetHalfWidths();
+		Math::Vec2F rotateOtherColliderHalfWidthsDifference = otherColliderHalfWidths - (otherColliderRotationMatrix * Math::Vec3F(otherColliderHalfWidths.x, otherColliderHalfWidths.y, 1.0f)).xy;
+
+		// Test object 1 normals
+		for (int axisIndex = 0; axisIndex < 2; axisIndex++)
+		{
+			Math::Vec2F axisOfRotation = colliderRotationMatrix.GetColumn(axisIndex).xy;
+
+			float colliderMinPoint = std::numeric_limits<float>::max();
+			float colliderMaxPoint = -std::numeric_limits<float>::min();
+
+			float valueAlongAxis = Math::Vec2F::Dot(colliderCenter + colliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter - colliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter + colliderHalfWidths.x - colliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter - colliderHalfWidths.x + colliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+
+			float otherColliderMinPoint = std::numeric_limits<float>::max();
+			float otherColliderMaxPoint = -std::numeric_limits<float>::max();
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter + otherColliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter - otherColliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter + otherColliderHalfWidths.x - otherColliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter - otherColliderHalfWidths.x + otherColliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			if(!((colliderMinPoint <= otherColliderMinPoint && otherColliderMinPoint <= colliderMaxPoint) || 
+				(otherColliderMinPoint <= colliderMinPoint && colliderMinPoint <= otherColliderMaxPoint)))
+			{
+				return false;
+			}
+		}
+
+		// test object 2 normals
+		for (int axisIndex = 0; axisIndex < 2; axisIndex++)
+		{
+			Math::Vec2F axisOfRotation = otherColliderRotationMatrix.GetColumn(axisIndex).xy;
+
+			float colliderMinPoint = std::numeric_limits<float>::max();
+			float colliderMaxPoint = -std::numeric_limits<float>::max();
+
+			float valueAlongAxis = Math::Vec2F::Dot(colliderCenter + colliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter - colliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter + colliderHalfWidths.x - colliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(colliderCenter - colliderHalfWidths.x + colliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < colliderMinPoint)  colliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > colliderMaxPoint)  colliderMaxPoint = valueAlongAxis;
+
+
+			float otherColliderMinPoint = std::numeric_limits<float>::max();
+			float otherColliderMaxPoint = -std::numeric_limits<float>::max();
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter + otherColliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter - otherColliderHalfWidths, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter + otherColliderHalfWidths.x - otherColliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			valueAlongAxis = Math::Vec2F::Dot(otherColliderCenter - otherColliderHalfWidths.x + otherColliderHalfWidths.y, axisOfRotation);
+			if (valueAlongAxis < otherColliderMinPoint)  otherColliderMinPoint = valueAlongAxis;
+			if (valueAlongAxis > otherColliderMaxPoint)  otherColliderMaxPoint = valueAlongAxis;
+
+			if (!((colliderMinPoint <= otherColliderMinPoint && otherColliderMinPoint <= colliderMaxPoint) ||
+				(otherColliderMinPoint <= colliderMinPoint && colliderMinPoint <= otherColliderMaxPoint)))
+			{
+				return false;
+			}
+		}
+
+		std::cout << "Collide!" << std::endl;
+		return true;
 	}
 }

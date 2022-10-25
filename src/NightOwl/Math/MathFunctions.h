@@ -8,7 +8,7 @@ namespace NightOwl::Math
 	inline bool NearEquals(const T floatOne, const T floatTwo)
 	{
 		T absDiff = std::abs(floatOne - floatTwo);
-		if (absDiff <= MAX_EPSILON_DIFF)
+		if (absDiff <= EPSILON)
 		{
 			return true;
 		}
