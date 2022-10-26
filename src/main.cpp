@@ -112,7 +112,7 @@ int main()
 	mesh->SetTriangles(triangles);
 	auto quad3RigidBody2D = quad3.AddComponent<NightOwl::Component::RigidBody2D>();
 	quad3RigidBody2D->SetMass(1.0f);
-	aabbCollider = new NightOwl::Physics::OBBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(0.5, 0.5), NightOwl::Math::QuatF());
+	aabbCollider = new NightOwl::Physics::CircleCollider2D(NightOwl::Math::Vec2F(0, 0), 0.5f);
 	quad3RigidBody2D->SetCollider(aabbCollider);
 
 	// Position objects in the scene
@@ -123,7 +123,7 @@ int main()
 	camera.GetTransform()->Translate(0, 0, 20, NightOwl::Component::Space::Local);
 
 	quad.GetTransform()->Translate(4.5, 0, 0, NightOwl::Component::Space::Local);
-	quad3.GetTransform()->Translate(4, 0, 0, NightOwl::Component::Space::Local);
+	quad3.GetTransform()->Translate(8, 0, 0, NightOwl::Component::Space::Local);
 
 	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
@@ -153,7 +153,6 @@ int main()
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyA))
 		{
-			//quad3.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 			quad.GetTransform()->Rotate(0, 0, 1, NightOwl::Component::Space::Local);
 		}
 

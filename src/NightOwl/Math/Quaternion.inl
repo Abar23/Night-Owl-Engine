@@ -242,9 +242,11 @@ namespace NightOwl::Math
 	{
 		Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
 
-		return (vector * (quaternion.w * quaternion.w - vectorPart.SqrMagnitude())) +
-			vectorPart * (Vec3<T>::Dot(vector, vectorPart) * static_cast<T>(2)) +
-			Vec3<T>::Cross(vectorPart, vector) * (quaternion.w * static_cast<T>(2));
+		float scalar = quaternion.w;
+
+		return static_cast<T>(2) * Vec3<T>::Dot(vectorPart, vector) * vectorPart
+			+ (scalar * scalar - Vec3<T>::Dot(vectorPart, vectorPart)) * vector
+			+ static_cast<T>(2) * scalar * Vec3<T>::Cross(vectorPart, vector);
 	}
 
 	template <typename T>

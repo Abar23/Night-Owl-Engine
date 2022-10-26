@@ -20,5 +20,9 @@ namespace NightOwl::Physics
 		static bool TestAABBCircle(AABBBoxCollider2D* collider, CircleCollider2D* otherCollider);
 
 		static bool TestOBBOBB(OBBBoxCollider2D* collider, OBBBoxCollider2D* otherCollider);
+
+		static bool TestAABBOBB(AABBBoxCollider2D* collider, OBBBoxCollider2D* otherCollider);
+
+		static bool TestCircleOBB(CircleCollider2D* collider, OBBBoxCollider2D* otherCollider);
 	};
 }
