@@ -4,7 +4,7 @@
 
 namespace NightOwl::Physics
 {
-	void PhysicsEngine2D::Update()
+	void PhysicsEngine2D::Update() const
 	{
 		for (auto* rigidBody2D : rigidBodies)
 		{
@@ -27,15 +27,16 @@ namespace NightOwl::Physics
 		rigidBodies.push_back(rigidBody2D);
 	}
 
-	void PhysicsEngine2D::RemoveRigidBody2D(Component::RigidBody2D* rigidBody2D)
+	void PhysicsEngine2D::RemoveRigidBody2D(const Component::RigidBody2D* rigidBody2D)
 	{
 		int rigidBody2DIndex = 0;
-		for (; rigidBody2DIndex < rigidBodies.size(); ++rigidBody2DIndex)
+		for (const auto* rigidBody : rigidBodies)
 		{
-			if(rigidBodies[rigidBody2DIndex] == rigidBody2D)
+			if(rigidBody == rigidBody2D)
 			{
 				break;
 			}
+			rigidBody2DIndex++;
 		}
 
 		if(rigidBody2DIndex != rigidBodies.size())
