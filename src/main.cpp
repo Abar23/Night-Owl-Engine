@@ -1,8 +1,11 @@
+#include "NightOwl/Behavior/OwlBehaviorManager.h"
+#include "NightOwl/Behavior/OwlBehaviorTest.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/Component/Materials/IMaterial.h"
 #include "NightOwl/Core/Application/Scene.h"
+#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
@@ -23,6 +26,8 @@ int main()
 	NightOwl::Window::WindowApi::CreateWindow("Night Owl Engine Demo", 600, 800);
 	NightOwl::Input::Input::Init();
 	NightOwl::Core::Time::Init();
+	NightOwl::Behavior::OwlBehaviorManager manager;
+	NightOwl::Core::OwlBehaviorManagerLocator::Provide(&manager);
 	NightOwl::Physics::PhysicsEngine2D engine;
 	NightOwl::Core::PhysicsEngine2DLocator::Provide(&engine);
 
@@ -68,13 +73,6 @@ int main()
 	};
 
 
-	NightOwl::Math::QuatF quat(NightOwl::Math::Vec3F::Right(), 90);
-	quat *= NightOwl::Math::QuatF::MakeRotationY(90);
-	quat.Normalize();
-	quat.GetEulerAngles();
-	quat *= NightOwl::Math::QuatF::MakeRotationZ(90);
-	quat.Normalize();
-	quat.GetEulerAngles();
 	//Add camera to scene
 	NightOwl::GameObject::GameObject& camera = scene.AddGameObject("Camera");
 	NightOwl::Component::Camera* cameraComponent = camera.AddComponent<NightOwl::Component::Camera>();
@@ -114,6 +112,7 @@ int main()
 	quad3RigidBody2D->SetMass(1.0f);
 	aabbCollider = new NightOwl::Physics::CircleCollider2D(NightOwl::Math::Vec2F(0, 0), 0.5f);
 	quad3RigidBody2D->SetCollider(aabbCollider);
+	auto* behavior = quad3.AddComponent<OwlBehaviorTest>();
 
 	// Position objects in the scene
 	quad.GetTransform()->SetParent(quad2.GetTransform());
@@ -126,30 +125,13 @@ int main()
 	quad3.GetTransform()->Translate(8, 0, 0, NightOwl::Component::Space::Local);
 
 	const NightOwl::Math::Vec4F clearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	manager.InitBehaviors();
+
 	while(!NightOwl::Window::WindowApi::GetWindow()->ShouldWindowClose())
 	{
 		NightOwl::Graphics::RenderApi::GetContext()->ClearColor(clearColor);
 		NightOwl::Graphics::RenderApi::GetContext()->ClearBuffer();
-
-		if(NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyUp))
-		{
-			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Up() * 1000.0f);
-		}
-
-		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyDown))
-		{
-			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Down() * 1000.0f);
-		}
-
-		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyRight))
-		{
-			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Right() * 1000.0f);
-		}
-
-		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyLeft))
-		{
-			quad3RigidBody2D->AddForce(NightOwl::Math::Vec2F::Left() * 1000.0f);
-		}
 
 		if (NightOwl::Input::Input::IsKeyHeld(NightOwl::Input::KeyCode::KeyA))
 		{
@@ -171,7 +153,7 @@ int main()
 			quad3.GetTransform()->SetRotation(NightOwl::Math::QuatF::MakeRotationY(0));
 		}
 
-		// Update scene graph
+		manager.Update();
 		scene.Update();
 		engine.Update();
 

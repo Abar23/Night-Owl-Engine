@@ -6,13 +6,13 @@ namespace NightOwl::Component
 {
 	Camera* Camera::mainCamera{ nullptr };
 
-	Camera::Camera(GameObject::GameObject* gameObject)
-		: Component(ComponentType::Camera),
-		fieldOfView(90.0f),
-		clippingPlanes(0.01f, 1000.0f),
-		isPerspectiveProjection(true),
-	    orthographicSize(1.0f),
-		isProjectionDirty(false)
+	Camera::Camera()
+		:	Component(ComponentType::Camera),
+			fieldOfView(90.0f),
+			clippingPlanes(0.01f, 1000.0f),
+			isPerspectiveProjection(true),
+			orthographicSize(1.0f),
+			isProjectionDirty(false)
 	{
 		this->gameObject = gameObject;
 		projectionMatrix = Math::Mat4F::Perspective(fieldOfView, Window::WindowApi::GetWindow()->GetAspectRatio(), clippingPlanes.near, clippingPlanes.far);

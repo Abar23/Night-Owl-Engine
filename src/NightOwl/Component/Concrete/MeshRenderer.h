@@ -10,7 +10,7 @@ namespace NightOwl::Component
 	class MeshRenderer : public Component
 	{
 	public:
-		MeshRenderer(GameObject::GameObject* gameObject);
+		MeshRenderer();
 
 		void Draw();
 

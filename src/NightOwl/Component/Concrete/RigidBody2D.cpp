@@ -3,7 +3,7 @@
 
 namespace NightOwl::Component
 {
-	RigidBody2D::RigidBody2D(GameObject::GameObject* gameObject)
+	RigidBody2D::RigidBody2D()
 		:	Component(ComponentType::RigidBody2D),
 			rotation(0.0f),
 			mass(0.0f),
@@ -13,7 +13,6 @@ namespace NightOwl::Component
 			accumulatedForces(0.0f),
 			collider(nullptr)
 	{
-		this->gameObject = gameObject;
 		Core::PhysicsEngine2DLocator::GetPhysicsEngine2D()->AddRigidBody2D(this);
 	}
 

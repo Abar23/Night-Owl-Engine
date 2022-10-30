@@ -7,12 +7,14 @@ namespace NightOwl::Behavior
 	public:
 		virtual ~IBehavior() = default;
 
-		virtual void OnAwake() = 0;
+		virtual void Awake() = 0;
 
-		virtual void OnUpdate() = 0;
+		virtual void Start() = 0;
 
-		virtual void OnEnable() = 0;
+		virtual void Update() = 0;
 
-		virtual void OnDisable() = 0;
+		virtual void Enable() = 0;
+
+		virtual void Disable() = 0;
 	};
 }

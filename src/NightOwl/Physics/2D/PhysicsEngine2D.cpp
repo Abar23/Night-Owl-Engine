@@ -1,6 +1,7 @@
+#include "PhysicsEngine2D.h"
 #include "CollisionTest.h"
 #include "NightOwl/Physics/Integrator/RungeKuttaIntegrator.h"
-#include "PhysicsEngine2D.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl::Physics
 {
@@ -8,17 +9,20 @@ namespace NightOwl::Physics
 	{
 		for (auto* rigidBody2D : rigidBodies)
 		{
-			Collider2D* collider = rigidBody2D->GetCollider();
-			for (auto* otherRigidBody2D : rigidBodies)
+			if(rigidBody2D->GetGameObject().IsActive())
 			{
-				if(rigidBody2D != otherRigidBody2D)
+				Collider2D* collider = rigidBody2D->GetCollider();
+				for (auto* otherRigidBody2D : rigidBodies)
 				{
-					Collider2D* otherCollider = otherRigidBody2D->GetCollider();
-					CollisionTest::TestCollision(collider, otherCollider);
+					if (rigidBody2D != otherRigidBody2D)
+					{
+						Collider2D* otherCollider = otherRigidBody2D->GetCollider();
+						CollisionTest::TestCollision(collider, otherCollider);
+					}
 				}
-			}
 
-			RungeKuttaIntegrator::Integrate2D(rigidBody2D);
+				RungeKuttaIntegrator::Integrate2D(rigidBody2D);
+			}
 		}
 	}
 

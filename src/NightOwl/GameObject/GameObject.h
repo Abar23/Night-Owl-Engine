@@ -1,11 +1,13 @@
 #pragma once
 
 #include "NightOwl/Component/Concrete/Transform.h"
-#include "NightOwl/Behavior/IBehavior.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "NightOwl/Behavior/OwlBehavior.h"
+#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 
 namespace NightOwl::Core
 {
@@ -19,13 +21,13 @@ namespace NightOwl::Component
 
 namespace NightOwl::GameObject
 {
-	class GameObject //: public Behavior::IBehavior
+	class GameObject
 	{
 	public:
 		GameObject(Core::Scene* scene, unsigned int id)
 			: scene(scene),
 		      id(id),
-		      active(true)
+		      isActive(true)
 		{
 			transform.gameObject = this;
 		}
@@ -34,24 +36,27 @@ namespace NightOwl::GameObject
 			: scene(scene),
 		      name(name),
 		      id(id),
-		      active(true)
+		      isActive(true)
 		{
 			transform.gameObject = this;
 		}
 
 
-		bool IsEnabled() const
+		bool IsActive() const
 		{
-			return active;
+			return isActive;
 		}
 
 		void SetActive(bool active)
 		{
-			if(this->active != active)
+			if(this->isActive != active)
 			{
-				this->active = active;
+				this->isActive = active;
 
-				//active ? OnEnable() : OnDisable();
+				for (auto& element : componentList)
+				{
+					element.get()->isEnabled = this->isActive;
+				}
 			}
 		}
 
@@ -80,7 +85,19 @@ namespace NightOwl::GameObject
 		{
 			ENGINE_ASSERT(CheckForComponent<T>() == -1, "Game object {0} already has component {1}", name, typeid(T).name());
 
-			componentList.push_back(std::make_shared<T>(this));
+			std::shared_ptr<Component::Component> component = std::make_shared<T>();
+
+			componentList.push_back(component);
+
+			component->gameObject = this;
+
+			// Check if new component is an owl behavior. If so, add to the owl behavior manager
+			Behavior::OwlBehavior* owlBehavior = dynamic_cast<Behavior::OwlBehavior*>(component.get());
+
+			if (owlBehavior != nullptr)
+			{
+				Core::OwlBehaviorManagerLocator::GetOwlBehaviorManager()->AddOwlBehavior(owlBehavior);
+			}
 
 			return dynamic_cast<T*>(componentList.back().get());
 		}
@@ -106,6 +123,14 @@ namespace NightOwl::GameObject
 
 			ENGINE_ASSERT(componentIndex >= 0, "Removing non-existant component {1} from game object object {0}", name, typeid(T).name());
 
+			// Check if component being removed is an owl behavior. If so, remove from the owl behavior manager
+			Behavior::OwlBehavior* owlBehavior = dynamic_cast<Behavior::OwlBehavior*>(componentList[componentIndex].get());
+
+			if (owlBehavior != nullptr)
+			{
+				Core::OwlBehaviorManagerLocator::GetOwlBehaviorManager()->RemoveOwlBehavior(owlBehavior);
+			}
+
 			componentList.erase(componentList.begin() + componentIndex);
 		}
 
@@ -114,14 +139,6 @@ namespace NightOwl::GameObject
 		{
 			return CheckForComponent<T>() >= 0;
 		}
-
-		//void OnAwake() override;
-
-		//void OnUpdate() override;
-
-		//void OnEnable() override;
-
-		//void OnDisable() override;
 
 	protected:
 		std::vector<std::shared_ptr<Component::Component>> componentList;
@@ -134,7 +151,7 @@ namespace NightOwl::GameObject
 
 		unsigned int id;
 
-		bool active;
+		bool isActive;
 
 		template <typename T>
 		int CheckForComponent() const

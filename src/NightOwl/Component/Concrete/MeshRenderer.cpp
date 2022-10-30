@@ -4,11 +4,10 @@
 
 namespace NightOwl::Component
 {
-	MeshRenderer::MeshRenderer(GameObject::GameObject* gameObject)
+	MeshRenderer::MeshRenderer()
 		: Component(ComponentType::MeshRenderer),
 		  isVisible(true)
 	{
-		this->gameObject = gameObject;
 		material = std::make_shared<StandardMaterial>();
 	}
 

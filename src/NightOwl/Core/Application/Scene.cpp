@@ -13,17 +13,20 @@ namespace NightOwl::Core
 
 		for(GameObject::GameObject* parent : rootGameObjects)
 		{
-			for(int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
+			if (parent->IsActive())
 			{
-				Component::Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
-				childTransform->PropagateParentLocalTransform(parent->GetTransform()->GetLocalModelMatrix());
+				for (int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
+				{
+					Component::Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
+					childTransform->PropagateParentLocalTransform(parent->GetTransform()->GetLocalModelMatrix());
+				}
 			}
 		}
 	}
 
 	GameObject::GameObject& Scene::AddGameObject()
 	{
-		auto gameObject = gameObjectsList.insert({ idCounter, std::make_shared<GameObject::GameObject>(this, idCounter) }).first->second;
+		auto& gameObject = gameObjectsList.insert({ idCounter, std::make_shared<GameObject::GameObject>(this, idCounter) }).first->second;
 		idCounter++;
 		SetDirtyFlag();
 		return *gameObject.get();
@@ -31,7 +34,7 @@ namespace NightOwl::Core
 
 	GameObject::GameObject& Scene::AddGameObject(const std::string& name)
 	{
-		auto gameObject = gameObjectsList.insert({idCounter, std::make_shared<GameObject::GameObject>(name, this, idCounter)}).first->second;
+		auto& gameObject = gameObjectsList.insert({idCounter, std::make_shared<GameObject::GameObject>(name, this, idCounter)}).first->second;
 		idCounter++;
 		SetDirtyFlag();
 		return *gameObject.get();

@@ -10,7 +10,7 @@ namespace NightOwl::Component
 	class RigidBody2D : public Component
 	{
 	public:
-		RigidBody2D(GameObject::GameObject* gameObject);
+		RigidBody2D();
 
 		~RigidBody2D() override;
 
