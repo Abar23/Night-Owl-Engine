@@ -31,5 +31,11 @@ namespace NightOwl::Behavior
 		std::set<OwlBehavior*> owlBehaviorsToAwake;
 
 		bool hasInitializedBehaviors;
+
+		void AwakeAndEnableOwlBehaviors();
+
+		void StartOwlBehaviors();
+
+		void UpdateOwlBehaviors();
 	};
 }

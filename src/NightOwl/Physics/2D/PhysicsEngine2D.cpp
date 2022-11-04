@@ -5,8 +5,9 @@
 
 namespace NightOwl::Physics
 {
-	void PhysicsEngine2D::Update() const
+	void PhysicsEngine2D::Update()
 	{
+		// Collision, integration
 		for (auto* rigidBody2D : rigidBodies)
 		{
 			if(rigidBody2D->GetGameObject().IsActive())
@@ -17,7 +18,65 @@ namespace NightOwl::Physics
 					if (rigidBody2D != otherRigidBody2D)
 					{
 						Collider2D* otherCollider = otherRigidBody2D->GetCollider();
-						CollisionTest::TestCollision(collider, otherCollider);
+						if (CollisionTest::TestCollision(collider, otherCollider))
+						{
+							collidingBodies.emplace(otherRigidBody2D);
+						}
+					}
+				}
+
+				// propagate collision events
+				if (!collidingBodies.empty())
+				{
+					if(rigidBody2D->newCollisions.empty())
+					{
+						for(auto* otherRigidBody : collidingBodies)
+						{
+							for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
+							{
+								Collision2D collision(rigidBody2D->GetCollider(), otherRigidBody->GetCollider());
+								owlBehavior->OnCollisionEnter2D(collision);
+							}
+							rigidBody2D->newCollisions.insert(otherRigidBody);
+						}
+					}
+					else
+					{
+						for (auto collidingBody = rigidBody2D->newCollisions.begin(); collidingBody != rigidBody2D->newCollisions.end();)
+						{
+							if(collidingBodies.contains(*collidingBody))
+							{
+								for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
+								{
+									Collision2D collision(rigidBody2D->GetCollider(), (*collidingBody)->GetCollider());
+									owlBehavior->OnCollisionStay2D(collision);
+								}
+								++collidingBody;
+							}
+							else
+							{
+								for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
+								{
+									Collision2D collision(rigidBody2D->GetCollider(), (*collidingBody)->GetCollider());
+									owlBehavior->OnCollisionExit2D(collision);
+								}
+								collidingBody = rigidBody2D->newCollisions.erase(collidingBody);
+							}
+						}
+					}
+
+					collidingBodies.clear();
+				}
+				else
+				{
+					for (auto collidingBody = rigidBody2D->newCollisions.begin(); collidingBody != rigidBody2D->newCollisions.end();)
+					{
+						for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
+						{
+							Collision2D collision(rigidBody2D->GetCollider(), (*collidingBody)->GetCollider());
+							owlBehavior->OnCollisionExit2D(collision);
+						}
+						collidingBody = rigidBody2D->newCollisions.erase(collidingBody);
 					}
 				}
 

@@ -263,7 +263,7 @@ namespace NightOwl::Physics
 		distanceFromBoxToCircle.y = std::abs(rotatedCircleCenter.y);
 
 		// Get distance between corner of obb box and center of circle
-		Math::Vec2F distanceTopRightCornerToCircle = rotatedCircleCenter - otherCollider->GetHalfWidths();
+		Math::Vec2F distanceTopRightCornerToCircle = distanceFromBoxToCircle - otherCollider->GetHalfWidths();
 		distanceTopRightCornerToCircle.x = std::max(distanceTopRightCornerToCircle.x, 0.0f);
 		distanceTopRightCornerToCircle.y = std::max(distanceTopRightCornerToCircle.y, 0.0f);
 

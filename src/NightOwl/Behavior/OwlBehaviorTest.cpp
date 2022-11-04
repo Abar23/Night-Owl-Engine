@@ -5,18 +5,15 @@
 
 void OwlBehaviorTest::Awake()
 {
-	std::cout << "Awake" << std::endl;
 	rigidBody2D = gameObject->GetComponent<NightOwl::Component::RigidBody2D>();
 }
 
 void OwlBehaviorTest::Start()
 {
-	std::cout << "Start" << std::endl;
 }
 
 void OwlBehaviorTest::Update()
 {
-	std::cout << "Update" << std::endl;
 	if(NightOwl::Input::Input::IsKeyPressed(NightOwl::Input::KeyCode::KeySpace))
 	{
 		isEnabled = false;
@@ -45,10 +42,23 @@ void OwlBehaviorTest::Update()
 
 void OwlBehaviorTest::OnEnable()
 {
-	std::cout << "Enable" << std::endl;
 }
 
 void OwlBehaviorTest::OnDisable()
 {
-	std::cout << "Disable" << std::endl;
+}
+
+void OwlBehaviorTest::OnCollisionEnter2D(const NightOwl::Physics::Collision2D& collision2D)
+{
+	std::cout << "Enter" << std::endl;
+}
+
+void OwlBehaviorTest::OnCollisionStay2D(const NightOwl::Physics::Collision2D& collision2D)
+{
+	std::cout << "Stay" << std::endl;
+}
+
+void OwlBehaviorTest::OnCollisionExit2D(const NightOwl::Physics::Collision2D& collision2D)
+{
+	std::cout << "Exit" << std::endl;
 }

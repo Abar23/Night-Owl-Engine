@@ -31,7 +31,7 @@ namespace NightOwl::Component
 
 		void Rotate(const Math::Vec3F& eulers, Space space);
 
-		const Math::Vec3F& GetLocalEulerAngles();
+		const Math::Vec3F GetLocalEulerAngles();
 
 		void SetLocalEulerAngles(float angleX, float angleY, float angleZ);
 

@@ -2,6 +2,7 @@
 
 #include "OwlBehaviorState.h"
 #include "NightOwl/Component/Component.h"
+#include "NightOwl/Physics/2D/Structures/Collision2D.h"
 
 namespace NightOwl::Behavior
 {
@@ -28,11 +29,11 @@ namespace NightOwl::Behavior
 
 		virtual void OnPostRender() { }
 
-		virtual void OnCollisionEnter2D() { }
+		virtual void OnCollisionEnter2D(const Physics::Collision2D& collision2D) { }
 
-		virtual void OnCollisionStay2D() { }
+		virtual void OnCollisionStay2D(const Physics::Collision2D& collision2D) { }
 
-		virtual void OnCollisionExit2D() { }
+		virtual void OnCollisionExit2D(const Physics::Collision2D& collision2D) { }
 
 		bool IsActiveAndEnabled() const;
 

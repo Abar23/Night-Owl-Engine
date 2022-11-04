@@ -73,6 +73,7 @@ namespace NightOwl::Math
 		Vec2<T> GetNegate() const;
 		Vec2<T>& Negate();
 		const T* GetValuePointer() const;
+		const std::string ToString() const;
 
 		static T Dot(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
 		static Vec2<T> Project(const Vec2<T>& leftVector, const Vec2<T>& rightVector);

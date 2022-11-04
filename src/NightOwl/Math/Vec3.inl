@@ -102,7 +102,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	std::string Vec3<T>::ToString() const
+	const std::string Vec3<T>::ToString() const
 	{
 		std::string vectorString = "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
 		return vectorString;

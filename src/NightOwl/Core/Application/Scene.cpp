@@ -15,10 +15,11 @@ namespace NightOwl::Core
 		{
 			if (parent->IsActive())
 			{
+				Math::Mat4F parentLocalModelMatrix = parent->GetTransform()->GetLocalModelMatrix();
 				for (int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
 				{
 					Component::Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
-					childTransform->PropagateParentLocalTransform(parent->GetTransform()->GetLocalModelMatrix());
+					childTransform->PropagateParentLocalTransform(parentLocalModelMatrix);
 				}
 			}
 		}
@@ -29,7 +30,7 @@ namespace NightOwl::Core
 		auto& gameObject = gameObjectsList.insert({ idCounter, std::make_shared<GameObject::GameObject>(this, idCounter) }).first->second;
 		idCounter++;
 		SetDirtyFlag();
-		return *gameObject.get();
+		return *gameObject;
 	}
 
 	GameObject::GameObject& Scene::AddGameObject(const std::string& name)
@@ -37,7 +38,7 @@ namespace NightOwl::Core
 		auto& gameObject = gameObjectsList.insert({idCounter, std::make_shared<GameObject::GameObject>(name, this, idCounter)}).first->second;
 		idCounter++;
 		SetDirtyFlag();
-		return *gameObject.get();
+		return *gameObject;
 	}
 
 	void Scene::RemoveGameObject(const GameObject::GameObject& gameObject)
@@ -56,7 +57,7 @@ namespace NightOwl::Core
 			rootGameObjects.clear();
 			for (auto& pair : gameObjectsList)
 			{
-				Component::Transform* transform = pair.second->GetTransform();
+				const Component::Transform* transform = pair.second->GetTransform();
 				if (!transform->HasParent())
 				{
 					rootGameObjects.push_back(pair.second.get());

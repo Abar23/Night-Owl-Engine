@@ -4,6 +4,14 @@
 #include "NightOwl/Math/Vec2.h"
 #include "NightOwl/Physics/2D/Collider/Collider2D.h"
 #include <memory>
+#include <set>
+
+namespace NightOwl::Physics
+{
+	class PhysicsEngine2D;
+
+	class Collision2D;
+}
 
 namespace NightOwl::Component
 {
@@ -58,5 +66,11 @@ namespace NightOwl::Component
 		Math::Vec2F accumulatedForces;
 
 		std::shared_ptr<Physics::Collider2D> collider;
+
+		std::set<RigidBody2D*> newCollisions;
+
+		std::set<RigidBody2D*> oldCollisions;
+
+		friend class Physics::PhysicsEngine2D;
 	};
 }

@@ -10,61 +10,15 @@ namespace NightOwl::Behavior
 
 	void OwlBehaviorManager::Update()
 	{
-		if(!owlBehaviorsToStart.empty())
-		{
-			for (auto* owlBehavior : owlBehaviorsToStart)
-			{
-				owlBehavior->Start();
-				owlBehaviorsToUpdate.insert(owlBehavior);
-				owlBehavior->state = OwlBehaviorState::Update;
-			}
-			owlBehaviorsToStart.clear();
-		}
-
-		for (auto* owlBehavior : owlBehaviorsToUpdate)
-		{
-			if(owlBehavior->state == OwlBehaviorState::Update)
-			{
-				if (owlBehavior->IsActiveAndEnabled())
-				{
-					owlBehavior->Update();
-				}
-				else if (!owlBehavior->isEnabled)
-				{
-					owlBehavior->OnDisable();
-					owlBehavior->state = OwlBehaviorState::OnDisable;
-				}
-			}
-			else if(owlBehavior->state == OwlBehaviorState::OnDisable && owlBehavior->isEnabled)
-			{
-				owlBehavior->OnEnable();
-				owlBehavior->state = OwlBehaviorState::Update;
-			}
-		}
+		StartOwlBehaviors();
+		AwakeAndEnableOwlBehaviors();
+		UpdateOwlBehaviors();
 	}
 
 	void OwlBehaviorManager::InitBehaviors()
 	{
-		if (!owlBehaviorsToAwake.empty())
-		{
-			for (auto* owlBehavior : owlBehaviorsToAwake)
-			{
-				owlBehavior->Awake();
-				owlBehavior->OnEnable();
-				owlBehaviorsToStart.insert(owlBehavior);
-				owlBehavior->state = OwlBehaviorState::Start;
-			}
-
-			for (auto* owlBehavior : owlBehaviorsToStart)
-			{
-				owlBehavior->Start();
-				owlBehaviorsToUpdate.insert(owlBehavior);
-				owlBehavior->state = OwlBehaviorState::Update;
-			}
-
-			owlBehaviorsToAwake.clear();
-			owlBehaviorsToStart.clear();
-		}
+		AwakeAndEnableOwlBehaviors();
+		StartOwlBehaviors();
 	}
 
 	void OwlBehaviorManager::AddOwlBehavior(OwlBehavior* owlBehavior)
@@ -109,5 +63,74 @@ namespace NightOwl::Behavior
 		owlBehaviorsToUpdate.clear();
 		owlBehaviorsToAwake.clear();
 		hasInitializedBehaviors = false;
+	}
+
+	void OwlBehaviorManager::AwakeAndEnableOwlBehaviors()
+	{
+		if (!owlBehaviorsToAwake.empty())
+		{
+			for (auto it = owlBehaviorsToAwake.begin(); it != owlBehaviorsToAwake.end();)
+			{
+				OwlBehavior* owlBehavior = *it;
+				if (owlBehavior->IsActiveAndEnabled())
+				{
+					owlBehavior->Awake();
+					owlBehavior->OnEnable();
+					owlBehaviorsToStart.insert(owlBehavior);
+					owlBehavior->state = OwlBehaviorState::Start;
+					it = owlBehaviorsToAwake.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+		}
+	}
+
+	void OwlBehaviorManager::StartOwlBehaviors()
+	{
+		if (!owlBehaviorsToStart.empty())
+		{
+			for (auto it = owlBehaviorsToStart.begin(); it != owlBehaviorsToStart.end();)
+			{
+				OwlBehavior* owlBehavior = *it;
+				if (owlBehavior->IsActiveAndEnabled())
+				{
+					owlBehavior->Start();
+					owlBehaviorsToUpdate.insert(owlBehavior);
+					owlBehavior->state = OwlBehaviorState::Update;
+					it = owlBehaviorsToStart.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+		}
+	}
+
+	void OwlBehaviorManager::UpdateOwlBehaviors()
+	{
+		for (auto* owlBehavior : owlBehaviorsToUpdate)
+		{
+			if (owlBehavior->state == OwlBehaviorState::Update)
+			{
+				if (owlBehavior->IsActiveAndEnabled())
+				{
+					owlBehavior->Update();
+				}
+				else if (!owlBehavior->isEnabled)
+				{
+					owlBehavior->OnDisable();
+					owlBehavior->state = OwlBehaviorState::OnDisable;
+				}
+			}
+			else if (owlBehavior->state == OwlBehaviorState::OnDisable && owlBehavior->isEnabled)
+			{
+				owlBehavior->OnEnable();
+				owlBehavior->state = OwlBehaviorState::Update;
+			}
+		}
 	}
 }

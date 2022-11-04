@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <string>
 #include "Vec2.h"
 
 namespace NightOwl::Math
@@ -145,6 +146,13 @@ namespace NightOwl::Math
 	const T* Vec2<T>::GetValuePointer() const
 	{
 		return data.data();
+	}
+
+	template <typename T>
+	const std::string Vec2<T>::ToString() const
+	{
+		std::string vectorString = "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+		return vectorString;
 	}
 
 	template <typename T>

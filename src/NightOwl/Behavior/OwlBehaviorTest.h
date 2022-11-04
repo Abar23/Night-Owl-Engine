@@ -17,6 +17,11 @@ public:
 
 	void OnDisable() override;
 
+	void OnCollisionEnter2D(const NightOwl::Physics::Collision2D& collision2D) override;
+
+	void OnCollisionStay2D(const NightOwl::Physics::Collision2D& collision2D) override;
+
+	void OnCollisionExit2D(const NightOwl::Physics::Collision2D& collision2D) override;
 private:
 	NightOwl::Component::RigidBody2D* rigidBody2D;
 };

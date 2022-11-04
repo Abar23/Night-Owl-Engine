@@ -153,12 +153,12 @@ int main()
 			quad3.GetTransform()->SetRotation(NightOwl::Math::QuatF::MakeRotationY(0));
 		}
 
-		manager.Update();
 		scene.Update();
 		engine.Update();
-
+		manager.Update();
 		NightOwl::Input::Input::Update();
 
+		// Create render system to hold mesh renderer components
 		quadMeshRenderer->Draw();
 		cube2MeshRenderer->Draw();
 		quad3MeshRenderer->Draw();

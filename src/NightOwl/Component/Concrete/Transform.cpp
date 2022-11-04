@@ -112,7 +112,7 @@ namespace NightOwl::Component
 		SetLocalDirtyFlag();
 	}
 
-	const Math::Vec3F& Transform::GetLocalEulerAngles()
+	const Math::Vec3F Transform::GetLocalEulerAngles()
 	{
 		return localRotation.GetEulerAngles();
 	}

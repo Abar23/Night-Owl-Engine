@@ -43,12 +43,12 @@ namespace NightOwl::Component
 		return projectionMatrix * GetViewMatrix();
 	}
 
-	const Math::Mat4F& Camera::GetViewMatrix()
+	const Math::Mat4F Camera::GetViewMatrix()
 	{
 		return gameObject->GetTransform()->GetWorldMatrix().GetInverse();
 	}
 
-	const Math::Mat4F& Camera::GetViewMatrix() const
+	const Math::Mat4F Camera::GetViewMatrix() const
 	{
 		return gameObject->GetTransform()->GetWorldMatrix();
 	}

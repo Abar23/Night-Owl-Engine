@@ -2,12 +2,11 @@
 
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/Behavior/OwlBehavior.h"
+#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "NightOwl/Behavior/OwlBehavior.h"
-#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 
 namespace NightOwl::Core
 {
@@ -17,6 +16,11 @@ namespace NightOwl::Core
 namespace NightOwl::Component
 {
 	class Component;
+}
+
+namespace NightOwl::Physics
+{
+	class PhysicsEngine2D;
 }
 
 namespace NightOwl::GameObject
@@ -97,6 +101,7 @@ namespace NightOwl::GameObject
 			if (owlBehavior != nullptr)
 			{
 				Core::OwlBehaviorManagerLocator::GetOwlBehaviorManager()->AddOwlBehavior(owlBehavior);
+				owlBehaviorList.insert(owlBehavior);
 			}
 
 			return dynamic_cast<T*>(componentList.back().get());
@@ -129,6 +134,7 @@ namespace NightOwl::GameObject
 			if (owlBehavior != nullptr)
 			{
 				Core::OwlBehaviorManagerLocator::GetOwlBehaviorManager()->RemoveOwlBehavior(owlBehavior);
+				owlBehaviorList.erase(owlBehavior);
 			}
 
 			componentList.erase(componentList.begin() + componentIndex);
@@ -143,6 +149,8 @@ namespace NightOwl::GameObject
 	protected:
 		std::vector<std::shared_ptr<Component::Component>> componentList;
 
+		std::set<Behavior::OwlBehavior*> owlBehaviorList;
+
 		Component::Transform transform;
 
 		Core::Scene* scene;
@@ -152,6 +160,8 @@ namespace NightOwl::GameObject
 		unsigned int id;
 
 		bool isActive;
+
+		friend class Physics::PhysicsEngine2D;
 
 		template <typename T>
 		int CheckForComponent() const
@@ -166,6 +176,11 @@ namespace NightOwl::GameObject
 			}
 
 			return notFound;
+		}
+
+		const std::set<Behavior::OwlBehavior*>& GetOwlBehaviorList()
+		{
+			return owlBehaviorList;
 		}
 	};
 }

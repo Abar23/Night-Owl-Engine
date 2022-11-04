@@ -15,9 +15,9 @@ namespace NightOwl::Component
 
 		Math::Mat4F ViewProjectionMatrix();
 
-		const Math::Mat4F& GetViewMatrix();
+		const Math::Mat4F GetViewMatrix();
 
-		const Math::Mat4F& GetViewMatrix() const;
+		const Math::Mat4F GetViewMatrix() const;
 
 		float GetNearClippingPlane();
 
