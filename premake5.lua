@@ -54,7 +54,8 @@ workspace "Night-Owl-Engine"
             vendorDir .. "/glad/include",
             vendorDir .. "/GLFW/include",
             vendorDir .. "/imgui/include",
-            vendorDir .. "/stb/include"
+            vendorDir .. "/stb/include",
+            vendorDir .. "/rapidjson/include"
         }
 
         links
