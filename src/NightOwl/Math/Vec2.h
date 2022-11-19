@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Swizzle.h"
+#include "MathFunctions.h"
 #include <ostream>
 #include <initializer_list>
 #include <array>
-#include "Swizzle.h"
-#include "MathFunctions.h"
 
 namespace NightOwl::Math
 {

@@ -41,4 +41,10 @@ namespace NightOwl::Physics
 	{
 		this->orientationOffsetFromObject = orientationOffsetFromObject;
 	}
+
+	START_REFLECTION(OBBBoxCollider2D)
+	//CLASS_MEMBER_REFLECTION(offsetFromCenterOfObject)
+	//CLASS_MEMBER_REFLECTION(halfWidths)
+	//CLASS_MEMBER_REFLECTION(orientationOffsetFromObject)
+	END_REFLECTION(OBBBoxCollider2D)
 }

@@ -121,4 +121,11 @@ namespace NightOwl::Component
 			isValid = false;
 		}
 	}
+
+	START_REFLECTION(Mesh)
+	CLASS_MEMBER_REFLECTION(vertices)
+	CLASS_MEMBER_REFLECTION(colors)
+	CLASS_MEMBER_REFLECTION(triangles)
+	CLASS_MEMBER_REFLECTION(uvs)
+	END_REFLECTION(Mesh)
 }

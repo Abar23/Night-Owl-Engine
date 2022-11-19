@@ -28,4 +28,9 @@ namespace NightOwl::Physics
 	{
 		this->halfWidths = halfWidths;
 	}
+
+	START_REFLECTION(AABBBoxCollider2D)
+	//CLASS_MEMBER_REFLECTION(offsetFromCenterOfObject)
+	//CLASS_MEMBER_REFLECTION(halfWidths)
+	END_REFLECTION(AABBBoxCollider2D)
 }

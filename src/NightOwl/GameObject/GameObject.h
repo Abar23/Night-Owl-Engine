@@ -11,6 +11,7 @@
 namespace NightOwl::Core
 {
 	class Scene;
+	class SceneSerializer;
 }
 
 namespace NightOwl::Component
@@ -162,6 +163,8 @@ namespace NightOwl::GameObject
 		bool isActive;
 
 		friend class Physics::PhysicsEngine2D;
+
+		friend class Core::SceneSerializer;
 
 		template <typename T>
 		int CheckForComponent() const

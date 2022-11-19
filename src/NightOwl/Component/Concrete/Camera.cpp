@@ -123,4 +123,13 @@ namespace NightOwl::Component
 	{
 		return mainCamera;
 	}
+
+	START_REFLECTION(Camera)
+	CLASS_MEMBER_REFLECTION(projectionMatrix)
+	CLASS_MEMBER_REFLECTION(fieldOfView)
+	CLASS_MEMBER_REFLECTION(clippingPlanes)
+	CLASS_MEMBER_REFLECTION(isPerspectiveProjection)
+	CLASS_MEMBER_REFLECTION(orthographicSize)
+	CLASS_MEMBER_REFLECTION(isProjectionDirty)
+	END_REFLECTION(Camera)
 }

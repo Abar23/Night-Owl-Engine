@@ -1,8 +1,9 @@
 #pragma once
 
 #include "NightOwl/Component/Component.h"
-#include "NightOwl/Component/Structures/CameraStructs.h"
+#include "NightOwl/Component/Structures/ClippingPlanes.h"
 #include "NightOwl/Math/Math.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl::Component
 {
@@ -50,6 +51,8 @@ namespace NightOwl::Component
 		void SetPerspectiveMode(bool enablePerspectiveProjection);
 
 		static Camera* GetMainCamera();
+
+		REFLECT()
 
 	private:
 		static Camera* mainCamera;

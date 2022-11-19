@@ -200,7 +200,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Vec3<T> Quaternion<T>::GetEulerAngles()
+	Vec3<T> Quaternion<T>::GetEulerAngles() const
 	{
 		Vec3<T> angles;
 

@@ -92,4 +92,15 @@ namespace NightOwl::Component
 		this->collider = std::shared_ptr<Physics::Collider2D>(collider);
 		this->collider->rigidBody2D = this;
 	}
+
+	START_REFLECTION(RigidBody2D)
+	CLASS_MEMBER_REFLECTION(velocity)
+	CLASS_MEMBER_REFLECTION(rotation)
+	CLASS_MEMBER_REFLECTION(mass)
+	CLASS_MEMBER_REFLECTION(inverseMass)
+	CLASS_MEMBER_REFLECTION(position)
+	CLASS_MEMBER_REFLECTION(linearVelocity)
+	CLASS_MEMBER_REFLECTION(accumulatedForces)
+	//CLASS_MEMBER_REFLECTION(collider)
+	END_REFLECTION(RigidBody2D)
 }

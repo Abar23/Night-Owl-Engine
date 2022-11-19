@@ -2,6 +2,7 @@
 
 #include "Collider2D.h"
 #include "NightOwl/Math/Vec2.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl::Physics
 {
@@ -21,6 +22,8 @@ namespace NightOwl::Physics
 		Math::Vec2F GetHalfWidths() const;
 
 		void SetHalfWidths(const Math::Vec2F& halfWidths);
+
+		REFLECT()
 
 	private:
 		Math::Vec2F offsetFromCenterOfObject;

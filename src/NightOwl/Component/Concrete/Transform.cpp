@@ -348,4 +348,13 @@ namespace NightOwl::Component
 	{
 		return !children.empty();
 	}
+
+	START_REFLECTION(Transform)
+	CLASS_MEMBER_REFLECTION(localScale)
+	CLASS_MEMBER_REFLECTION(localRotation)
+	CLASS_MEMBER_REFLECTION(localPosition)
+	CLASS_MEMBER_REFLECTION(worldScaleOffset)
+	CLASS_MEMBER_REFLECTION(worldRotationOffset)
+	CLASS_MEMBER_REFLECTION(worldPosition)
+	END_REFLECTION(Transform)
 }

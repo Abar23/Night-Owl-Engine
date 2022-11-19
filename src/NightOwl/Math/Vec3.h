@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vec2.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl::Math
 {
@@ -235,6 +236,8 @@ namespace NightOwl::Math
 			stream << "(" << vector.x << ", " << vector.y << ", " << vector.z << ")";
 			return stream;
 		}
+
+		REFLECT()
 	};
 
 	using Vec3UI = Vec3<unsigned int>;

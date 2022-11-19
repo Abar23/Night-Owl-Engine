@@ -3,6 +3,7 @@
 #include "Collider2D.h"
 #include "NightOwl/Math/Quaternion.h"
 #include "NightOwl/Math/Vec2.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl::Physics
 {
@@ -25,6 +26,7 @@ namespace NightOwl::Physics
 
 		void SetOrientation(const Math::QuatF& orientationOffsetFromObject);
 
+		REFLECT()
 
 	private:
 		Math::Vec2F offsetFromCenterOfObject;
@@ -32,6 +34,5 @@ namespace NightOwl::Physics
 		Math::Vec2F halfWidths;
 
 		Math::QuatF orientationOffsetFromObject;
-
 	};
 }

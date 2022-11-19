@@ -18,6 +18,7 @@
 #include "NightOwl/Physics/2D/Collider/AABBBoxCollider2D.h"
 #include "NightOwl/Physics/2D/Collider/CircleCollider2D.h"
 #include "NightOwl/Physics/2D/Collider/OBBBoxCollider2D.h"
+#include "NightOwl/Core/Serialization/SceneSerializer.h"
 
 int main()
 {
@@ -87,6 +88,7 @@ int main()
 	mesh->SetColors(colors);
 	mesh->SetUVs(uvs);
 	mesh->SetTriangles(triangles);
+	
 	auto quadRigidBody2D = quad.AddComponent<NightOwl::Component::RigidBody2D>();
 	quadRigidBody2D->SetMass(1.0f);
 	NightOwl::Physics::Collider2D* aabbCollider = new NightOwl::Physics::OBBBoxCollider2D(NightOwl::Math::Vec2F(0, 0), NightOwl::Math::Vec2F(2, 2), NightOwl::Math::QuatF());
@@ -166,6 +168,9 @@ int main()
 		NightOwl::Window::WindowApi::GetWindow()->Update();
 		NightOwl::Core::Time::Update();
 	}
-		
+
+	NightOwl::Core::SceneSerializer serializer(scene);
+	serializer.Serialize("./assets/Scenes/scene.json");
+
 	return 0;
 }

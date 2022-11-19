@@ -38,7 +38,7 @@ namespace NightOwl::Math
 		Mat3<T> GetRotationMatrix() const;
 		void SetOrthogonalRotationMatrix(const Mat3<T>& matrix);
 		void SetNonOrthogonalRotationMatrix(const Mat3<T>& matrix);
-		Vec3<T> GetEulerAngles();
+		Vec3<T> GetEulerAngles() const;
 
 		static Vec3<T> TransformVector(const Quaternion<T>& quaternion, const Vec3<T>& vector);
 		static T Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);

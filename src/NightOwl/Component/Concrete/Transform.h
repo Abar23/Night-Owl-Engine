@@ -3,6 +3,7 @@
 #include "NightOwl/Math/Math.h"
 #include "NightOwl/Component/Component.h"
 #include "NightOwl/Component/Types/Space.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 #include <vector>
 
 namespace NightOwl::Core
@@ -74,6 +75,8 @@ namespace NightOwl::Component
 		bool HasParent() const;
 
 		bool HasChildren() const;
+
+		REFLECT()
 
 	private:
 		Math::Mat4F localModelMatrix;

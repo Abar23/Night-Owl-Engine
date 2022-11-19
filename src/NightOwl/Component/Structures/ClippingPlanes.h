@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NightOwl/Core/Reflection/Reflection.h"
+
 namespace NightOwl::Component
 {
 	class ClippingPlanes
@@ -10,6 +12,8 @@ namespace NightOwl::Component
 			this->near = near;
 			this->far = far;
 		}
+
+		REFLECT()
 
 		float far;
 

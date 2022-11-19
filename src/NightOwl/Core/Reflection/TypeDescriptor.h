@@ -1,7 +1,7 @@
 #pragma once
 
+#include "rapidjson/document.h"
 #include <cstddef>
-#include <string>
 
 namespace NightOwl::Core
 {
@@ -13,16 +13,10 @@ namespace NightOwl::Core
 				size(size)
 		{ }
 
-		virtual ~TypeDescriptor();
+		virtual ~TypeDescriptor() = default;
 
-		virtual std::string getName() const
-		{
-			return name;
-		}
+		virtual void Serialize(const void* object, rapidjson::Document& document, rapidjson::Value& value) = 0;
 
-		virtual void Dump(const void* object, int indentLevel = 0) const = 0;
-
-	private:
 		const char* name;
 
 		std::size_t size;

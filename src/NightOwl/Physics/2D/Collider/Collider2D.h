@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NightOwl/Core/Reflection/Reflection.h"
+
 namespace NightOwl::Component
 {
 	class RigidBody2D;
@@ -20,6 +22,8 @@ namespace NightOwl::Physics
 		{
 			return rigidBody2D;
 		}
+
+		REFLECT()
 
 	protected:
 		Component::RigidBody2D* rigidBody2D;

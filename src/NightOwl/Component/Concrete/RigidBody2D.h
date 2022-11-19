@@ -3,6 +3,7 @@
 #include "NightOwl/Component/Component.h"
 #include "NightOwl/Math/Vec2.h"
 #include "NightOwl/Physics/2D/Collider/Collider2D.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 #include <memory>
 #include <set>
 
@@ -49,6 +50,8 @@ namespace NightOwl::Component
 		Physics::Collider2D* GetCollider();
 
 		void SetCollider(Physics::Collider2D* collider);
+
+		REFLECT()
 
 	private:
 		Math::Vec2F velocity;

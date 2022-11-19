@@ -2,6 +2,7 @@
 
 #include "Collider2D.h"
 #include "NightOwl/Math/Vec2.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl::Physics
 {
@@ -17,6 +18,8 @@ namespace NightOwl::Physics
 		float GetRadius() const;
 
 		Math::Vec2F GetCenterOfCircle() const;
+
+		REFLECT()
 
 	private:
 		Math::Vec2F offsetFromCenterOfObject;

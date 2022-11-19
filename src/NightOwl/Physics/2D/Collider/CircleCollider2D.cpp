@@ -23,4 +23,9 @@ namespace NightOwl::Physics
 	{
 		return offsetFromCenterOfObject + rigidBody2D->GetGameObject().GetTransform()->GetPosition().xy;
 	}
+
+	START_REFLECTION(CircleCollider2D)
+	//CLASS_MEMBER_REFLECTION(offsetFromCenterOfObject)
+	//CLASS_MEMBER_REFLECTION(radius)
+	END_REFLECTION(CircleCollider2D)
 }

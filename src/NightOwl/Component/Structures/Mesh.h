@@ -4,6 +4,7 @@
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 #include <vector>
 
 namespace NightOwl::Component
@@ -34,6 +35,8 @@ namespace NightOwl::Component
 		void SetUVs(const std::vector<Math::Vec2F>& uvs);
 
 		void Clear();
+
+		REFLECT()
 
 	private:
 		std::vector<Math::Vec3F> vertices;

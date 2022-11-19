@@ -6,6 +6,8 @@
 
 namespace NightOwl::Core
 {
+	class SceneSerializer;
+
 	class Scene
 	{
 	public:
@@ -22,6 +24,8 @@ namespace NightOwl::Core
 		std::vector<GameObject::GameObject*>& GetRootGameObjects();
 
 	private:
+		friend class SceneSerializer;
+
 		std::map<unsigned int, std::shared_ptr<GameObject::GameObject>> gameObjectsList;
 
 		std::vector<GameObject::GameObject*> rootGameObjects;

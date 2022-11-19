@@ -2,6 +2,7 @@
 
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
+#include "NightOwl/Core/Reflection/Reflection.h"	
 
 namespace NightOwl::Component
 {

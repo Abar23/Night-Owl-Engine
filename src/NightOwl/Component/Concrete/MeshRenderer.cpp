@@ -1,5 +1,4 @@
 #include "MeshRenderer.h"
-
 #include "NightOwl/Component/Materials/StandardMaterial.h"
 
 namespace NightOwl::Component
@@ -43,4 +42,9 @@ namespace NightOwl::Component
 	{
 		this->material = material;
 	}
+
+	START_REFLECTION(MeshRenderer)
+	CLASS_MEMBER_REFLECTION(mesh)
+	CLASS_MEMBER_REFLECTION(isVisible)
+	END_REFLECTION(MeshRenderer)
 }
