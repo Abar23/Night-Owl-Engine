@@ -4,12 +4,12 @@
 namespace NightOwl::Graphics
 {
 	VertexBufferData::VertexBufferData()
-		: type(VertexDataType::None), normalize(false), numberOfComponents(0), sizeOfData(0)
+		: type(VertexDataType::None), normalize(false), numberOfComponents(0), sizeOfData(0), attributeLocation(0)
 	{
 	}
 
-	VertexBufferData::VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, bool normalize)
-		: shaderAttributeName{ shaderAttributeName }, type(type), normalize(normalize)
+	VertexBufferData::VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, unsigned int attributeLocation, bool normalize)
+		: shaderAttributeName{ shaderAttributeName }, type(type), normalize(normalize), attributeLocation(attributeLocation)
 	{
 		SetDataSizeAndNumberOfComponents();
 	}
@@ -53,6 +53,16 @@ namespace NightOwl::Graphics
 	unsigned VertexBufferData::GetSizeofData() const
 	{
 		return sizeOfData;
+	}
+
+	void VertexBufferData::SetAttributeLocation(unsigned int attributeLocation)
+	{
+		this->attributeLocation = attributeLocation;
+	}
+
+	unsigned int VertexBufferData::GetAttributeLocation() const
+	{
+		return attributeLocation;
 	}
 
 	void VertexBufferData::SetDataSizeAndNumberOfComponents()

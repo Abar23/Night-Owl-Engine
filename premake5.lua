@@ -45,7 +45,8 @@ workspace "Night-Owl-Engine"
             "OPEN_GL",
             "ENGINE_LOG_FILE=\"./Logs/EngineLogs.txt\"",
             "CLIENT_LOG_FILE=\"./Logs/ClientLogs.txt\"",
-            "LOG_FILE_DIR=\"./Logs/\""
+            "LOG_FILE_DIR=\"./Logs/\"",
+            "SERIALIZED_SCENE_DIR=\"./assets/Scenes\""
         }
 
         includedirs

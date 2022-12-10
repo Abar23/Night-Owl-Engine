@@ -1,5 +1,6 @@
 #include "MeshRenderer.h"
 #include "NightOwl/Component/Materials/StandardMaterial.h"
+#include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 
 namespace NightOwl::Component
 {
@@ -8,6 +9,7 @@ namespace NightOwl::Component
 		  isVisible(true)
 	{
 		material = std::make_shared<StandardMaterial>();
+		Core::MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);
 	}
 
 	void MeshRenderer::Draw()

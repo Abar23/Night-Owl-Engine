@@ -17,7 +17,7 @@ namespace NightOwl::Graphics
 
 		virtual void SetData(const void* vertexData) = 0;
 
-		virtual void OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize) = 0;
+		virtual void OverwriteVertexBufferDataAtIndex(int& index, const void* vertexData, unsigned int vertexDataSize) = 0;
 
 		virtual void SetVertexBufferLayout(const VertexBufferLayout& layout) = 0;
 

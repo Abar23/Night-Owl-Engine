@@ -84,8 +84,6 @@ namespace NightOwl::Physics
 			return false;
 		}
 
-		ENGINE_LOG_INFO("Collision between game object {0} and {1}", collider->GetRigidBody()->GetGameObject().GetName(), otherCollider->GetRigidBody()->GetGameObject().GetName());
-
 		return true;
 	}
 

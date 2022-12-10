@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include <ranges>
+
 namespace NightOwl::Core
 {
 	Scene::Scene()
@@ -67,6 +69,21 @@ namespace NightOwl::Core
 		}
 
 		return rootGameObjects;
+	}
+
+	GameObject::GameObject* Scene::FindGameObject(const std::string& gameObjectName)
+	{
+		for (auto& gameObjectPtr : gameObjectsList | std::views::values)
+		{
+			std::shared_ptr<GameObject::GameObject> object = gameObjectPtr;
+
+			if(gameObjectPtr->GetName() == gameObjectName)
+			{
+				return gameObjectPtr.get();
+			}
+		}
+
+		return nullptr;
 	}
 
 	void Scene::SetDirtyFlag()

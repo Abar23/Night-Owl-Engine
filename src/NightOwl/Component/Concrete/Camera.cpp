@@ -11,10 +11,10 @@ namespace NightOwl::Component
 			fieldOfView(90.0f),
 			clippingPlanes(0.01f, 1000.0f),
 			isPerspectiveProjection(true),
-			orthographicSize(1.0f),
 			isProjectionDirty(false)
 	{
 		this->gameObject = gameObject;
+		orthographicSize = static_cast<float>(Window::WindowApi::GetWindow()->GetHeight() / 2);
 		projectionMatrix = Math::Mat4F::Perspective(fieldOfView, Window::WindowApi::GetWindow()->GetAspectRatio(), clippingPlanes.near, clippingPlanes.far);
 		mainCamera = this;
 	}

@@ -69,21 +69,23 @@ namespace NightOwl::Component
 		indexBuffer->SetData(triangles.data());
 
 		Graphics::VertexBufferLayout layout;
-		layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3));
+		layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Position", Graphics::VertexDataType::VectorFloat3, 0));
 		if(!colors.empty())
 		{
-			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Color", Graphics::VertexDataType::VectorFloat3));
+			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("Color", Graphics::VertexDataType::VectorFloat3, 1));
 		}
 		if(!uvs.empty())
 		{
-			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("UV", Graphics::VertexDataType::VectorFloat2));
+			layout.AddVertexBufferDataDefinition(Graphics::VertexBufferData("UV", Graphics::VertexDataType::VectorFloat2, 2));
 		}
 
 		vertexBuffer->SetVertexBufferLayout(layout);
 		vertexBuffer->SetSize(layout.GetDataPerVertex() * triangles.size() * 3);
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(0, vertices.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * vertices.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(1, colors.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * colors.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(2, uvs.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat2) * uvs.size());
+
+		int attributeVertexBufferLayoutIndex = 0;
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, vertices.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * vertices.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, colors.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat3) * colors.size());
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, uvs.data(), VertexDataTypeToDataTypeSize(Graphics::VertexDataType::VectorFloat2) * uvs.size());
 
 		vertexArrayObject->SetupVertexBufferAttributes();
 	}
@@ -110,15 +112,13 @@ namespace NightOwl::Component
 
 	void Mesh::ValidateMesh()
 	{
-		auto expectedNumberOfVerticesPerTriangle = 3 * triangles.size();
+		isValid = false;
+
+		const auto expectedNumberOfVerticesPerTriangle = 3 * triangles.size();
 
 		if(expectedNumberOfVerticesPerTriangle <= vertices.size() * VertexDataTypeToNumberOfComponents(Graphics::VertexDataType::VectorFloat3))
 		{
 			isValid = true;
-		}
-		else
-		{
-			isValid = false;
 		}
 	}
 

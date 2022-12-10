@@ -62,6 +62,7 @@ namespace NightOwl::Component
 		return inverseMass;
 	}
 
+	// Fix this!!!!!!!!!!!!!!!!
 	Math::Vec2F RigidBody2D::GetPosition() const
 	{
 		return position;
@@ -95,7 +96,7 @@ namespace NightOwl::Component
 
 	START_REFLECTION(RigidBody2D)
 	CLASS_MEMBER_REFLECTION(velocity)
-	CLASS_MEMBER_REFLECTION(rotation)
+	{"rotation", offsetof(T, rotation), NightOwl::Core::TypeResolver<decltype(rotation)>::Get()},
 	CLASS_MEMBER_REFLECTION(mass)
 	CLASS_MEMBER_REFLECTION(inverseMass)
 	CLASS_MEMBER_REFLECTION(position)

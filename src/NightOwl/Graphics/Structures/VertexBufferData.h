@@ -10,7 +10,7 @@ namespace NightOwl::Graphics
 	public:
 		VertexBufferData();
 
-		VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, bool normalize = false);
+		VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, unsigned int attributeLocation, bool normalize = false);
 
 		const std::string& GetShaderAttributeName() const;
 
@@ -28,12 +28,22 @@ namespace NightOwl::Graphics
 
 		unsigned int GetSizeofData() const;
 
+		void SetAttributeLocation(unsigned int attributeLocation);
+
+		unsigned int GetAttributeLocation() const;
+
 	private:
 		std::string shaderAttributeName;
+
 		VertexDataType type;
+
 		bool normalize;
+
 		unsigned int numberOfComponents;
+
 		unsigned int sizeOfData;
+
+		unsigned int attributeLocation;
 
 		void SetDataSizeAndNumberOfComponents();
 	};

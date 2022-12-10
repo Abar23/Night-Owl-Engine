@@ -42,7 +42,7 @@ namespace NightOwl::Graphics
 		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	void Graphics::OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize)
+	void Graphics::OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int& index, const void* vertexData, unsigned int vertexDataSize)
 	{
 		if(vertexDataSize != 0)
 		{
@@ -64,6 +64,8 @@ namespace NightOwl::Graphics
 				byteVertexDataPointer += data.GetSizeofData();
 				offset += layout.GetDataPerVertex();
 			}
+
+			index++;
 		}
 	}
 

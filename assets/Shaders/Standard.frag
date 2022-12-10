@@ -19,6 +19,11 @@ void main(void)
     if(isInputTextureSet)
     {
         outputColor = texture(inputTexture, inVertexData.materialUvs);
+
+        if(outputColor.a < 0.1)
+        {
+            discard;
+        }
     }
 
 	FragColor = outputColor;

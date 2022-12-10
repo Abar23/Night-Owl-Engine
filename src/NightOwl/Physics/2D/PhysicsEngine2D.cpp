@@ -20,7 +20,7 @@ namespace NightOwl::Physics
 						Collider2D* otherCollider = otherRigidBody2D->GetCollider();
 						if (CollisionTest::TestCollision(collider, otherCollider))
 						{
-							collidingBodies.emplace(otherRigidBody2D);
+							collidingBodies.insert(otherRigidBody2D);
 						}
 					}
 				}
@@ -28,9 +28,10 @@ namespace NightOwl::Physics
 				// propagate collision events
 				if (!collidingBodies.empty())
 				{
-					if(rigidBody2D->newCollisions.empty())
+
+					for(auto* otherRigidBody : collidingBodies)
 					{
-						for(auto* otherRigidBody : collidingBodies)
+						if (!rigidBody2D->newCollisions.contains(otherRigidBody))
 						{
 							for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
 							{
@@ -40,11 +41,12 @@ namespace NightOwl::Physics
 							rigidBody2D->newCollisions.insert(otherRigidBody);
 						}
 					}
-					else
+
+					if (!rigidBody2D->newCollisions.empty())
 					{
 						for (auto collidingBody = rigidBody2D->newCollisions.begin(); collidingBody != rigidBody2D->newCollisions.end();)
 						{
-							if(collidingBodies.contains(*collidingBody))
+							if (collidingBodies.contains(*collidingBody))
 							{
 								for (auto* owlBehavior : rigidBody2D->gameObject->owlBehaviorList)
 								{
@@ -64,7 +66,6 @@ namespace NightOwl::Physics
 							}
 						}
 					}
-
 					collidingBodies.clear();
 				}
 				else

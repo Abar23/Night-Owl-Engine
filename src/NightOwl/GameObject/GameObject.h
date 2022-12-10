@@ -147,6 +147,11 @@ namespace NightOwl::GameObject
 			return CheckForComponent<T>() >= 0;
 		}
 
+		Core::Scene* GetScene()
+		{
+			return scene;
+		}
+
 	protected:
 		std::vector<std::shared_ptr<Component::Component>> componentList;
 

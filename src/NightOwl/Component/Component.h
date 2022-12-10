@@ -56,6 +56,5 @@ namespace NightOwl::Component
 		bool isEnabled;
 
 		friend class GameObject::GameObject;
-
 	};
 }

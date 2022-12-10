@@ -52,8 +52,8 @@ namespace NightOwl::Graphics
 		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
 		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);
 
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -23,6 +23,8 @@ namespace NightOwl::Core
 
 		std::vector<GameObject::GameObject*>& GetRootGameObjects();
 
+		GameObject::GameObject* FindGameObject(const std::string& gameObjectName);
+
 	private:
 		friend class SceneSerializer;
 

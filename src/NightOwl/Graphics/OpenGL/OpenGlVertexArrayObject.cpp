@@ -53,7 +53,6 @@ namespace NightOwl::Graphics
 	void OpenGlVertexArrayObject::SetupVertexBufferAttributes()
 	{
 		const VertexBufferLayout& layout = vertexBuffer->GetVertexBufferLayout();
-		unsigned int attributeLocation = 0;
 		unsigned int accumulativeOffset = 0;
 		for(const VertexBufferData& data : layout.GetBufferDataDefinitions() )
 		{
@@ -62,10 +61,9 @@ namespace NightOwl::Graphics
 			{
 			case VertexDataType::VectorFloat2:
 			case VertexDataType::VectorFloat3:
-				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, attributeLocation, 0);
-				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, attributeLocation, data.GetNumberOfComponents(), GL_FLOAT, data.GetNormalize(), accumulativeOffset);
-				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, attributeLocation);
-				attributeLocation++;
+				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, data.GetAttributeLocation(), 0);
+				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), GL_FLOAT, data.GetNormalize(), accumulativeOffset);
+				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, data.GetAttributeLocation());
 				accumulativeOffset += data.GetSizeofData();
 				break;
 
