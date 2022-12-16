@@ -4,7 +4,7 @@
 namespace NightOwl::Graphics
 {
 	OpenGlVertexArrayObject::OpenGlVertexArrayObject()
-		: vertexArrayObjectId(0)
+		:	vertexArrayObjectId(0)
 	{
 		GL_CALL(glCreateVertexArrays, 1, &vertexArrayObjectId);
 	}

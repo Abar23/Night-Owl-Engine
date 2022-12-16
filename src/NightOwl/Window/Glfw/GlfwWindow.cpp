@@ -14,15 +14,18 @@ namespace NightOwl::Window
 
 		#ifdef DEBUG
 		glfwSetErrorCallback(ErrorCallback);
-			#ifdef OPEN_GL
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-			#endif
+
+		#ifdef OPEN_GL
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		#endif
+
 		#endif
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
 		Graphics::RenderApi::CreateContext(this);//Create context
 
 		glfwGetFramebufferSize(windowHandle, &properties.pixelWidth, &properties.pixelHeight);
+
 		properties.screnWidth = width;
 		properties.screenHeight = height;
 		properties.aspectRatio = static_cast<float>(width) / static_cast<float>(height);

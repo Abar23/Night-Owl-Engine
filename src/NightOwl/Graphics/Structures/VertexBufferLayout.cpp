@@ -3,7 +3,7 @@
 namespace NightOwl::Graphics
 {
 	VertexBufferLayout::VertexBufferLayout()
-		: dataPerVertex(0)
+		:	dataPerVertex(0)
 	{
 	}
 
@@ -18,7 +18,8 @@ namespace NightOwl::Graphics
 	}
 
 	VertexBufferLayout::VertexBufferLayout(std::vector<VertexBufferData>& bufferDataDefs)
-		: bufferDataDefinitions(bufferDataDefs), dataPerVertex(0)
+		:	bufferDataDefinitions(bufferDataDefs),
+			dataPerVertex(0)
 	{
 		for (const VertexBufferData& data : bufferDataDefinitions)
 		{

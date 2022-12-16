@@ -4,13 +4,13 @@
 namespace NightOwl::Graphics
 {
 	OpenGlIndexBuffer::OpenGlIndexBuffer()
-		: indexBufferDataSize(0)
+		:	indexBufferDataSize(0)
 	{
 		GL_CALL(glCreateBuffers, 1, &indexBufferId);
 	}
 
 	OpenGlIndexBuffer::OpenGlIndexBuffer(const void* indexData, unsigned int indexDataSize)
-		: indexBufferDataSize(indexDataSize)
+		:	indexBufferDataSize(indexDataSize)
 	{
 		GL_CALL(glCreateBuffers, 1, &indexBufferId);
 		GL_CALL(glNamedBufferData, indexBufferId, indexDataSize * sizeof(unsigned int), indexData, GL_DYNAMIC_DRAW);

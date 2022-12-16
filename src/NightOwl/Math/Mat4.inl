@@ -129,10 +129,10 @@ namespace NightOwl::Math
 		Vec3<T> thirdRow = Vec3<T>::Cross(d, u) + s * w;
 		Vec3<T> fourthRow = Vec3<T>::Cross(u, c) - s * z;
 
-		return Mat4<T>(firstRow.x, firstRow.y, firstRow.z, -Vec3<T>::Dot(b, t),
-			secondRow.x, secondRow.y, secondRow.z, Vec3<T>::Dot(a, t),
-			thirdRow.x, thirdRow.y, thirdRow.z, -Vec3<T>::Dot(d, s),
-			fourthRow.x, fourthRow.y, fourthRow.z, Vec3<T>::Dot(c, s));
+		return Mat4<T>( firstRow.x,  firstRow.y,  firstRow.z, -Vec3<T>::Dot(b, t),
+					   secondRow.x, secondRow.y, secondRow.z,  Vec3<T>::Dot(a, t),
+					    thirdRow.x,  thirdRow.y,  thirdRow.z, -Vec3<T>::Dot(d, s),
+					   fourthRow.x, fourthRow.y, fourthRow.z,  Vec3<T>::Dot(c, s));
 	}
 
 	template <typename T>
@@ -191,9 +191,9 @@ namespace NightOwl::Math
 	Mat4<T> Mat4<T>::GetTranspose() const
 	{
 		return Mat4<T>(data[0][0], data[0][1], data[0][2], data[0][3],
-			data[1][0], data[1][1], data[1][2], data[1][3],
-			data[2][0], data[2][1], data[2][2], data[2][3],
-			data[3][0], data[3][1], data[3][2], data[3][3]);
+					   data[1][0], data[1][1], data[1][2], data[1][3],
+					   data[2][0], data[2][1], data[2][2], data[2][3],
+					   data[3][0], data[3][1], data[3][2], data[3][3]);
 	}
 
 	template <typename T>
@@ -252,9 +252,9 @@ namespace NightOwl::Math
 	Vec4<T> Mat4<T>::GetRow(const int rowIndex) const
 	{
 		return Vec4<T>(data[0][rowIndex],
-			data[1][rowIndex],
-			data[2][rowIndex],
-			data[3][rowIndex]);
+					   data[1][rowIndex],
+					   data[2][rowIndex],
+					   data[3][rowIndex]);
 	}
 
 	template <typename T>
@@ -294,9 +294,9 @@ namespace NightOwl::Math
 	Mat4<T> Mat4<T>::GetAffineMatrix() const
 	{
 		return Mat4<T>(data[0][0], data[1][0], data[2][0], 0,
-			data[0][1], data[1][1], data[2][1], 0,
-			data[0][2], data[1][2], data[2][2], 0,
-			0, 0, 0, 1);
+					   data[0][1], data[1][1], data[2][1], 0,
+					   data[0][2], data[1][2], data[2][2], 0,
+								0,			0,			0, 1);
 	}
 
 	template <typename T>
@@ -338,10 +338,10 @@ namespace NightOwl::Math
 		T cos = std::cos(radians);
 		T sin = std::sin(radians);
 
-		return Mat4<T>(1, 0, 0, 0,
-			0, cos, -sin, 0,
-			0, sin, cos, 0,
-			0, 0, 0, 1);
+		return Mat4<T>(1,   0,    0, 0,
+					   0, cos, -sin, 0,
+					   0, sin,  cos, 0,
+					   0,   0,    0, 1);
 	}
 
 	template <typename T>
@@ -351,10 +351,10 @@ namespace NightOwl::Math
 		T cos = std::cos(radians);
 		T sin = std::sin(radians);
 
-		return Mat4<T>(cos, 0, sin, 0,
-			0, 1, 0, 0,
-			-sin, 0, cos, 0,
-			0, 0, 0, 1);
+		return Mat4<T>( cos, 0, sin, 0,
+						  0, 1,   0, 0,
+					   -sin, 0, cos, 0,
+						  0, 0,   0, 1);
 	}
 
 	template <typename T>
@@ -365,9 +365,9 @@ namespace NightOwl::Math
 		T sin = std::sin(radians);
 
 		return Mat4<T>(cos, -sin, 0, 0,
-			sin, cos, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
+					   sin,  cos, 0, 0,
+						 0,    0, 1, 0,
+						 0,    0, 0, 1);
 	}
 
 	template <typename T>
@@ -385,64 +385,64 @@ namespace NightOwl::Math
 		T axisXAxisZ = x * axis.z;
 		T axisYAxisZ = y * axis.z;
 
-		return Mat4<T>(cos + x * axis.x, axisXAxisY - sin * axis.z, axisXAxisZ + sin * axis.y, 0,
-			axisXAxisY + sin * axis.z, cos + y * axis.y, axisYAxisZ - sin * axis.x, 0,
-			axisXAxisZ - sin * axis.y, axisYAxisZ + sin * axis.x, cos + z * axis.z, 0,
-			0, 0, 0, 1);
+		return Mat4<T>(			cos + x * axis.x, axisXAxisY - sin * axis.z, axisXAxisZ + sin * axis.y, 0,
+					   axisXAxisY + sin * axis.z,		   cos + y * axis.y, axisYAxisZ - sin * axis.x, 0,
+					   axisXAxisZ - sin * axis.y, axisYAxisZ + sin * axis.x,		  cos + z * axis.z, 0,
+											   0,						  0,						 0, 1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeScale(const T uniformScale)
 	{
-		return Mat4<T>(uniformScale, 0, 0, 0,
-			0, uniformScale, 0, 0,
-			0, 0, uniformScale, 0,
-			0, 0, 0, 1);
+		return Mat4<T>(uniformScale,			0,			  0, 0,
+								  0, uniformScale,			  0, 0,
+								  0,			0, uniformScale, 0,
+								  0,			0,			  0, 1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeScale(const T scaleX, const T scaleY, const T scaleZ)
 	{
-		return Mat4<T>(scaleX, 0, 0, 0,
-			0, scaleY, 0, 0,
-			0, 0, scaleZ, 0,
-			0, 0, 0, 1);
+		return Mat4<T>(scaleX,		0,		0, 0,
+							0, scaleY,		0, 0,
+							0,		0, scaleZ, 0,
+							0,		0,		0, 1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeScale(const Vec3<T>& vector)
 	{
-		return Mat4<T>(vector.x, 0, 0, 0,
-			0, vector.y, 0, 0,
-			0, 0, vector.z, 0,
-			0, 0, 0, 1);
+		return Mat4<T>(vector.x,		0,		  0, 0,
+							  0, vector.y,		  0, 0,
+							  0,		0, vector.z, 0,
+							  0,		0,		  0, 1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeTranslation(const T uniformTranslation)
 	{
 		return Mat4<T>(1, 0, 0, uniformTranslation,
-			0, 1, 0, uniformTranslation,
-			0, 0, 1, uniformTranslation,
-			0, 0, 0, 1);
+					   0, 1, 0, uniformTranslation,
+					   0, 0, 1, uniformTranslation,
+					   0, 0, 0,					 1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeTranslation(const T translationX, const T translationY, const T translationZ)
 	{
 		return Mat4<T>(1, 0, 0, translationX,
-			0, 1, 0, translationY,
-			0, 0, 1, translationZ,
-			0, 0, 0, 1);
+					   0, 1, 0, translationY,
+					   0, 0, 1, translationZ,
+					   0, 0, 0,			   1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::MakeTranslation(const Vec3<T>& vector)
 	{
 		return Mat4<T>(1, 0, 0, vector.x,
-			0, 1, 0, vector.y,
-			0, 0, 1, vector.z,
-			0, 0, 0, 1);
+					   0, 1, 0, vector.y,
+					   0, 0, 1, vector.z,
+					   0, 0, 0,		   1);
 	}
 
 	template <typename T>
@@ -452,32 +452,41 @@ namespace NightOwl::Math
 		Vec3<T> rightAxis = Vec3<T>::Cross(up, forwardAxis).GetNormalize();
 		Vec3<T> upAxis = Vec3<T>::Cross(forwardAxis, rightAxis).GetNormalize();
 
-		return Mat4<T>(rightAxis.x, rightAxis.y, rightAxis.z, -Vec3<T>::Dot(rightAxis, cameraPosition),
-			upAxis.x, upAxis.y, upAxis.z, -Vec3<T>::Dot(upAxis, cameraPosition),
-			forwardAxis.x, forwardAxis.y, forwardAxis.z, -Vec3<T>::Dot(forwardAxis, cameraPosition),
-			0, 0, 0, 1);
+		return Mat4<T>(rightAxis.x,	  rightAxis.y,   rightAxis.z,   -Vec3<T>::Dot(rightAxis, cameraPosition),
+						  upAxis.x,		 upAxis.y,		upAxis.z,	   -Vec3<T>::Dot(upAxis, cameraPosition),
+					 forwardAxis.x, forwardAxis.y, forwardAxis.z, -Vec3<T>::Dot(forwardAxis, cameraPosition),
+								 0,				0,			   0,															   1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::Orthographic(const T left, const T right, const T bottom, const T top, const T near, const T far)
 	{
-		return Mat4<T>(static_cast<T>(2) / (right - left), 0, 0, static_cast<T>(-1) * (left + right) / (right - left),
-			0, static_cast<T>(2) / (top - bottom), 0, static_cast<T>(-1) * (bottom + top) / (top - bottom),
-			0, 0, static_cast<T>(-2) / (far - near), static_cast<T>(-1) * (near + far) / (far - near),
-			0, 0, 0, 1);
+				T two = static_cast<T>(2);
+		T negativeTwo = static_cast<T>(-2);
+		T negativeOne = static_cast<T>(-1);
+
+		return Mat4<T>(two / (right - left),					0,							0, negativeOne * (left + right) / (right - left),
+										  0, two / (top - bottom),							0, negativeOne * (bottom + top) / (top - bottom),
+										  0,					0, negativeTwo / (far - near),	   negativeOne * (near + far) / (far - near),
+										  0,					0,							0,											   1);
 	}
 
 	template <typename T>
 	Mat4<T> Mat4<T>::Perspective(const T fieldOfViewInDegrees, const T aspectRatio, const T near, const T far)
 	{
-		T yScale = static_cast<T>(1) / std::tan(DegreesToRad(fieldOfViewInDegrees) / static_cast<T>(2));
+		T two = static_cast<T>(2);
+		T negativeTwo = static_cast<T>(-2);
+		T one = static_cast<T>(1);
+		T negativeOne = static_cast<T>(-1);
+
+		T yScale = one / std::tan(DegreesToRad(fieldOfViewInDegrees) / two);
 		T xScale = yScale / aspectRatio;
 		T farMinusNear = far - near;
 
-		return Mat4<T>(xScale, 0, 0, 0,
-			0, yScale, 0, 0,
-			0, 0, static_cast<T>(-1) * (far + near) / (farMinusNear), static_cast<T>(-2) * far * near / farMinusNear,
-			0, 0, -1, 0);
+		return Mat4<T>(xScale,		0,											 0,										  0,
+							0, yScale,											 0,										  0,
+							0,		0, negativeOne * (far + near) / (farMinusNear), negativeTwo * far * near / farMinusNear,
+							0,		0,								   negativeOne,										  0);
 	}
 
 	template <typename T>
@@ -590,9 +599,9 @@ namespace NightOwl::Math
 	Vec4<T> operator*(const Mat4<T>& matrix, const Vec4<T>& vector)
 	{
 		return Vec4<T>(matrix(0, 0) * vector.x + matrix(1, 0) * vector.y + matrix(2, 0) * vector.z + matrix(3, 0) * vector.w,
-			matrix(0, 1) * vector.x + matrix(1, 1) * vector.y + matrix(2, 1) * vector.z + matrix(3, 1) * vector.w,
-			matrix(0, 2) * vector.x + matrix(1, 2) * vector.y + matrix(2, 2) * vector.z + matrix(3, 2) * vector.w,
-			matrix(0, 3) * vector.x + matrix(1, 3) * vector.y + matrix(2, 3) * vector.z + matrix(3, 3) * vector.w);
+					   matrix(0, 1) * vector.x + matrix(1, 1) * vector.y + matrix(2, 1) * vector.z + matrix(3, 1) * vector.w,
+					   matrix(0, 2) * vector.x + matrix(1, 2) * vector.y + matrix(2, 2) * vector.z + matrix(3, 2) * vector.w,
+					   matrix(0, 3) * vector.x + matrix(1, 3) * vector.y + matrix(2, 3) * vector.z + matrix(3, 3) * vector.w);
 	}
 
 	template <typename T>

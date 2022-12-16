@@ -17,8 +17,7 @@ namespace NightOwl::Component
 		  parent(nullptr),
 		  isLocalDirty(false),
 		  isWorldDirty(false)
-	{
-	}
+	{ }
 
 	void Transform::Scale(float scaleX, float scaleY, float scaleZ, Space space)
 	{

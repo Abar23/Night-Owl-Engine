@@ -18,6 +18,6 @@ namespace NightOwl::Core
 		}
 
 	private:
-		inline static Behavior::OwlBehaviorManager* owlBehaviorManagerInstance = nullptr;
+		inline static Behavior::OwlBehaviorManager* owlBehaviorManagerInstance{ nullptr };
 	};
 }

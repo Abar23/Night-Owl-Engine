@@ -18,6 +18,6 @@ namespace NightOwl::Core
 		}
 
 	private:
-		inline static Physics::PhysicsEngine2D* physicsEngine2DInstance = nullptr;
+		inline static Physics::PhysicsEngine2D* physicsEngine2DInstance{ nullptr };
 	};
 }

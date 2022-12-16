@@ -7,7 +7,8 @@
 namespace NightOwl::Graphics
 {
 	OpenGlShader::OpenGlShader(const std::string& name, const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
-		: programId(0), name{ name }
+		:	programId(0),
+			name{ name }
 	{
 		const unsigned int vertexShaderId = CompileShaderSource(vertexShaderPath, GL_VERTEX_SHADER);
 		const unsigned int fragmentShaderId = CompileShaderSource(fragmentShaderPath, GL_FRAGMENT_SHADER);

@@ -15,16 +15,16 @@ namespace NightOwl::Component
 		Component(const Component& other) = default;
 
 		Component()
-			: gameObject(nullptr), type(ComponentType::None), isEnabled(true)
-		{
-			
-		}
+			:	gameObject(nullptr),
+				type(ComponentType::None),
+				isEnabled(true)
+		{ }
 
 		Component(ComponentType type)
-			: gameObject(nullptr), type(type), isEnabled(true)
-		{
-
-		}
+			:	gameObject(nullptr),
+				type(type),
+				isEnabled(true)
+		{ }
 
 		virtual ~Component() = default;
 

@@ -159,8 +159,8 @@ namespace NightOwl::Math
 	T Mat3<T>::Determinant() const
 	{
 		return data[0][0] * (data[1][1] * data[2][2] - data[2][1] * data[1][2])
-			+ data[1][0] * (data[2][1] * data[0][2] - data[0][1] * data[2][2])
-			+ data[2][0] * (data[0][1] * data[1][2] - data[1][1] * data[0][2]);
+			 + data[1][0] * (data[2][1] * data[0][2] - data[0][1] * data[2][2])
+			 + data[2][0] * (data[0][1] * data[1][2] - data[1][1] * data[0][2]);
 	}
 
 	template <typename T>
@@ -198,9 +198,9 @@ namespace NightOwl::Math
 		T cos = std::cos(radians);
 		T sin = std::sin(radians);
 
-		return Mat3<T>(1, 0, 0,
-			0, cos, -sin,
-			0, sin, cos);
+		return Mat3<T>(1,   0,    0,
+					   0, cos, -sin,
+					   0, sin,  cos);
 	}
 
 	template <typename T>
@@ -210,9 +210,9 @@ namespace NightOwl::Math
 		T cos = std::cos(radians);
 		T sin = std::sin(radians);
 
-		return Mat3<T>(cos, 0, sin,
-			0, 1, 0,
-			-sin, 0, cos);
+		return Mat3<T>( cos, 0, sin,
+					      0, 1,   0,
+					   -sin, 0, cos);
 	}
 
 	template <typename T>
@@ -223,8 +223,8 @@ namespace NightOwl::Math
 		T sin = std::sin(radians);
 
 		return Mat3<T>(cos, -sin, 0,
-			sin, cos, 0,
-			0, 0, 1);
+					   sin,  cos, 0,
+						 0,    0, 1);
 	}
 
 	template <typename T>
@@ -242,33 +242,33 @@ namespace NightOwl::Math
 		T axisXAxisZ = x * axis.z;
 		T axisYAxisZ = y * axis.z;
 
-		return Mat3<T>(cos + x * axis.x, axisXAxisY - sin * axis.z, axisXAxisZ + sin * axis.y,
-			axisXAxisY + sin * axis.z, cos + y * axis.y, axisYAxisZ - sin * axis.x,
-			axisXAxisZ - sin * axis.y, axisYAxisZ + sin * axis.x, cos + z * axis.z);
+		return Mat3<T>(         cos + x * axis.x, axisXAxisY - sin * axis.z, axisXAxisZ + sin * axis.y,
+					   axisXAxisY + sin * axis.z,          cos + y * axis.y, axisYAxisZ - sin * axis.x,
+					   axisXAxisZ - sin * axis.y, axisYAxisZ + sin * axis.x,          cos + z * axis.z);
 	}
 
 	template <typename T>
 	Mat3<T> Mat3<T>::MakeScale(const T uniformScale)
 	{
-		return Mat3<T>(uniformScale, 0, 0,
-			0, uniformScale, 0,
-			0, 0, uniformScale);
+		return Mat3<T>(uniformScale,		    0,			  0,
+								  0, uniformScale,			  0,
+								  0,		    0, uniformScale);
 	}
 
 	template <typename T>
 	Mat3<T> Mat3<T>::MakeScale(const T scaleX, const T scaleY, const T scaleZ)
 	{
-		return Mat3<T>(scaleX, 0, 0,
-			0, scaleY, 0,
-			0, 0, scaleZ);
+		return Mat3<T>(scaleX,		0,		0,
+							0, scaleY,		0,
+							0,		0, scaleZ);
 	}
 
 	template <typename T>
 	Mat3<T> Mat3<T>::MakeScale(const Vec3<T>& vector)
 	{
-		return Mat3<T>(vector.x, 0, 0,
-			0, vector.y, 0,
-			0, 0, vector.z);
+		return Mat3<T>(vector.x,		0,		  0,
+							  0, vector.y,		  0,
+							  0,		0, vector.z);
 	}
 
 	template <typename T>

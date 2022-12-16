@@ -2,5 +2,5 @@
 
 namespace NightOwl::Window
 {
-	std::unique_ptr<IWindow> WindowApi::window{ nullptr };
+	//std::unique_ptr<IWindow> WindowApi::window{ nullptr };
 }

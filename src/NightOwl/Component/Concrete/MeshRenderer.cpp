@@ -5,8 +5,8 @@
 namespace NightOwl::Component
 {
 	MeshRenderer::MeshRenderer()
-		: Component(ComponentType::MeshRenderer),
-		  isVisible(true)
+		:	Component(ComponentType::MeshRenderer),
+			isVisible(true)
 	{
 		material = std::make_shared<StandardMaterial>();
 		Core::MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);

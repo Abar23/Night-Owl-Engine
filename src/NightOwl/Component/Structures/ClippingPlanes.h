@@ -8,10 +8,9 @@ namespace NightOwl::Component
 	{
 	public:
 		ClippingPlanes(float near, float far)
-		{
-			this->near = near;
-			this->far = far;
-		}
+			:	far(far),
+				near(near)
+		{ }
 
 		REFLECT()
 

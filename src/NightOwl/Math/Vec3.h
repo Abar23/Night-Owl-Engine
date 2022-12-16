@@ -19,7 +19,7 @@ namespace NightOwl::Math
 			{
 				T x, y, z;
 			};
-
+			
 			Swizzle<Vec2, T, 3, 0, 0> xx;
 			Swizzle<Vec2, T, 3, 0, 1> xy;
 			Swizzle<Vec2, T, 3, 0, 2> xz;

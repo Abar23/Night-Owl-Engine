@@ -112,16 +112,16 @@ namespace NightOwl::Math
 	T Vec3<T>::Dot(const Vec3& leftVector, const Vec3& rightVector)
 	{
 		return leftVector.x * rightVector.x +
-			leftVector.y * rightVector.y +
-			leftVector.z * rightVector.z;
+			   leftVector.y * rightVector.y +
+			   leftVector.z * rightVector.z;
 	}
 
 	template <typename T>
 	Vec3<T> Vec3<T>::Cross(const Vec3& leftVector, const Vec3& rightVector)
 	{
 		return Vec3(leftVector.y * rightVector.z - leftVector.z * rightVector.y,
-			leftVector.z * rightVector.x - leftVector.x * rightVector.z,
-			leftVector.x * rightVector.y - leftVector.y * rightVector.x);
+					leftVector.z * rightVector.x - leftVector.x * rightVector.z,
+					leftVector.x * rightVector.y - leftVector.y * rightVector.x);
 	}
 
 	template <typename T>

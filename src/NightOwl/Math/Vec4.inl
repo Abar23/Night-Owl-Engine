@@ -124,9 +124,9 @@ namespace NightOwl::Math
 	T Vec4<T>::Dot(const Vec4<T>& leftVector, const Vec4<T>& rightVector)
 	{
 		return leftVector.x * rightVector.x +
-			leftVector.y * rightVector.y +
-			leftVector.z * rightVector.z +
-			leftVector.w * rightVector.w;
+			   leftVector.y * rightVector.y +
+			   leftVector.z * rightVector.z +
+			   leftVector.w * rightVector.w;
 	}
 
 	template <typename T>

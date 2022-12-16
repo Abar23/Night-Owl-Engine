@@ -3,6 +3,7 @@
 namespace NightOwl::Core
 {
 	std::unique_ptr<Time> Time::timeInstance{ nullptr };
+
 	std::mutex Time::mutexLock;
 
 	void Time::Init()

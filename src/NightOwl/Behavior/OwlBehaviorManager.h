@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <unordered_set>
 
 namespace NightOwl::Behavior
 {
@@ -22,13 +22,14 @@ namespace NightOwl::Behavior
 		void Reset();
 
 	private:
-		std::set<OwlBehavior*> owlBehaviors;
+		// TODO: May not need the below set
+		std::unordered_set<OwlBehavior*> owlBehaviors;
 
-		std::set<OwlBehavior*> owlBehaviorsToStart;
+		std::unordered_set<OwlBehavior*> owlBehaviorsToStart;
 
-		std::set<OwlBehavior*> owlBehaviorsToUpdate;
+		std::unordered_set<OwlBehavior*> owlBehaviorsToUpdate;
 
-		std::set<OwlBehavior*> owlBehaviorsToAwake;
+		std::unordered_set<OwlBehavior*> owlBehaviorsToAwake;
 
 		bool hasInitializedBehaviors;
 

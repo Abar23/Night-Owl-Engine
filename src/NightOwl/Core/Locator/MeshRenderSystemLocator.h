@@ -18,6 +18,6 @@ namespace NightOwl::Core
 		}
 
 	private:
-		inline static Graphics::MeshRendererSystem* meshRendererSystemInstance = nullptr;
+		inline static Graphics::MeshRendererSystem* meshRendererSystemInstance{ nullptr };
 	};
 }

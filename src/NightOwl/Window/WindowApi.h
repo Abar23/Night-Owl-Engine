@@ -24,6 +24,6 @@ namespace NightOwl::Window
 		}
 
 	private:
-		static std::unique_ptr<IWindow> window;
+		inline static std::unique_ptr<IWindow> window{nullptr};
 	};
 }

@@ -7,7 +7,7 @@
 namespace NightOwl::Graphics
 {
 	OpenGlContext::OpenGlContext(GLFWwindow* window)
-		: window(window)
+		:	window(window)
 	{
 		glfwMakeContextCurrent(window);
 		int gladLoadedSucessfully = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -28,7 +28,7 @@ namespace NightOwl::Graphics
 		GL_CALL(glEnable, GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		GL_CALL(glDebugMessageCallback, Utility::GlDebugOutput, nullptr);
 
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+		GL_CALL(glDebugMessageControl, GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, NULL, GL_FALSE);
 		#endif
 
 		GL_CALL(glEnable, GL_BLEND);
@@ -76,13 +76,8 @@ namespace NightOwl::Graphics
 
 	void OpenGlContext::EnableWireframe(bool enabled)
 	{
-		if(enabled)
-		{
-			GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, GL_LINE);
-		}
-		else
-		{
-			GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, GL_FILL);
-		}
+		const int mode = enabled ? GL_LINE : GL_FILL;
+
+		GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, mode);
 	}
 }

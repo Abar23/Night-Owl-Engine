@@ -65,4 +65,3 @@ namespace NightOwl::Input
 		return nightOwlInputAction;
 	}
 }
-

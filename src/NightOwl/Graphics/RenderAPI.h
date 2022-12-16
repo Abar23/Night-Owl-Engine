@@ -78,6 +78,6 @@ namespace NightOwl::Graphics
 		}
 
 	private:
-		static std::unique_ptr<IContext> graphicsContext;
+		inline static std::unique_ptr<IContext> graphicsContext{ nullptr };
 	};
 }

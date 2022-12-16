@@ -253,9 +253,9 @@ namespace NightOwl::Math
 	T Quaternion<T>::Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
 	{
 		return leftQuaternion.x * rightQuaternion.x +
-			leftQuaternion.y * rightQuaternion.y +
-			leftQuaternion.z * rightQuaternion.z +
-			leftQuaternion.w * rightQuaternion.w;
+			   leftQuaternion.y * rightQuaternion.y +
+			   leftQuaternion.z * rightQuaternion.z +
+			   leftQuaternion.w * rightQuaternion.w;
 	}
 
 	template <typename T>
@@ -333,7 +333,7 @@ namespace NightOwl::Math
 	{
 		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
-		if (dot > DOT_THRESHHOLD)
+		if (dot > DOT_THRESHOLD)
 		{
 			return Nlerp(leftQuaternion, rightQuaternion, t);
 		}

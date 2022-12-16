@@ -15,7 +15,7 @@ namespace NightOwl::Component
 		OwlBehavior
 	};
 
-	inline const std::string ComponentTypeToString(ComponentType type)
+	inline std::string ComponentTypeToString(ComponentType type)
 	{
 		switch (type)
 		{

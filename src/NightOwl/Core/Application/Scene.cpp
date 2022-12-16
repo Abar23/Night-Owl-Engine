@@ -6,8 +6,7 @@ namespace NightOwl::Core
 {
 	Scene::Scene()
 		: isDirty(false)
-	{
-	}
+	{ }
 
 	void Scene::Update()
 	{

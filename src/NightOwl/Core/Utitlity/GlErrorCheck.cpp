@@ -20,31 +20,31 @@ namespace NightOwl::Utility
 			switch (glErrorCode)
 			{
 			case GL_INVALID_ENUM:
-				errorMessage += "GL_INVALID_ENUM: an unacceptable value has been passed for an enumerated argument in an OpenGL function.";
+				errorMessage += "GL_INVALID_ENUM: an unacceptable value has been passed for an enumerated argument in an OpenGL function";
 				break;
 
 			case GL_INVALID_VALUE:
-				errorMessage += "GL_INVALID_VALUE: an out of range numeric argument was passed to an OpenGL function.";
+				errorMessage += "GL_INVALID_VALUE: an out of range numeric argument was passed to an OpenGL function";
 				break;
 
 			case GL_INVALID_OPERATION:
-				errorMessage += "GL_INVALID_OPERATION: an OpenGL function that is not allowed in the current OpenGL state was called.";
+				errorMessage += "GL_INVALID_OPERATION: an OpenGL function that is not allowed in the current OpenGL state was called";
 				break;
 
 			case GL_INVALID_FRAMEBUFFER_OPERATION:
-				errorMessage += "GL_INVALID_FRAMEBUFFER_OPERATION: an OpenGL framer buffer object is not complete.";
+				errorMessage += "GL_INVALID_FRAMEBUFFER_OPERATION: an OpenGL framer buffer object is not complete";
 				break;
 
 			case GL_OUT_OF_MEMORY:
-				errorMessage += "GL_OUT_OF_MEMORY: not enough memory is left to complete the called OpenGL function.";
+				errorMessage += "GL_OUT_OF_MEMORY: not enough memory is left to complete the called OpenGL function";
 				break;
 
 			case GL_STACK_UNDERFLOW:
-				errorMessage += "GL_STACK_UNDERFLOW: an OpenGL pop operation was called at the bottom of the OpenGL stack.";
+				errorMessage += "GL_STACK_UNDERFLOW: an OpenGL pop operation was called at the bottom of the OpenGL stack";
 				break;
 
 			case GL_STACK_OVERFLOW:
-				errorMessage += "GL_STACK_OVERFLOW: an OpenGL push operation has exceeded the maximum size of the OpenGl stack.";
+				errorMessage += "GL_STACK_OVERFLOW: an OpenGL push operation has exceeded the maximum size of the OpenGl stack";
 				break;
 			}
 
@@ -71,58 +71,58 @@ namespace NightOwl::Utility
 		switch (source)
 		{
 		case GL_DEBUG_SOURCE_API:
-			sourceMessage = "OpenGL API.";
+			sourceMessage = "OpenGL API";
 			break;
 
 		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-			sourceMessage = "Windowing System API.";
+			sourceMessage = "Windowing System API";
 			break;
 
 		case GL_DEBUG_SOURCE_SHADER_COMPILER:
-			sourceMessage = "Shader Compiler.";
+			sourceMessage = "Shader Compiler";
 			break;
 
 		case GL_DEBUG_SOURCE_THIRD_PARTY:
-			sourceMessage = "Third Party Application associated with OpenGL.";
+			sourceMessage = "Third Party Application associated with OpenGL";
 			break;
 
 		case GL_DEBUG_SOURCE_APPLICATION:
-			sourceMessage = "User of this Application.";
+			sourceMessage = "User of this Application";
 			break;
 
 		case GL_DEBUG_SOURCE_OTHER:
-			sourceMessage = "Other.";
+			sourceMessage = "Other";
 			break;
 		}
 
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			typeMessage = "API Error.";
+			typeMessage = "API Error";
 			break;
 
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			typeMessage = "Deprecated Behavior Used.";
+			typeMessage = "Deprecated Behavior Used";
 			break;
 
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			typeMessage = "Undefined Behavior.";
+			typeMessage = "Undefined Behavior";
 			break;
 
 		case GL_DEBUG_TYPE_PORTABILITY:
-			typeMessage = "Non-Portable Functionality Used.";
+			typeMessage = "Non-Portable Functionality Used";
 			break;
 
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			typeMessage = "Code Performance Issue.";
+			typeMessage = "Code Performance Issue";
 			break;
 
 		case GL_DEBUG_TYPE_MARKER:
-			typeMessage = "Marker.";
+			typeMessage = "Marker";
 			break;
 
 		case GL_DEBUG_TYPE_PUSH_GROUP:
-			typeMessage = "Group Pushing.";
+			typeMessage = "Group Pushing";
 			break;
 
 		case GL_DEBUG_TYPE_POP_GROUP:
@@ -130,60 +130,75 @@ namespace NightOwl::Utility
 			break;
 
 		case GL_DEBUG_TYPE_OTHER:
-			typeMessage = "Other.";
+			typeMessage = "Other";
 			break;
 		}
 
 		switch (severity)
 		{
 		case GL_DEBUG_SEVERITY_HIGH:
-			severityMessage = "High.";
+			severityMessage = "High";
 			break;
 
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			severityMessage = "Medium.";
+			severityMessage = "Medium";
 			break;
 
 		case GL_DEBUG_SEVERITY_LOW:
-			severityMessage = "Low.";
+			severityMessage = "Low";
 			break;
 
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
-			severityMessage = "Notification.";
+			severityMessage = "Notification";
 			break;
 		}
 
-		ENGINE_LOG_DEBUG("OpenGL debug message: Source is {0}. Type is {1}. Severity is {2}", sourceMessage, typeMessage, severityMessage);
-		ENGINE_LOG_DEBUG("OpenGL debug message: {0}", message);
-		ENGINE_LOG_DEBUG("OpenGL debug message: User params are {0}", message);
+		ENGINE_LOG_DEBUG(
+R"(OpenGL Debug Message Callback triggered 
+Source: {0}
+Type: {1}
+Severity: {2}
+Message: {3}
+User Params: {4})", 
+			sourceMessage, typeMessage, severityMessage, message, userParam);
 	}
 
 	void CheckOpenGlShaderCompilerErrors(const unsigned int shaderId)
 	{
 		int compilationSuccessful;
 		GL_CALL(glGetShaderiv, shaderId, GL_COMPILE_STATUS, &compilationSuccessful);
-		if (!compilationSuccessful)
+
+		if(compilationSuccessful)
 		{
-			int maxErrorBufferLength;
-			GL_CALL(glGetShaderiv, shaderId, GL_INFO_LOG_LENGTH, &maxErrorBufferLength);
-			std::vector<char> errorBuffer(maxErrorBufferLength);
-			GL_CALL(glGetShaderInfoLog, shaderId, maxErrorBufferLength, NULL, errorBuffer.data());
-			ENGINE_LOG_ERROR(errorBuffer.data());
+			return;
 		}
+
+		int maxErrorBufferLength;
+		GL_CALL(glGetShaderiv, shaderId, GL_INFO_LOG_LENGTH, &maxErrorBufferLength);
+
+		std::vector<char> errorBuffer(maxErrorBufferLength);
+		GL_CALL(glGetShaderInfoLog, shaderId, maxErrorBufferLength, NULL, errorBuffer.data());
+
+		ENGINE_LOG_ERROR(errorBuffer.data());
 	}
 
 	void CheckOpenGlShaderProgramLinkerErrors(const unsigned int shaderId)
 	{
 		int compilationSuccessful;
 		GL_CALL(glGetProgramiv, shaderId, GL_LINK_STATUS, &compilationSuccessful);
-		if (!compilationSuccessful)
+
+		if(compilationSuccessful)
 		{
-			int maxErrorBufferLength;
-			GL_CALL(glGetProgramiv, shaderId, GL_INFO_LOG_LENGTH, &maxErrorBufferLength);
-			std::vector<char> errorBuffer(maxErrorBufferLength);
-			GL_CALL(glGetProgramInfoLog, shaderId, maxErrorBufferLength, NULL, errorBuffer.data());
-			ENGINE_LOG_ERROR(errorBuffer.data());
+			return;
 		}
+
+		int maxErrorBufferLength;
+		GL_CALL(glGetProgramiv, shaderId, GL_INFO_LOG_LENGTH, &maxErrorBufferLength);
+
+		std::vector<char> errorBuffer(maxErrorBufferLength);
+		GL_CALL(glGetProgramInfoLog, shaderId, maxErrorBufferLength, NULL, errorBuffer.data());
+
+		ENGINE_LOG_ERROR(errorBuffer.data());
 	}
 
 }
