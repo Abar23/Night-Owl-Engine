@@ -1,3 +1,5 @@
+#include "NightOwlPch.h"
+
 #include "ClippingPlanes.h"
 
 namespace NightOwl::Component

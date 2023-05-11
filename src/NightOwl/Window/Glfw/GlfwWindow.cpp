@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "GlfwWindow.h"
 #include "GLFW/glfw3.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
@@ -7,6 +9,7 @@
 namespace NightOwl::Window
 {
 	GlfwWindow::GlfwWindow(const std::string& windowName, const unsigned int height, const unsigned int width)
+		:	isFullScreen(false)
 	{
 		int glfwStartedSuccessfully = glfwInit();
 
@@ -22,16 +25,30 @@ namespace NightOwl::Window
 		#endif
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
+		
 		Graphics::RenderApi::CreateContext(this);//Create context
 
-		glfwGetFramebufferSize(windowHandle, &properties.pixelWidth, &properties.pixelHeight);
+		glfwGetFramebufferSize(windowHandle, &windowProperties.pixelWidth, &windowProperties.pixelHeight);
 
-		properties.screnWidth = width;
-		properties.screenHeight = height;
-		properties.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-		properties.windowName = windowName;
+		windowProperties.hasAspectRatioChanged = false;
+		windowProperties.isMinimized = false;
+		windowProperties.screenWidth = width;
+		windowProperties.screenHeight = height;
+		windowProperties.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+		windowProperties.windowName = windowName;
 
-		glfwSetWindowUserPointer(windowHandle, &properties);
+		glfwSetWindowUserPointer(windowHandle, &windowProperties);
+		
+		monitorHandle = glfwGetPrimaryMonitor();
+		
+		const GLFWvidmode* videoMode = glfwGetVideoMode(monitorHandle);
+		
+		monitorProperties.monitorWidth = videoMode->width;
+		monitorProperties.monitorHeight = videoMode->height;
+		monitorProperties.refreshRate = videoMode->refreshRate;
+		
+		glfwSetMonitorUserPointer(monitorHandle, &monitorProperties);
+		
 		glfwSwapInterval(1);
 
 		glfwSetWindowSizeCallback(windowHandle, ScreenResizeCallback);
@@ -40,9 +57,11 @@ namespace NightOwl::Window
 		glfwSetCursorPosCallback(windowHandle, MousePositionCallback);
 		glfwSetMouseButtonCallback(windowHandle, MouseButtonCallback);
 		glfwSetScrollCallback(windowHandle, MouseScrollCallback);
+		glfwSetJoystickCallback(GamepadConnectionCallback);
+		glfwSetWindowIconifyCallback(windowHandle, WindowMinimizationCallback);
 	}
 
-	GlfwWindow::~GlfwWindow()
+	void GlfwWindow::Shutdown()
 	{
 		glfwDestroyWindow(windowHandle);
 		glfwTerminate();
@@ -55,12 +74,12 @@ namespace NightOwl::Window
 
 	unsigned GlfwWindow::GetHeight()
 	{
-		return properties.screenHeight;
+		return windowProperties.screenHeight;
 	}
 
 	unsigned GlfwWindow::GetWidth()
 	{
-		return properties.screnWidth;
+		return windowProperties.screenWidth;
 	}
 
 	void* GlfwWindow::GetWindowHandle()
@@ -68,39 +87,195 @@ namespace NightOwl::Window
 		return windowHandle;
 	}
 
+	Input::GamePadConnection GlfwWindow::GetGamePadConnectionStatus(Input::GamePadId gamePadId)
+	{
+		int isConnected = glfwJoystickIsGamepad(Input::NightOwlGamePadIdToGlfwGamePadId(gamePadId));
+
+		if (isConnected)
+		{
+			return Input::GamePadConnection::GamePadConnected;
+		}
+
+		return Input::GamePadConnection::GamePadDisconnected;
+	}
+
+	Input::GamePadState GlfwWindow::GetGamePadState(Input::GamePadId gamePadId)
+	{
+		Input::GamePadState gamePadState;
+		GLFWgamepadstate glfwGamePadState;
+
+		glfwGetGamepadState(static_cast<int>(gamePadId), &glfwGamePadState);
+
+		auto& buttons = gamePadState.GetButtons();
+		auto& axes = gamePadState.GetAxes();
+
+		for (int buttonIndex = 0; buttonIndex < buttons.size(); buttonIndex++)
+		{
+			buttons[buttonIndex] = Input::GlfwInputActionToNightOwlKeyAction(glfwGamePadState.buttons[buttonIndex]);
+		}
+
+		for (int axisIndex = 0; axisIndex < axes.size(); axisIndex ++)
+		{
+			axes[axisIndex] = glfwGamePadState.axes[axisIndex];
+		}
+
+		return gamePadState;
+	}
+
 	float GlfwWindow::GetAspectRatio()
 	{
-		return properties.aspectRatio;
+		return windowProperties.aspectRatio;
 	}
 
 	const WindowProperties& GlfwWindow::GetWindowProperties()
 	{
-		return properties;
+		return windowProperties;
+	}
+
+	const MonitorProperties& GlfwWindow::GetMonitorProperties()
+	{
+		return monitorProperties;
 	}
 
 	void GlfwWindow::SetKeyCallback(std::function<void(int, int, int, int)> keyCallback)
 	{
-		properties.keyCallback = keyCallback;
+		windowProperties.keyCallback = keyCallback;
 	}
 
 	void GlfwWindow::SetMouseButtonCallback(std::function<void(int, int, int)> mouseButtonCallback)
 	{
-		properties.mouseButtonCallback = mouseButtonCallback;
+		windowProperties.mouseButtonCallback = mouseButtonCallback;
 	}
 
 	void GlfwWindow::SetMousePositionCallback(std::function<void(double, double)> mousePositionCallback)
 	{
-		properties.mousePositionCallback = mousePositionCallback;
+		windowProperties.mousePositionCallback = mousePositionCallback;
 	}
 
 	void GlfwWindow::SetMouseScrollCallback(std::function<void(double, double)> mouseScrollCallback)
 	{
-		properties.mouseScrollCallback = mouseScrollCallback;
+		windowProperties.mouseScrollCallback = mouseScrollCallback;
+	}
+
+	void GlfwWindow::SetGamePadConnectionCallback(std::function<void(int, int)> gamepadConnectionCallback)
+	{
+		this->gamepadConnectionCallback = gamepadConnectionCallback;
+	}
+
+	void GlfwWindow::ToggleFullScreen()
+	{
+		if (glfwGetWindowMonitor(windowHandle) != nullptr || monitorHandle == nullptr)
+		{
+			glfwSetWindowMonitor(windowHandle,
+								 nullptr,
+								 monitorProperties.windowSnapshot.positionX,
+								 monitorProperties.windowSnapshot.positionY,
+								 monitorProperties.windowSnapshot.width,
+								 monitorProperties.windowSnapshot.height,
+								 GLFW_DONT_CARE);
+
+			isFullScreen = false;
+
+			return;
+		}
+
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(windowHandle));
+		glfwGetWindowPos(windowHandle, &monitorProperties.windowSnapshot.positionX, &monitorProperties.windowSnapshot.positionY);
+		monitorProperties.windowSnapshot.width = properties->screenWidth;
+		monitorProperties.windowSnapshot.height = properties->screenHeight;
+
+		const GLFWvidmode* videoMode = glfwGetVideoMode(monitorHandle);
+		monitorProperties.monitorWidth = videoMode->width;
+		monitorProperties.monitorHeight = videoMode->height;
+		monitorProperties.refreshRate = videoMode->refreshRate;
+
+		glfwSetWindowMonitor(windowHandle,
+							 monitorHandle,
+							 0,
+							 0,
+							 monitorProperties.monitorWidth,
+							 monitorProperties.monitorHeight,
+							 monitorProperties.refreshRate);
+
+		isFullScreen = true;
+	}
+
+	bool GlfwWindow::IsFullScreen()
+	{
+		return isFullScreen;
+	}
+
+	bool GlfwWindow::IsMinimized()
+	{
+		return windowProperties.isMinimized;
+	}
+
+	void GlfwWindow::SetMonitor(uint32_t index)
+	{
+		int count;
+		GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+		ENGINE_ASSERT(index >= count, "Cannot Set Monitor at index: {0}", index);
+
+		monitorHandle = monitors[index];
+		
+		const WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(windowHandle));
+		glfwGetWindowPos(windowHandle, &monitorProperties.windowSnapshot.positionX, &monitorProperties.windowSnapshot.positionY);
+		monitorProperties.windowSnapshot.width = properties->screenWidth;
+		monitorProperties.windowSnapshot.height = properties->screenHeight;
+
+		const GLFWvidmode* videoMode = glfwGetVideoMode(monitorHandle);
+		monitorProperties.monitorWidth = videoMode->width;
+		monitorProperties.monitorHeight = videoMode->height;
+		monitorProperties.refreshRate = videoMode->refreshRate;
+
+		glfwSetWindowMonitor(windowHandle, 
+							 monitorHandle, 
+							 0, 
+							 0, 
+							 monitorProperties.monitorWidth, 
+							 monitorProperties.monitorHeight, 
+							 monitorProperties.refreshRate);
+	}
+
+	int GlfwWindow::GetTotalMonitors()
+	{
+		int count;
+		glfwGetMonitors(&count);
+		return count;
+	}
+
+	void GlfwWindow::CloseWindow()
+	{
+		glfwSetWindowShouldClose(windowHandle, true);
+	}
+
+	void GlfwWindow::EnableCursor()
+	{
+		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	}
+
+	void GlfwWindow::HideCursor()
+	{
+		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	}
+
+	void GlfwWindow::DisableCursor()
+	{
+		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
+	bool GlfwWindow::HasWindowChangedAspectRatio()
+	{
+		return windowProperties.hasAspectRatioChanged;
 	}
 
 	void GlfwWindow::Update()
 	{
+		windowProperties.hasAspectRatioChanged = false;
+
 		glfwPollEvents();
+
 		Graphics::RenderApi::GetContext()->SwapBuffers();
 	}
 
@@ -114,8 +289,9 @@ namespace NightOwl::Window
 		WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
 
 		properties->screenHeight = height;
-		properties->screnWidth = width;
+		properties->screenWidth = width;
 		properties->aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+		properties->hasAspectRatioChanged = true;
 	}
 
 	void GlfwWindow::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -166,5 +342,20 @@ namespace NightOwl::Window
 		{
 			properties->mouseScrollCallback(xOffset, yOffset);
 		}
+	}
+
+	void GlfwWindow::GamepadConnectionCallback(int gamepadId, int connectionEventType)
+	{
+		if (gamepadConnectionCallback != nullptr)
+		{
+			gamepadConnectionCallback(gamepadId, connectionEventType);
+		}
+	}
+
+	void GlfwWindow::WindowMinimizationCallback(GLFWwindow* window, int iconified)
+	{
+		WindowProperties* properties = static_cast<WindowProperties*>(glfwGetWindowUserPointer(window));
+
+		properties->isMinimized = static_cast<bool>(iconified);
 	}
 }

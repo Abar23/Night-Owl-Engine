@@ -12,13 +12,11 @@ namespace NightOwl::Component
 	public:
 		Camera();
 
-		void LookAt(Math::Vec3F pointToLookAt);
+		std::shared_ptr<Component> Clone() override;
 
-		Math::Mat4F ViewProjectionMatrix();
+		Math::Mat4F GetViewProjectionMatrix();
 
-		const Math::Mat4F GetViewMatrix();
-
-		const Math::Mat4F GetViewMatrix() const;
+		Math::Mat4F GetViewMatrix();
 
 		float GetNearClippingPlane();
 
@@ -36,11 +34,11 @@ namespace NightOwl::Component
 
 		void SetFieldOfView(float fieldOfView);
 
-		//void SetAspectRatioToWindows();
+		void ResetAspectRatio();
 
-		//float GetAspectRatio() const;
+		float GetAspectRatio() const;
 
-		//void SetAspectRatio(float aspectRatio);
+		void SetAspectRatio(float width, float height);
 
 		float GetOrthographicSize() const;
 
@@ -50,12 +48,16 @@ namespace NightOwl::Component
 
 		void SetPerspectiveMode(bool enablePerspectiveProjection);
 
-		static Camera* GetMainCamera();
+		static Core::WeakPointer<Camera> GetMainCamera();
+
+		static void SetMainCamera(Camera& camera);
+
+		void Remove() override;
 
 		REFLECT()
 
 	private:
-		static Camera* mainCamera;
+		static Core::WeakPointer<Camera> mainCamera;
 
 		Math::Mat4F projectionMatrix;
 
@@ -63,19 +65,18 @@ namespace NightOwl::Component
 
 		ClippingPlanes clippingPlanes;
 
-		bool isPerspectiveProjection;
-
-		//float aspectRatio;
+		float aspectRatio;
 
 		float orthographicSize;
 
-		//bool isAspectRatioDirty;
+		bool isPerspectiveProjection;
+
+		bool wasAspectRatioSet;
 
 		bool isProjectionDirty;
 
-		//void SetAspectRatioDirtyFlag();
-
 		void SetProjectionDirtyFlag();
+
+		void SetWasAspectRatioSetFlag();
 	};
 }
-

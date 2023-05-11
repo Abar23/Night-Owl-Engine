@@ -14,13 +14,15 @@ namespace NightOwl::Graphics
 
 		VertexBufferLayout(std::vector<VertexBufferData>& bufferDataDefs);
 
-		void AddVertexBufferDataDefinition(const VertexBufferData& vertexBufferDataDef);
+		void AddVertexBufferDataDefinition(VertexBufferData& vertexBufferDataDef);
 
 		const std::vector<VertexBufferData>& GetBufferDataDefinitions() const;
 
 		void SetBufferDataDefinitions(std::vector<VertexBufferData>& bufferDataDefs);
 
 		int GetDataPerVertex() const;
+
+		int GetIndexOfShaderAttribute(const std::string& name) const;
 
 	private:
 		std::vector<VertexBufferData> bufferDataDefinitions;

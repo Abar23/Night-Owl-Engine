@@ -1,3 +1,5 @@
+#include "NightOwlPch.h"
+
 #include "Mesh.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"

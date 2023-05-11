@@ -21,9 +21,13 @@ namespace NightOwl::Component
 	public:
 		RigidBody2D();
 
+		std::shared_ptr<Component> Clone() override;
+
 		~RigidBody2D() override;
 
 		void AddForce(Math::Vec2F forceVector);
+
+		void AddImpulse(const Math::Vec2F& impulseVector);
 
 		Math::Vec2F GetVelocity() const;
 
@@ -43,18 +47,60 @@ namespace NightOwl::Component
 
 		void SetPosition(const Math::Vec2F& position);
 
+		Math::Vec2F GetDifferedPositionChange() const;
+
+		void ResetDifferedPositionChange();
+
+		void AddDifferedPositionChange(Math::Vec2F positionChange);
+
 		Math::Vec2F GetAccumulatedForces() const;
+
+		Math::Vec2F GetAccumulatedImpulses() const;
 
 		void ClearForces();
 
-		Physics::Collider2D* GetCollider();
+		void ClearImpulses();
 
-		void SetCollider(Physics::Collider2D* collider);
+		Core::WeakPointer <Physics::Collider2D> GetCollider();
+
+		void SetCollider(NightOwl::Core::WeakPointer <Physics::Collider2D> collider);
+
+		bool IsKinematic() const;
+
+		void SetIsKinematic(bool isKinematic);
+
+		bool IsGravitational() const;
+
+		void SetIsGravitational(bool isGravitational);
+
+		bool IsTrigger() const;
+
+		void SetIsTrigger(bool isTrigger);
+
+		float GetGravityScale() const;
+
+		void SetGravityScale(float gravityScale);
+
+		float GetDragCoefficient() const;
+
+		void SetDragCoefficient(float dragCoefficient);
+
+		float GetCoefficientOfRestitution() const;
+
+		void SetCoefficientOfRestitution(float coefficientOfRestitution);
+
+		Math::Vec2F GetColliderPosition();
 
 		REFLECT()
 
 	private:
 		Math::Vec2F velocity;
+
+		bool isGravitational;
+
+		bool isKinematic;
+
+		bool isTrigger;
 
 		float rotation; // z-axis only
 
@@ -62,18 +108,34 @@ namespace NightOwl::Component
 
 		float inverseMass;
 
+		float gravityScale;
+
+		float dragCoefficient;
+
+		float coefficientOfRestitution;
+
 		Math::Vec2F position;
+
+		Math::Vec2F differedPositionChange;
 
 		Math::Vec2F linearVelocity;
 
 		Math::Vec2F accumulatedForces;
 
+		Math::Vec2F accumulatedImpulses;
+
+		int impulseCounter;
+
 		std::shared_ptr<Physics::Collider2D> collider;
 
-		std::set<RigidBody2D*> newCollisions;
+		std::set<Core::WeakPointer<RigidBody2D>> newCollisions;
 
-		std::set<RigidBody2D*> oldCollisions;
+		std::set<Core::WeakPointer<RigidBody2D>> oldCollisions;
 
 		friend class Physics::PhysicsEngine2D;
+
+		friend class Physics::Collider2D;
+
+		void Remove() override;
 	};
 }

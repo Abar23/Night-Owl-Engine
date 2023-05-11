@@ -11,7 +11,7 @@ namespace NightOwl::Math
 {
 	template <typename T>
 	Mat3<T>::Mat3()
-		: data{ 0 }
+		:	data{ 0 }
 	{
 	}
 
@@ -33,8 +33,8 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Mat3<T>::Mat3(const T m00, const T m01, const T m02,
-		const T m10, const T m11, const T m12,
-		const T m20, const T m21, const T m22)
+		          const T m10, const T m11, const T m12,
+		          const T m20, const T m21, const T m22)
 	{
 		// Column-major ordering
 		data[0][0] = m00;
@@ -71,7 +71,7 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Mat3<T>::Mat3(const T diagonal)
-		: data{ 0 }
+		:	data{ 0 }
 	{
 		data[0][0] = diagonal;
 		data[1][1] = diagonal;
@@ -85,7 +85,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Mat3<T> Mat3<T>::Inverted() const
+	Mat3<T> Mat3<T>::GetInverse() const
 	{
 		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
 		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);
@@ -98,8 +98,8 @@ namespace NightOwl::Math
 		T inverseDet = static_cast<T>(1) / Vec3<T>::Dot(aCrossB, c);
 
 		return Mat3<T>(bCrossC.x * inverseDet, bCrossC.y * inverseDet, bCrossC.z * inverseDet,
-			cCrossA.x * inverseDet, cCrossA.y * inverseDet, cCrossA.z * inverseDet,
-			aCrossB.x * inverseDet, aCrossB.y * inverseDet, aCrossB.z * inverseDet);
+					   cCrossA.x * inverseDet, cCrossA.y * inverseDet, cCrossA.z * inverseDet,
+					   aCrossB.x * inverseDet, aCrossB.y * inverseDet, aCrossB.z * inverseDet);
 	}
 
 	template <typename T>
@@ -131,11 +131,11 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Mat3<T> Mat3<T>::Transposed() const
+	Mat3<T> Mat3<T>::GetTranspose() const
 	{
 		return Mat3<T>(data[0][0], data[0][1], data[0][2],
-			data[1][0], data[1][1], data[1][2],
-			data[2][0], data[2][1], data[2][2]);
+					   data[1][0], data[1][1], data[1][2],
+					   data[2][0], data[2][1], data[2][2]);
 	}
 
 	template <typename T>

@@ -57,41 +57,67 @@ namespace NightOwl::Math
 		};
 
 		Vec2();
+
 		Vec2(std::initializer_list<T> args);
+
 		Vec2(const T x, const T y);
+
 		Vec2(const T scalar);
+
 		Vec2(const Vec2<T>& vector);
 
 		~Vec2() = default;
 
 		T Magnitude() const;
-		T SqrMagnitude() const;
+
+		T SquareMagnitude() const;
+
 		Vec2<T> GetNormalize() const;
+
 		Vec2<T>& Normalize();
+
 		Vec2<T> GetRenormalize() const;
+
 		Vec2<T>& Renormalize();
+
 		Vec2<T> GetNegate() const;
+
 		Vec2<T>& Negate();
+
 		const T* GetValuePointer() const;
+
 		const std::string ToString() const;
 
 		static T Dot(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
+
 		static Vec2<T> Project(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
+
 		static Vec2<T> Reject(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
+
 		static Vec2<T> Lerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t);
+
 		static Vec2<T> Zero();
+
 		static Vec2<T> XAxis();
+
 		static Vec2<T> YAxis();
+
 		static Vec2<T> Up();
+
 		static Vec2<T> Down();
+
 		static Vec2<T> Left();
+
 		static Vec2<T> Right();
 
 		Vec2<T>& operator=(const Vec2<T>& vector);
+
 		Vec2<T>& operator+=(const Vec2<T>& vector);
+
 		Vec2<T>& operator-=(const Vec2<T>& vector);
 
 		Vec2<T>& operator*=(const T scalar);
+
 		Vec2<T>& operator/=(const T scalar);
 
 		friend bool operator==(const Vec2<T>& leftVector, const Vec2<T>& rightVector)

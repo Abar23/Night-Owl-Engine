@@ -4,7 +4,7 @@ namespace NightOwl::Math
 {
 	constexpr float EPSILON = 1.0e-5f;
 
-	constexpr float F_PI = (float)M_PI;
+	constexpr float F_PI = static_cast<float>(M_PI);
 
 	constexpr float DOT_THRESHOLD = 0.9995f;
 

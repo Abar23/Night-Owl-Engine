@@ -358,34 +358,53 @@ namespace NightOwl::Math
 		};
 
 		Vec4();
+
 		Vec4(const Vec4<T>& vector);
+
 		Vec4(std::initializer_list<T> args);
+
 		Vec4(const T x, const T y, const T z, const T w);
+
 		Vec4(const T x, const T y, const T z);
+
 		Vec4(const T scalar);
 
 		~Vec4() = default;
 
 		T Magnitude() const;
+
 		T SqrMagnitude() const;
+
 		Vec4<T> GetNormalize() const;
+
 		Vec4<T>& Normalize();
+
 		Vec4<T> GetRenormalize() const;
+
 		Vec4<T>& Renormalize();
+
 		Vec4<T> GetNegate() const;
+
 		Vec4<T>& Negate();
+
 		const T* GetValuePointer() const;
+
 		std::string ToString() const;
 
 		static T Dot(const Vec4<T>& leftVector, const Vec4<T>& rightVector);
+
 		static Vec4<T> Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t);
+
 		static Vec4<T> Zero();
 
 		Vec4<T>& operator=(const Vec4<T>& vector);
+
 		Vec4<T>& operator+=(const Vec4<T>& vector);
+
 		Vec4<T>& operator-=(const Vec4<T>& vector);
 
 		Vec4& operator*=(const T scalar);
+
 		Vec4& operator/=(const T scalar);
 
 		friend bool operator==(const Vec4<T>& leftVector, const Vec4<T>& rightVector)

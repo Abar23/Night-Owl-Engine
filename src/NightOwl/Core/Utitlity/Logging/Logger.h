@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NightOwl/Core/Utitlity/Utils.h"
 #include <string>
 #include <chrono>
 #include <fstream>
@@ -27,11 +28,7 @@ namespace NightOwl::Utility
 			{
 				auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 				
-				#ifdef _WIN64
-				const std::string fileName = (strrchr(file.c_str(), '\\') ? strrchr(file.c_str(), '\\') + 1 : file.c_str());
-				#else
-				std::string fileName = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
-				#endif
+				std::string fileName = StripFilePathToName(file);
 				
 				const std::string preamble = std::format("[{0:%H:%M:%S}] {1}({2}) ", now, fileName, line);
 
@@ -45,11 +42,16 @@ namespace NightOwl::Utility
 			}
 		}
 
+		void Shutdown()
+		{
+			logFile.close();
+		}
+
 	private:
 		friend class LoggerManager;
 
 		std::ofstream logFile;
-
+		
 		void OpenFile(const char* logFileName);
 
 		static std::string SeverityToString(MessageSeverity severity);

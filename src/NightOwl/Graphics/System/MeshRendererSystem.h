@@ -2,7 +2,6 @@
 
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include <vector>
-#include <set>
 
 namespace NightOwl::Graphics
 {
@@ -11,12 +10,14 @@ namespace NightOwl::Graphics
 	public:
 		void Update();
 
-		void AddMeshRenderer(Component::MeshRenderer* meshRenderer);
+		void AddMeshRenderer(const Component::MeshRenderer* meshRenderer);
 
 		void RemoveMeshRenderer(const Component::MeshRenderer* meshRenderer);
 
 	private:
 		std::vector<Component::MeshRenderer*> meshRenderers;
+
+		static bool Comparator(const Component::MeshRenderer* lhs, const Component::MeshRenderer* rhs);
 	};
 }
 

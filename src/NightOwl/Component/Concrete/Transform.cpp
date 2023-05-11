@@ -1,4 +1,8 @@
+#include <NightOwlPch.h>
+
 #include "Transform.h"
+
+#include "NightOwl/Core/Application/Scene.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/GameObject/GameObject.h"
 
@@ -30,13 +34,13 @@ namespace NightOwl::Component
 	{
 		if (parent == nullptr || space == Space::Local)
 		{
-			localScale += scale;
+			localScale = scale;
 
 			SetLocalDirtyFlag();
 		}
 		else if (space == Space::World)
 		{
-			worldScaleOffset += scale;
+			worldScaleOffset = scale;
 
 			SetWorldDirtyFlag();
 		}
@@ -154,30 +158,30 @@ namespace NightOwl::Component
 		return children.size();
 	}
 
-	const Transform& Transform::GetParent()
+	Transform& Transform::GetParent()
 	{
 		return *parent;
 	}
 
-	void Transform::SetParent(Transform* parentTransform)
+	void Transform::SetParent(Core::WeakPointer<Transform> parentTransform)
 	{
 		if(parentTransform != nullptr && parentTransform != parent)
 		{
 			parent = parentTransform;
-			parent->SetChild(*this);
+			parent->SetChild(this);
 			inverseOfOriginalParentLocalModelMatrix = parent->GetWorldMatrix().GetInverse();
 			for (const auto& childTransform : parentTransform->children)
 			{
 				childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
 			}
-		}
 
-		// What to do when parent exists and parenting to new object
+			gameObject->GetScene()->SetDirtyFlag();
+		}
 	}
 
-	Transform* Transform::RemoveParent()
+	Core::WeakPointer<Transform> Transform::RemoveParent()
 	{
-		Transform* parentBeingRemoved = nullptr;
+		Core::WeakPointer<Transform> parentBeingRemoved = nullptr;
 
 		if(parent != nullptr)
 		{
@@ -205,13 +209,21 @@ namespace NightOwl::Component
 			worldRotationOffset = Math::QuatF();
 			parentLocalMatrix = Math::Mat4F::Identity();
 			inverseOfOriginalParentLocalModelMatrix = Math::Mat4F::Identity();
+
+			gameObject->GetScene()->SetDirtyFlag();
 		}
+
 		return parentBeingRemoved;
 	}
 
-	void Transform::SetChild(Transform& childTransform)
+	void Transform::SetChild(Transform* childTransform)
 	{
-		children.push_back(&childTransform);
+		children.push_back(childTransform);
+	}
+
+	bool Transform::IsChildOf(Transform* parent)
+	{
+		return this->parent == parent;
 	}
 
 	const Math::Mat4F& Transform::GetLocalModelMatrix(bool overrideDirtyFlag)
@@ -230,7 +242,6 @@ namespace NightOwl::Component
 				worldMatrix = localModelMatrix;
 			}
 
-			isLocalDirty = false;
 		}
 
 		return localModelMatrix;
@@ -265,7 +276,7 @@ namespace NightOwl::Component
 		return worldMatrix;
 	}
 
-	Transform* Transform::GetChildAtIndex(int index) const
+	Core::WeakPointer<Transform> Transform::GetChildAtIndex(int index) const
 	{
 		ENGINE_ASSERT(index < children.size(), "Transform does not have child at index {0}", index);
 
@@ -299,27 +310,35 @@ namespace NightOwl::Component
 		SetWorldDirtyFlag();
 	}
 
-	Math::QuatF Transform::GetRotation() const
+	void Transform::Remove()
+	{
+
+	}
+
+	Math::QuatF Transform::GetRotation()
 	{
 		Math::QuatF currentWorldRotation;
-		currentWorldRotation.SetNonOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
+		currentWorldRotation.SetNonOrthogonalRotationMatrix(GetWorldMatrix().GetRotationMatrix());
 		return currentWorldRotation.Normalize();
 	}
 
 	void Transform::SetRotation(const Math::QuatF& newRotation)
 	{
-		Math::QuatF currentWorldRotation;
-		currentWorldRotation.SetOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
-		// Apply current world rotation offset to the inverse of the total rotations on the object, then apply desired rotation.
-		// Need to multiply by the world rotation offset since it will have the inverse of all rotation in it once this function has run.
-		this->worldRotationOffset = newRotation * currentWorldRotation.Inverse() * worldRotationOffset;
-		this->worldRotationOffset.Normalize();
-		isWorldDirty = true;
+		if(parent == nullptr)
+		{
+			this->worldRotationOffset = newRotation;
+			this->worldRotationOffset.Normalize();
+			isWorldDirty = true;
+			return;
+		}
+
+		localRotation = newRotation.GetNormalize();
+		isLocalDirty = true;
 	}
 
-	Math::Vec3F Transform::GetPosition() const
+	Math::Vec3F Transform::GetPosition()
 	{
-		return worldMatrix.GetTranslation();
+		return GetWorldMatrix().GetTranslation();
 	}
 
 	void Transform::SetPosition(const Math::Vec3F& worldPosition)
@@ -346,6 +365,51 @@ namespace NightOwl::Component
 	bool Transform::HasChildren() const
 	{
 		return !children.empty();
+	}
+
+	Math::Vec3F Transform::GetForward()
+	{
+		return GetRotation().GetRotationMatrix().GetColumn(2);
+	}
+
+	Math::Vec3F Transform::GetRight()
+	{
+		return GetRotation().GetRotationMatrix().GetColumn(0);
+	}
+
+	Math::Vec3F Transform::GetUp()
+	{
+		return GetRotation().GetRotationMatrix().GetColumn(1);
+	}
+
+	void Transform::Clone(const Transform& tranformToClone)
+	{
+		localModelMatrix = tranformToClone.localModelMatrix;
+		worldMatrix = tranformToClone.worldMatrix;
+		parentLocalMatrix = tranformToClone.parentLocalMatrix;
+		inverseOfOriginalParentLocalModelMatrix = tranformToClone.inverseOfOriginalParentLocalModelMatrix;
+		localScale = tranformToClone.localScale;
+		localRotation = tranformToClone.localRotation;
+		localPosition = tranformToClone.localPosition;
+		worldScaleOffset = tranformToClone.worldScaleOffset;
+		worldRotationOffset = tranformToClone.worldRotationOffset;
+		worldPosition = tranformToClone.worldPosition;
+		root = tranformToClone.root;
+		parent = tranformToClone.parent;
+
+		isLocalDirty = tranformToClone.isLocalDirty;
+		isWorldDirty = tranformToClone.isWorldDirty;
+
+		if(parent != nullptr)
+		{
+			parent->SetChild(this);
+		}
+
+		for (auto& transform : tranformToClone.children)
+		{
+			auto clonedChild = transform->GetGameObject().Clone();
+			children.push_back(clonedChild->GetTransform());
+		}
 	}
 
 	START_REFLECTION(Transform)

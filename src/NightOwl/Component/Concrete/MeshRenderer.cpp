@@ -1,5 +1,7 @@
+#include <NightOwlPch.h>
+
 #include "MeshRenderer.h"
-#include "NightOwl/Component/Materials/StandardMaterial.h"
+#include "NightOwl/Graphics/Materials/StandardMaterial.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 
 namespace NightOwl::Component
@@ -8,8 +10,22 @@ namespace NightOwl::Component
 		:	Component(ComponentType::MeshRenderer),
 			isVisible(true)
 	{
-		material = std::make_shared<StandardMaterial>();
+		material = std::make_shared<Graphics::StandardMaterial>();
 		Core::MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);
+	}
+
+	std::shared_ptr<Component> MeshRenderer::Clone()
+	{
+		std::shared_ptr<MeshRenderer> clone = std::make_shared<MeshRenderer>();
+
+		clone->mesh.SetUVs(mesh.GetUVs());
+		clone->mesh.SetVertices(mesh.GetVertices());
+		clone->mesh.SetColors(mesh.GetColors());
+		clone->mesh.SetTriangles(mesh.GetTriangles());
+		clone->material = material->Clone();
+		clone->isVisible = isVisible;
+
+		return clone;
 	}
 
 	void MeshRenderer::Draw()
@@ -20,7 +36,7 @@ namespace NightOwl::Component
 		}
 	}
 
-	Mesh* MeshRenderer::GetMesh()
+	NightOwl::Core::WeakPointer<Mesh> MeshRenderer::GetMesh()
 	{
 		return &mesh;
 	}
@@ -35,14 +51,19 @@ namespace NightOwl::Component
 		return isVisible;
 	}
 
-	const std::shared_ptr<IMaterial> MeshRenderer::GetMaterial()
+	const std::shared_ptr<Graphics::IMaterial> MeshRenderer::GetMaterial()
 	{
 		return material;
 	}
 
-	void MeshRenderer::SetMaterial(std::shared_ptr<IMaterial> material)
+	void MeshRenderer::SetMaterial(std::shared_ptr<Graphics::IMaterial> material)
 	{
 		this->material = material;
+	}
+
+	void MeshRenderer::Remove()
+	{
+		Core::MeshRendererSystemLocator::GetMeshRendererSystem()->RemoveMeshRenderer(this);
 	}
 
 	START_REFLECTION(MeshRenderer)

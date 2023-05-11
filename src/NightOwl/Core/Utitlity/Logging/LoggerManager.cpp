@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include <filesystem>
 #include "LoggerManager.h"
 
@@ -11,6 +13,12 @@ namespace NightOwl::Utility
 		std::filesystem::create_directory(LOG_FILE_DIR);
 		clientLogger->OpenFile(CLIENT_LOG_FILE);
 		engineLogger->OpenFile(ENGINE_LOG_FILE);
+	}
+
+	void LoggerManager::Shutdown()
+	{
+		clientLogger->Shutdown();
+		engineLogger->Shutdown();
 	}
 
 	std::shared_ptr<Logger> LoggerManager::GetEngineLogger()

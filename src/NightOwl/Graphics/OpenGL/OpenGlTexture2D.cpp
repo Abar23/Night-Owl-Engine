@@ -1,13 +1,25 @@
+#include <NightOwlPch.h>
+
 #include "OpenGlTexture2D.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
-#include "NightOwl/Core/Utitlity/Assert.h"
-#include "stb/stb_image.h"
 
 namespace NightOwl::Graphics
 {
-	OpenGlTexture2D::OpenGlTexture2D(const std::string& texturePath)
+	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, int numberOfChannels)
+		:	height(height),
+			width(width),
+			numberOfChannels(numberOfChannels)
 	{
-		LoadTexture(texturePath);
+		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
+		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);
+
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
 	}
 
 	OpenGlTexture2D::~OpenGlTexture2D()
@@ -39,27 +51,5 @@ namespace NightOwl::Graphics
 	unsigned int OpenGlTexture2D::GetTextureId()
 	{
 		return textureId;
-	}
-
-	void OpenGlTexture2D::LoadTexture(const std::string& texturePath)
-	{
-		stbi_set_flip_vertically_on_load(true);
-
-		stbi_uc* data = stbi_load(texturePath.c_str(), &width, &height, &numberOfChannels, 4);
-
-		ENGINE_ASSERT(data != nullptr, "Failed to load texture from file path: {0}", texturePath);
-
-		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
-		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);
-
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-		stbi_image_free(data);
 	}
 }

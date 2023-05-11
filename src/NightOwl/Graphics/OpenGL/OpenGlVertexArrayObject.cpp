@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "OpenGlVertexArrayObject.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 

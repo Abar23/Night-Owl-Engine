@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "Input.h"
 #include "NightOwl/Input/InputAction.h"
 #include "NightOwl/Window/WindowApi.h"
@@ -7,6 +9,7 @@ namespace NightOwl::Input
 	using namespace std::placeholders;
 
 	std::unique_ptr<Input> Input::inputInstance{nullptr};
+
 	std::mutex Input::mutexLock;
 
 	Input::Input()
@@ -17,10 +20,9 @@ namespace NightOwl::Input
 			isKeyInputDirty(false),
 			isMouseButtonInputDirty(false)
 	{
-		Window::WindowApi::GetWindow()->SetKeyCallback(std::bind(&Input::KeyCallback, _1, _2, _3, _4));
-		Window::WindowApi::GetWindow()->SetMouseButtonCallback(std::bind(&Input::MouseButtonCallback, _1, _2, _3));
-		Window::WindowApi::GetWindow()->SetMousePositionCallback(std::bind(&Input::MousePositionCallback, _1, _2));
-		Window::WindowApi::GetWindow()->SetMouseScrollCallback(std::bind(&Input::MouseScrollCallback, _1, _2));
+		SetupWindowCallbacks();
+
+		CheckForConnectedControllers();
 	}
 
 	Input* Input::GetInstance()
@@ -40,43 +42,11 @@ namespace NightOwl::Input
 
 	void Input::Update()
 	{
-		if(inputInstance->isKeyInputDirty)
-		{
-			for (auto& keyIndex : inputInstance->keyActionArray)
-			{
-				if (keyIndex == InputAction::Pressed)
-				{
-					keyIndex = InputAction::Held;
-					inputInstance->anyKeyHeldCounter++;
-					inputInstance->anyKeyPressedCounter--;
-				}
-				else if (keyIndex == InputAction::Released)
-				{
-					keyIndex = InputAction::None;
-					inputInstance->anyKeyHeldCounter--;
-				}
-			}
-			inputInstance->isKeyInputDirty = false;
-		}
+		UpdateKeys();
 
-		if (inputInstance->isMouseButtonInputDirty)
-		{
-			for (auto& mouseButtonIndex : inputInstance->mouseButtonActionArray)
-			{
-				if (mouseButtonIndex == InputAction::Pressed)
-				{
-					mouseButtonIndex = InputAction::Held;
-					inputInstance->anyKeyHeldCounter++;
-					inputInstance->anyKeyPressedCounter--;
-				}
-				else if (mouseButtonIndex == InputAction::Released)
-				{
-					mouseButtonIndex = InputAction::None;
-					inputInstance->anyKeyHeldCounter--;
-				}
-			}
-			inputInstance->isMouseButtonInputDirty = false;
-		}
+		UpdateMouseButtons();
+
+		UpdateGamePads();
 	}
 
 	const Math::Vec2D& Input::GetScrollDelta() 
@@ -114,6 +84,84 @@ namespace NightOwl::Input
 		return inputInstance->mouseButtonActionArray[static_cast<int>(nightOwlMouseButton)] == InputAction::Held;
 	}
 
+	bool Input::IsGamePadButtonPressed(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton)
+	{
+		if(!IsGamePadConnected(nightOwlGamePadId))
+		{
+			return false;
+		}
+
+		GamePadState& gamePadState = inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)];
+		return gamePadState.GetButton(nightOwlGamePadButton) == InputAction::Pressed;
+	}
+
+	bool Input::HasAnyGamePadPressedButton(GamePadButton nightOwlGamePadButton)
+	{
+		return DoesAnyGameButtonHaveState(nightOwlGamePadButton, InputAction::Pressed);
+	}
+
+	bool Input::IsGamePadButtonRelease(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton)
+	{
+		if(!IsGamePadConnected(nightOwlGamePadId))
+		{
+			return false;
+		}	
+
+		GamePadState& gamePadState = inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)];
+		return gamePadState.GetButton(nightOwlGamePadButton) == InputAction::Released;
+	}
+
+	bool Input::HasAnyGamePadReleasedButton(GamePadButton nightOwlGamePadButton)
+	{
+		return DoesAnyGameButtonHaveState(nightOwlGamePadButton, InputAction::Released);
+	}
+
+	bool Input::IsGamePadButtonHeld(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton)
+	{
+		if(!IsGamePadConnected(nightOwlGamePadId))
+		{
+			return false;
+		}
+
+		GamePadState& gamePadState = inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)];
+		return gamePadState.GetButton(nightOwlGamePadButton) == InputAction::Held;
+	}
+
+	bool Input::HasAnyGamePadHeldButton(GamePadButton nightOwlGamePadButton)
+	{
+		return DoesAnyGameButtonHaveState(nightOwlGamePadButton, InputAction::Held);
+	}
+
+	bool Input::IsGamePadConnected(GamePadId nightOwlGamePadId)
+	{
+		ENGINE_ASSERT(nightOwlGamePadId != GamePadId::None, "GamePadId None given to Input System when asking if game pad is connected");
+
+		return inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)].IsGamePadConnected();
+	}
+
+	float Input::GetGamePadAxis(GamePadId nightOwlGamePadId, GamePadAxis nightOwlGamePadAxis)
+	{
+		if(!IsGamePadConnected(nightOwlGamePadId))
+		{
+			return 0.0f;
+		}	
+
+		const auto& gamePadAxes = inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)].GetAxes();
+		return gamePadAxes[static_cast<int>(nightOwlGamePadAxis)];
+	}
+
+	std::array<float, 4> Input::GetAxisOfAllGamePads(GamePadAxis nightOwlGamePadAxis)
+	{
+		std::array<float, 4> gamePadAxisValues = { 0.0f };
+
+		for (int gamePadId = 0; gamePadId < static_cast<int>(GamePadId::Gamepad_4); ++gamePadId)
+		{
+			gamePadAxisValues[gamePadId] = GetGamePadAxis(static_cast<GamePadId>(gamePadId), nightOwlGamePadAxis);
+		}
+
+		return gamePadAxisValues;
+	}
+
 	bool Input::IsAnyKeyHeld() 
 	{
 		return inputInstance->anyKeyHeldCounter > 0;
@@ -124,29 +172,122 @@ namespace NightOwl::Input
 		return inputInstance->anyKeyPressedCounter > 0;
 	}
 
+	void Input::UpdateKeys()
+	{
+		if (!inputInstance->isKeyInputDirty)
+		{
+			return;
+		}
+
+		for (auto& keyIndex : inputInstance->keyActionArray)
+		{
+			if (keyIndex == InputAction::Pressed)
+			{
+				keyIndex = InputAction::Held;
+				inputInstance->anyKeyHeldCounter++;
+				inputInstance->anyKeyPressedCounter--;
+			}
+			else if (keyIndex == InputAction::Released)
+			{
+				keyIndex = InputAction::None;
+				inputInstance->anyKeyHeldCounter--;
+			}
+		}
+
+		inputInstance->isKeyInputDirty = false;
+	}
+
+	void Input::UpdateMouseButtons()
+	{
+		if (!inputInstance->isMouseButtonInputDirty)
+		{
+			return;
+		}
+
+		for (auto& mouseButtonIndex : inputInstance->mouseButtonActionArray)
+		{
+			if (mouseButtonIndex == InputAction::Pressed)
+			{
+				mouseButtonIndex = InputAction::Held;
+				inputInstance->anyKeyHeldCounter++;
+				inputInstance->anyKeyPressedCounter--;
+			}
+			else if (mouseButtonIndex == InputAction::Released)
+			{
+				mouseButtonIndex = InputAction::None;
+				inputInstance->anyKeyHeldCounter--;
+			}
+		}
+
+		inputInstance->isMouseButtonInputDirty = false;
+	}
+
+	void Input::UpdateGamePads()
+	{
+		for (int gamePadIndex = 0; gamePadIndex < inputInstance->gamePads.size(); ++gamePadIndex)
+		{
+			GamePadState& currentGamePadState = inputInstance->gamePads[gamePadIndex];
+
+			if (currentGamePadState.IsGamePadConnected())
+			{
+				GamePadState newGamePadState = Window::WindowApi::GetWindow()->GetGamePadState(static_cast<GamePadId>(gamePadIndex));
+
+				currentGamePadState.SetAxes(newGamePadState.GetAxes());
+
+				auto& currentButtonStates = currentGamePadState.GetButtons();
+				auto& newButtonStates = newGamePadState.GetButtons();
+
+				for (int buttonIndex = 0; buttonIndex < currentButtonStates.size(); buttonIndex++)
+				{
+					auto& currentButtonState = currentButtonStates[buttonIndex];
+					const auto& newButtonState = newButtonStates[buttonIndex];
+
+					if (currentButtonState == InputAction::None && newButtonState == InputAction::Pressed)
+					{
+						currentButtonState = InputAction::Pressed;
+						inputInstance->anyKeyPressedCounter++;
+					}
+					else if (currentButtonState == InputAction::Pressed && newButtonState == InputAction::Pressed)
+					{
+						currentButtonState = InputAction::Held;
+						inputInstance->anyKeyHeldCounter++;
+						inputInstance->anyKeyPressedCounter--;
+					}
+					else if ((currentButtonState == InputAction::Pressed || currentButtonState == InputAction::Held) && newButtonState == InputAction::Released)
+					{
+						currentButtonState = InputAction::Released;
+					}
+					else if (currentButtonState == InputAction::Released && newButtonState == InputAction::Released)
+					{
+						currentButtonState = InputAction::None;
+						inputInstance->anyKeyHeldCounter--;
+					}
+				}
+			}
+		}
+	}
+
 	void Input::KeyCallback(int key, int scancode, int action, int mods)
 	{
-		ENGINE_LOG_INFO("Key {0} Scancode {1} Action {2} Mods {3}", key, scancode, action, mods);
-
 		const KeyCode nightOwlKeyCode = GlfwKeyCodeToNightOwlKeyCode(key);
 		const InputAction nightOwlInputAction = GlfwInputActionToNightOwlKeyAction(action);
 
-		if(nightOwlInputAction != InputAction::Repeated)
+		if(nightOwlInputAction == InputAction::Repeated)
 		{
-			inputInstance->keyActionArray[static_cast<int>(nightOwlKeyCode)] = nightOwlInputAction;
-			inputInstance->isKeyInputDirty = true;
+			return;
+		}
 
-			if (nightOwlInputAction == InputAction::Pressed)
-			{
-				inputInstance->anyKeyPressedCounter++;
-			}
+		inputInstance->keyActionArray[static_cast<int>(nightOwlKeyCode)] = nightOwlInputAction;
+		inputInstance->isKeyInputDirty = true;
+
+		if (nightOwlInputAction == InputAction::Pressed)
+		{
+			inputInstance->anyKeyPressedCounter++;
 		}
 	}
 
 	void Input::MouseButtonCallback(int button, int action, int mods)
 	{
-		ENGINE_LOG_INFO("Button {0} Action {1} Mods {2}", button, action, mods);
-
 		const MouseButton nightOwlMouseButton = GlfwMouseButtonToNightOwlMouseButton(button);
 		const InputAction nightOwlInputAction = GlfwInputActionToNightOwlKeyAction(action);
 
@@ -155,6 +296,7 @@ namespace NightOwl::Input
 			inputInstance->mouseButtonActionArray[static_cast<int>(nightOwlMouseButton)] = nightOwlInputAction;
 			inputInstance->isMouseButtonInputDirty = true;
 
+			
 			if (nightOwlInputAction == InputAction::Pressed)
 			{
 				inputInstance->anyKeyPressedCounter++;
@@ -164,17 +306,86 @@ namespace NightOwl::Input
 
 	void Input::MousePositionCallback(double xPosition, double yPosition)
 	{
-		ENGINE_LOG_INFO("xPosition {0} yPosition {1}", xPosition, yPosition);
-
 		inputInstance->mousePosition.x = xPosition;
 		inputInstance->mousePosition.y = yPosition;
 	}
 
 	void Input::MouseScrollCallback(double xOffset, double yOffset)
 	{
-		ENGINE_LOG_INFO("xOffset {0} yOffset {1}", xOffset, yOffset);
-
 		inputInstance->scrollDelta.x = xOffset;
 		inputInstance->scrollDelta.y = yOffset;
+	}
+
+	void Input::GamePadConnectionCallback(int gamePadId, int connectionEventType)
+	{
+		const GamePadId nightOwlGamePadId = GlfwGamePadIdToNightOwlGamePadId(gamePadId);
+		const GamePadConnection nightOwlGamePadConnection = GlfwGamePadConnectionToNightOwlGamePadConnection(connectionEventType);
+
+		if (nightOwlGamePadId > GamePadId::Gamepad_4)
+		{
+			return;
+		}
+
+		GamePadState& gamePad = inputInstance->gamePads[static_cast<int>(nightOwlGamePadId)];
+		gamePad.SetGamePadConnectionStatus(nightOwlGamePadConnection);
+
+		if (gamePad.IsGamePadConnected())
+		{
+			return;
+		}
+
+		for (auto& currentButton : gamePad.GetButtons())
+		{
+			if (currentButton == InputAction::Pressed)
+			{
+				inputInstance->anyKeyPressedCounter--;
+			}
+
+			if (currentButton == InputAction::Held)
+			{
+				inputInstance->anyKeyHeldCounter--;
+			}
+
+			currentButton = InputAction::None;
+		}
+	}
+
+	bool Input::DoesAnyGameButtonHaveState(GamePadButton button, InputAction action)
+	{
+		bool isButtonHeld = false;
+
+		for (auto& gamePadState : inputInstance->gamePads)
+		{
+			if (!gamePadState.IsGamePadConnected())
+			{
+				continue;
+			}
+
+			if (gamePadState.GetButton(button) == action)
+			{
+				isButtonHeld = true;
+				break;
+			}
+		}
+
+		return isButtonHeld;
+	}
+
+	void Input::CheckForConnectedControllers()
+	{
+		for (int gamePadStateIndex = 0; gamePadStateIndex < inputInstance->gamePads.size(); ++gamePadStateIndex)
+		{
+			const GamePadConnection status = Window::WindowApi::GetWindow()->GetGamePadConnectionStatus(static_cast<GamePadId>(gamePadStateIndex));
+			inputInstance->gamePads[gamePadStateIndex].SetGamePadConnectionStatus(status);
+		}
+	}
+
+	void Input::SetupWindowCallbacks()
+	{
+		Window::WindowApi::GetWindow()->SetKeyCallback(std::bind(&Input::KeyCallback, _1, _2, _3, _4));
+		Window::WindowApi::GetWindow()->SetMouseButtonCallback(std::bind(&Input::MouseButtonCallback, _1, _2, _3));
+		Window::WindowApi::GetWindow()->SetMousePositionCallback(std::bind(&Input::MousePositionCallback, _1, _2));
+		Window::WindowApi::GetWindow()->SetMouseScrollCallback(std::bind(&Input::MouseScrollCallback, _1, _2));
+		Window::WindowApi::GetWindow()->SetGamePadConnectionCallback(std::bind(&Input::GamePadConnectionCallback, _1, _2));
 	}
 }

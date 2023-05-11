@@ -9,15 +9,13 @@ namespace NightOwl::Math
 {
 	template <typename T>
 	Quaternion<T>::Quaternion()
-		: x(0), y(0), z(0), w(1)
-	{
-	}
+		:	x(0), y(0), z(0), w(1)
+	{ }
 
 	template <typename T>
 	Quaternion<T>::Quaternion(const T x, const T y, const T z, const T w)
-		: x(x), y(y), z(z), w(w)
-	{
-	}
+		:	x(x), y(y), z(z), w(w)
+	{ }
 
 	template <typename T>
 	Quaternion<T>::Quaternion(const Vec3<T>& unitVector, const T angleInDegrees)
@@ -41,11 +39,11 @@ namespace NightOwl::Math
 	template <typename T>
 	T Quaternion<T>::Norm() const
 	{
-		return std::sqrt(SqrNorm());
+		return std::sqrt(SquareNorm());
 	}
 
 	template <typename T>
-	T Quaternion<T>::SqrNorm() const
+	T Quaternion<T>::SquareNorm() const
 	{
 		return x * x + y * y + z * z + w * w;
 	}
@@ -71,14 +69,14 @@ namespace NightOwl::Math
 	template <typename T>
 	Quaternion<T> Quaternion<T>::GetRenormalize() const
 	{
-		T inverseNorm = FastInverseSquareRootAroundOne(SqrNorm());
+		T inverseNorm = FastInverseSquareRootAroundOne(SquareNorm());
 		return Quaternion<T>(x * inverseNorm, y * inverseNorm, z * inverseNorm, w * inverseNorm);
 	}
 
 	template <typename T>
 	Quaternion<T>& Quaternion<T>::Renormalize()
 	{
-		T inverseNorm = FastInverseSquareRootAroundOne(SqrNorm());
+		T inverseNorm = FastInverseSquareRootAroundOne(SquareNorm());
 		*this *= inverseNorm;
 		return *this;
 	}
@@ -286,13 +284,13 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(Vec3<T> angles)
+	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(float xAngleInDegrees, float yAngleInDegrees, float zAngleInDegrees)
 	{
 		T two = static_cast<T>(2);
 
-		T xHalfAngle = DegreesToRad(angles.x / two);
-		T yHalfAngle = DegreesToRad(angles.y / two);
-		T zHalfAngle = DegreesToRad(angles.z / two);
+		T xHalfAngle = DegreesToRad(xAngleInDegrees / two);
+		T yHalfAngle = DegreesToRad(yAngleInDegrees / two);
+		T zHalfAngle = DegreesToRad(zAngleInDegrees / two);
 
 		T xCos = std::cos(xHalfAngle);
 		T yCos = std::cos(yHalfAngle);
@@ -313,6 +311,12 @@ namespace NightOwl::Math
 		T z = zSinXCos * yCos - zCosXSin * ySin;
 
 		return Quaternion(x, y, z, w);
+	}
+
+	template <typename T>
+	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(Vec3<T> anglesInDegrees)
+	{
+		return MakeRotationFromEulers(anglesInDegrees.x, anglesInDegrees.y, anglesInDegrees.z);
 	}
 
 

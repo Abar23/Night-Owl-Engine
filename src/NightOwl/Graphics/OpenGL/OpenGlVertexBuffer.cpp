@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "OpenGlVertexBuffer.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
@@ -42,30 +44,32 @@ namespace NightOwl::Graphics
 		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	void Graphics::OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int& index, const void* vertexData, unsigned int vertexDataSize)
+	void OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize)
 	{
-		if(vertexDataSize != 0)
+		ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), "Vertex buffer does not contain a vertex buffer data definition at index {0}", index);
+
+		if(vertexDataSize == 0)
 		{
-			ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), "Vertex buffer does not contain a vertex buffer data definition at index {0}", index);
+			return;
+		}
 
-			const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
+		if(index < 0)
+		{
+			return;
+		}
 
-			unsigned int offset = 0;
-			for (int i = 0; i < index; i++)
-			{
-				offset += layout.GetBufferDataDefinitions()[i].GetSizeofData();
-			}
+		const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
 
-			const char* byteVertexDataPointer = static_cast<const char*>(vertexData);
-			const char* byteVertexDataPointerEnd = byteVertexDataPointer + vertexDataSize;
-			while (byteVertexDataPointer < byteVertexDataPointerEnd)
-			{
-				GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointer);
-				byteVertexDataPointer += data.GetSizeofData();
-				offset += layout.GetDataPerVertex();
-			}
+		unsigned int offset = data.GetOffset();
 
-			index++;
+		const char* byteVertexDataPointerBegin = static_cast<const char*>(vertexData);
+		const char* byteVertexDataPointerEnd = byteVertexDataPointerBegin + vertexDataSize;
+
+		while (byteVertexDataPointerBegin < byteVertexDataPointerEnd)
+		{
+			GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointerBegin);
+			byteVertexDataPointerBegin += data.GetSizeofData();
+			offset += layout.GetDataPerVertex();
 		}
 	}
 

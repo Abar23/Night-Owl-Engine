@@ -12,11 +12,15 @@ public:
 
 	int screenHeight;
 
-	int screnWidth;
+	int screenWidth;
 
 	float aspectRatio;
 
 	std::string windowName;
+
+	bool isMinimized;
+
+	bool hasAspectRatioChanged;
 
 	std::function<void(int, int, int, int)> keyCallback;
 

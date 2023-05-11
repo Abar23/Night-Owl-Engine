@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "VertexBufferLayout.h"
 
 namespace NightOwl::Graphics
@@ -27,8 +29,9 @@ namespace NightOwl::Graphics
 		}
 	}
 
-	void VertexBufferLayout::AddVertexBufferDataDefinition(const VertexBufferData& vertexBufferDataDef)
+	void VertexBufferLayout::AddVertexBufferDataDefinition(VertexBufferData& vertexBufferDataDef)
 	{
+		vertexBufferDataDef.SetOffset(dataPerVertex);
 		bufferDataDefinitions.push_back(vertexBufferDataDef);
 		dataPerVertex += vertexBufferDataDef.GetSizeofData();
 	}
@@ -46,6 +49,21 @@ namespace NightOwl::Graphics
 	int VertexBufferLayout::GetDataPerVertex() const
 	{
 		return dataPerVertex;
+	}
+
+	int VertexBufferLayout::GetIndexOfShaderAttribute(const std::string& name) const
+	{
+		int indexOfShaderAttribute = 0;
+		for (const auto & bufferDataDefinition : bufferDataDefinitions)
+		{
+			if(bufferDataDefinition.GetShaderAttributeName() == name)
+			{
+				return indexOfShaderAttribute;
+			}
+			indexOfShaderAttribute++;
+		}
+
+		return -1;
 	}
 }
 

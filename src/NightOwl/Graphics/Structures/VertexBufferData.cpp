@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "VertexBufferData.h"
 #include "NightOwl/Graphics/Types/VertexDataTypes.h"
 
@@ -70,6 +72,16 @@ namespace NightOwl::Graphics
 	unsigned int VertexBufferData::GetAttributeLocation() const
 	{
 		return attributeLocation;
+	}
+
+	unsigned int VertexBufferData::GetOffset() const
+	{
+		return offset;
+	}
+
+	void VertexBufferData::SetOffset(unsigned int offset)
+	{
+		this->offset = offset;
 	}
 
 	void VertexBufferData::SetDataSizeAndNumberOfComponents()

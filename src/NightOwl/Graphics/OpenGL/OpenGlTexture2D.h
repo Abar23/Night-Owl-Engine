@@ -8,7 +8,7 @@ namespace NightOwl::Graphics
 	class OpenGlTexture2D : public ITexture2D
 	{
 	public:
-		OpenGlTexture2D(const std::string& texturePath);
+		OpenGlTexture2D(const void* pixelData, int height, int width, int numberOfChannels);
 
 		~OpenGlTexture2D() override;
 
@@ -30,8 +30,6 @@ namespace NightOwl::Graphics
 		int width;
 
 		int numberOfChannels;
-
-		void LoadTexture(const std::string& texturePath);
 	};
 }
 

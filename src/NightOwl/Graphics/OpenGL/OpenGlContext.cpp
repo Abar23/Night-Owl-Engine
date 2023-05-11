@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "OpenGlContext.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
@@ -7,7 +9,8 @@
 namespace NightOwl::Graphics
 {
 	OpenGlContext::OpenGlContext(GLFWwindow* window)
-		:	window(window)
+		:	window(window),
+			clearColor(DEFAULT_CLEAR_COLOR)
 	{
 		glfwMakeContextCurrent(window);
 		int gladLoadedSucessfully = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -59,9 +62,9 @@ namespace NightOwl::Graphics
 		GL_CALL(glDrawElements, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, 0);
 	}
 
-	void OpenGlContext::ClearColor(Math::Vec4F color)
+	void OpenGlContext::ClearColor()
 	{
-		GL_CALL(glClearColor, color.x, color.y, color.z, color.w);
+		GL_CALL(glClearColor, clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 	}
 
 	void OpenGlContext::ClearBuffer()
@@ -74,10 +77,15 @@ namespace NightOwl::Graphics
 		GL_CALL(glViewport, cornerX, cornerY, viewWidth, viewHeight);
 	}
 
-	void OpenGlContext::EnableWireframe(bool enabled)
+	void OpenGlContext::EnableWireFrame(bool enabled)
 	{
 		const int mode = enabled ? GL_LINE : GL_FILL;
 
 		GL_CALL(glPolygonMode, GL_FRONT_AND_BACK, mode);
+	}
+
+	void OpenGlContext::SetClearColor(const Math::Vec4F& color)
+	{
+		clearColor = color;
 	}
 }

@@ -32,6 +32,10 @@ namespace NightOwl::Graphics
 
 		unsigned int GetAttributeLocation() const;
 
+		unsigned int GetOffset() const;
+
+		void SetOffset(unsigned int offset);
+
 	private:
 		std::string shaderAttributeName;
 
@@ -44,6 +48,8 @@ namespace NightOwl::Graphics
 		unsigned int sizeOfData;
 
 		unsigned int attributeLocation;
+
+		unsigned int offset;
 
 		void SetDataSizeAndNumberOfComponents();
 	};

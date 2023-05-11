@@ -1,12 +1,16 @@
-#include "MeshRendererSystem.h"
+#include "NightOwlPch.h"
 
+#include "MeshRendererSystem.h"
+#include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl::Graphics
 {
 	void MeshRendererSystem::Update()
 	{
-		for (auto* meshRenderer : meshRenderers)
+		std::sort(meshRenderers.begin(), meshRenderers.end(), Comparator);
+
+		for (auto meshRenderer : meshRenderers)
 		{
 			if(meshRenderer->GetGameObject().IsActive())
 			{
@@ -15,7 +19,7 @@ namespace NightOwl::Graphics
 		}
 	}
 
-	void MeshRendererSystem::AddMeshRenderer(Component::MeshRenderer* meshRenderer)
+	void MeshRendererSystem::AddMeshRenderer(const Component::MeshRenderer* meshRenderer)
 	{
 		meshRenderers.push_back(meshRenderer);
 	}
@@ -23,7 +27,7 @@ namespace NightOwl::Graphics
 	void MeshRendererSystem::RemoveMeshRenderer(const Component::MeshRenderer* meshRenderer)
 	{
 		int meshRendererIndex = 0;
-		for (const auto* renderer : meshRenderers)
+		for (const auto renderer : meshRenderers)
 		{
 			if (renderer == meshRenderer)
 			{
@@ -36,5 +40,16 @@ namespace NightOwl::Graphics
 		{
 			meshRenderers.erase(meshRenderers.begin() + meshRendererIndex);
 		}
+	}
+
+	bool MeshRendererSystem::Comparator(const Component::MeshRenderer* lhs,
+										const Component::MeshRenderer* rhs)
+	{
+		const Math::Vec3F cameraPosition = Component::Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition();
+
+		const float lhsSquareDistance = Math::Vec3F(cameraPosition - lhs->GetGameObject().GetTransform()->GetPosition()).SquareMagnitude();
+		const float rhsSquareDistance = Math::Vec3F(cameraPosition - rhs->GetGameObject().GetTransform()->GetPosition()).SquareMagnitude();
+
+		return rhsSquareDistance < lhsSquareDistance;
 	}
 }

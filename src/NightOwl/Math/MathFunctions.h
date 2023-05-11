@@ -37,4 +37,10 @@ namespace NightOwl::Math
 
 		return coeffOne + coeffTwo * value + coeffThree * value * value;
 	}
+
+	template <typename T>
+	inline T MapValueInRange(const T value, const T inputStart, const T inputEnd, const T outputStart, const T outputEnd)
+	{
+		return outputStart + (outputEnd - outputStart) / (inputEnd - inputStart) * (value - inputStart);
+	}
 }

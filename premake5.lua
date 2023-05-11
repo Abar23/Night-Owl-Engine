@@ -30,6 +30,9 @@ workspace "Night-Owl-Engine"
         targetdir ("./build/bin/" .. outputDir .. "/%{prj.name}") 
         objdir ("./build/obj/" .. outputDir .. "/%{prj.name}")
         
+        pchheader "NightOwlPch.h"
+        pchsource "src/NightOwlPch.cpp"
+
         files { 
             sourceDir .. "/**.h", 
             sourceDir .. "/**.cpp",
@@ -71,15 +74,11 @@ workspace "Night-Owl-Engine"
             systemversion "latest"
 
         filter "configurations:Debug"
-            defines { 
-                "DEBUG" 
-            }  
-            
-            symbols "On" 
-
+            defines "DEBUG" 
+            runtime "Debug"
+            symbols "on" 
+    
         filter "configurations:Release"  
-            defines { 
-                "NDEBUG" 
-            }    
-            
-            optimize "On" 
+            defines "RELEASE" 
+            runtime "Release"
+            optimize "on" 

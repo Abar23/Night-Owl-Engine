@@ -1,3 +1,5 @@
+#include <NightOwlPch.h>
+
 #include "NightOwl/Input/KeyCode.h"
 #include "GLFW/glfw3.h"
 
@@ -9,162 +11,162 @@ namespace NightOwl::Input
 
 		switch (nightOwlKeyCode)
 		{
-		case KeyCode::KeyNone:
+		case KeyCode::None:
 			glfwKeyCode = GLFW_KEY_UNKNOWN;
 			break;
 
-		case KeyCode::KeySpace:
+		case KeyCode::Space:
 			glfwKeyCode = GLFW_KEY_SPACE;
 			break;
 
-		case KeyCode::KeyApostrophe:
+		case KeyCode::Apostrophe:
 			glfwKeyCode = GLFW_KEY_APOSTROPHE;
 			break;
 
-		case KeyCode::KeyComma:
-		case KeyCode::KeyMinus:
-		case KeyCode::KeyPeriod:
-		case KeyCode::KeySlash:
-		case KeyCode::Key0:
-		case KeyCode::Key1:
-		case KeyCode::Key2:
-		case KeyCode::Key3:
-		case KeyCode::Key4:
-		case KeyCode::Key5:
-		case KeyCode::Key6:
-		case KeyCode::Key7:
-		case KeyCode::Key8:
-		case KeyCode::Key9:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_COMMA - static_cast<int>(KeyCode::KeyComma);
+		case KeyCode::Comma:
+		case KeyCode::Minus:
+		case KeyCode::Period:
+		case KeyCode::Slash:
+		case KeyCode::Num0:
+		case KeyCode::Num1:
+		case KeyCode::Num2:
+		case KeyCode::Num3:
+		case KeyCode::Num4:
+		case KeyCode::Num5:
+		case KeyCode::Num6:
+		case KeyCode::Num7:
+		case KeyCode::Num8:
+		case KeyCode::Num9:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_COMMA - static_cast<int>(KeyCode::Comma);
 			break;
 
-		case KeyCode::KeySemicolon:
+		case KeyCode::Semicolon:
 			glfwKeyCode = GLFW_KEY_SEMICOLON;
 			break;
 
-		case KeyCode::KeyEqual:
+		case KeyCode::Equal:
 			glfwKeyCode = GLFW_KEY_EQUAL;
 			break;
 
-		case KeyCode::KeyA:
-		case KeyCode::KeyB:
-		case KeyCode::KeyC:
-		case KeyCode::KeyD:
-		case KeyCode::KeyE:
-		case KeyCode::KeyF:
-		case KeyCode::KeyG:
-		case KeyCode::KeyH:
-		case KeyCode::KeyI:
-		case KeyCode::KeyJ:
-		case KeyCode::KeyK:
-		case KeyCode::KeyL:
-		case KeyCode::KeyM:
-		case KeyCode::KeyN:
-		case KeyCode::KeyO:
-		case KeyCode::KeyP:
-		case KeyCode::KeyQ:
-		case KeyCode::KeyR:
-		case KeyCode::KeyS:
-		case KeyCode::KeyT:
-		case KeyCode::KeyU:
-		case KeyCode::KeyV:
-		case KeyCode::KeyW:
-		case KeyCode::KeyX:
-		case KeyCode::KeyY:
-		case KeyCode::KeyZ:
-		case KeyCode::KeyLeftBracket:
-		case KeyCode::KeyBackslash:
-		case KeyCode::KeyRightBracket:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_A - static_cast<int>(KeyCode::KeyA);
+		case KeyCode::A:
+		case KeyCode::B:
+		case KeyCode::C:
+		case KeyCode::D:
+		case KeyCode::E:
+		case KeyCode::F:
+		case KeyCode::G:
+		case KeyCode::H:
+		case KeyCode::I:
+		case KeyCode::J:
+		case KeyCode::K:
+		case KeyCode::L:
+		case KeyCode::M:
+		case KeyCode::N:
+		case KeyCode::O:
+		case KeyCode::P:
+		case KeyCode::Q:
+		case KeyCode::R:
+		case KeyCode::S:
+		case KeyCode::T:
+		case KeyCode::U:
+		case KeyCode::V:
+		case KeyCode::W:
+		case KeyCode::X:
+		case KeyCode::Y:
+		case KeyCode::Z:
+		case KeyCode::LeftBracket:
+		case KeyCode::Backslash:
+		case KeyCode::RightBracket:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_A - static_cast<int>(KeyCode::A);
 			break;
 
-		case KeyCode::KeyGraveAccent:
+		case KeyCode::GraveAccent:
 			glfwKeyCode = GLFW_KEY_GRAVE_ACCENT;
 			break;
 
-		case KeyCode::KeyEscape:
-		case KeyCode::KeyEnter:
-		case KeyCode::KeyTab:
-		case KeyCode::KeyBackspace:
-		case KeyCode::KeyInsert:
-		case KeyCode::KeyDelete:
-		case KeyCode::KeyRight:
-		case KeyCode::KeyLeft:
-		case KeyCode::KeyDown:
-		case KeyCode::KeyUp:
-		case KeyCode::KeyPageUp:
-		case KeyCode::KeyPageDown:
-		case KeyCode::KeyHome:
-		case KeyCode::KeyEnd:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_ESCAPE - static_cast<int>(KeyCode::KeyEscape);
+		case KeyCode::Escape:
+		case KeyCode::Enter:
+		case KeyCode::Tab:
+		case KeyCode::Backspace:
+		case KeyCode::Insert:
+		case KeyCode::Delete:
+		case KeyCode::Right:
+		case KeyCode::Left:
+		case KeyCode::Down:
+		case KeyCode::Up:
+		case KeyCode::PageUp:
+		case KeyCode::PageDown:
+		case KeyCode::Home:
+		case KeyCode::End:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_ESCAPE - static_cast<int>(KeyCode::Escape);
 			break;
 
-		case KeyCode::KeyCapsLock:
-		case KeyCode::KeyScrollLock:
-		case KeyCode::KeyNumLock:
-		case KeyCode::KeyPrintScreen:
-		case KeyCode::KeyPause:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_CAPS_LOCK - static_cast<int>(KeyCode::KeyCapsLock);
+		case KeyCode::CapsLock:
+		case KeyCode::ScrollLock:
+		case KeyCode::NumLock:
+		case KeyCode::PrintScreen:
+		case KeyCode::Pause:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_CAPS_LOCK - static_cast<int>(KeyCode::CapsLock);
 			break;
 
-		case KeyCode::KeyF1:
-		case KeyCode::KeyF2:
-		case KeyCode::KeyF3:
-		case KeyCode::KeyF4:
-		case KeyCode::KeyF5:
-		case KeyCode::KeyF6:
-		case KeyCode::KeyF7:
-		case KeyCode::KeyF8:
-		case KeyCode::KeyF9:
-		case KeyCode::KeyF10:
-		case KeyCode::KeyF11:
-		case KeyCode::KeyF12:
-		case KeyCode::KeyF13:
-		case KeyCode::KeyF14:
-		case KeyCode::KeyF15:
-		case KeyCode::KeyF16:
-		case KeyCode::KeyF17:
-		case KeyCode::KeyF18:
-		case KeyCode::KeyF19:
-		case KeyCode::KeyF20:
-		case KeyCode::KeyF21:
-		case KeyCode::KeyF22:
-		case KeyCode::KeyF23:
-		case KeyCode::KeyF24:
-		case KeyCode::KeyF25:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_F1 - static_cast<int>(KeyCode::KeyF1);
+		case KeyCode::F1:
+		case KeyCode::F2:
+		case KeyCode::F3:
+		case KeyCode::F4:
+		case KeyCode::F5:
+		case KeyCode::F6:
+		case KeyCode::F7:
+		case KeyCode::F8:
+		case KeyCode::F9:
+		case KeyCode::F10:
+		case KeyCode::F11:
+		case KeyCode::F12:
+		case KeyCode::F13:
+		case KeyCode::F14:
+		case KeyCode::F15:
+		case KeyCode::F16:
+		case KeyCode::F17:
+		case KeyCode::F18:
+		case KeyCode::F19:
+		case KeyCode::F20:
+		case KeyCode::F21:
+		case KeyCode::F22:
+		case KeyCode::F23:
+		case KeyCode::F24:
+		case KeyCode::F25:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_F1 - static_cast<int>(KeyCode::F1);
 			break;
 
-		case KeyCode::KeyNumPad0:
-		case KeyCode::KeyNumPad1:
-		case KeyCode::KeyNumPad2:
-		case KeyCode::KeyNumPad3:
-		case KeyCode::KeyNumPad4:
-		case KeyCode::KeyNumPad5:
-		case KeyCode::KeyNumPad6:
-		case KeyCode::KeyNumPad7:
-		case KeyCode::KeyNumPad8:
-		case KeyCode::KeyNumPad9:
-		case KeyCode::KeyNumPadDecimal:
-		case KeyCode::KeyNumPadDivide:
-		case KeyCode::KeyNumPadMultiply:
-		case KeyCode::KeyNumPadSubtract:
-		case KeyCode::KeyNumPadAdd:
-		case KeyCode::KeyNumPadEnter:
-		case KeyCode::KeyNumPadEqual:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_KP_0 - static_cast<int>(KeyCode::KeyNumPad0);
+		case KeyCode::NumPad0:
+		case KeyCode::NumPad1:
+		case KeyCode::NumPad2:
+		case KeyCode::NumPad3:
+		case KeyCode::NumPad4:
+		case KeyCode::NumPad5:
+		case KeyCode::NumPad6:
+		case KeyCode::NumPad7:
+		case KeyCode::NumPad8:
+		case KeyCode::NumPad9:
+		case KeyCode::NumPadDecimal:
+		case KeyCode::NumPadDivide:
+		case KeyCode::NumPadMultiply:
+		case KeyCode::NumPadSubtract:
+		case KeyCode::NumPadAdd:
+		case KeyCode::NumPadEnter:
+		case KeyCode::NumPadEqual:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_KP_0 - static_cast<int>(KeyCode::NumPad0);
 			break;
 
-		case KeyCode::KeyLeftShift:
-		case KeyCode::KeyLeftControl:
-		case KeyCode::KeyLeftAlt:
-		case KeyCode::KeyLeftSuper:
-		case KeyCode::KeyRightShift:
-		case KeyCode::KeyRightControl:
-		case KeyCode::KeyRightAlt:
-		case KeyCode::KeyRightSuper:
-		case KeyCode::KeyMenu:
-			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_LEFT_SHIFT - static_cast<int>(KeyCode::KeyLeftShift);
+		case KeyCode::LeftShift:
+		case KeyCode::LeftControl:
+		case KeyCode::LeftAlt:
+		case KeyCode::LeftSuper:
+		case KeyCode::RightShift:
+		case KeyCode::RightControl:
+		case KeyCode::RightAlt:
+		case KeyCode::RightSuper:
+		case KeyCode::Menu:
+			glfwKeyCode = static_cast<int>(nightOwlKeyCode) + GLFW_KEY_LEFT_SHIFT - static_cast<int>(KeyCode::LeftShift);
 			break;
 
 		default:
@@ -182,15 +184,15 @@ namespace NightOwl::Input
 		switch (glfwKeyCode)
 		{
 		case GLFW_KEY_UNKNOWN:
-			nightOwlKeyCode = KeyCode::KeyNone;
+			nightOwlKeyCode = KeyCode::None;
 			break;
 
 		case GLFW_KEY_SPACE:
-			nightOwlKeyCode = KeyCode::KeySpace;
+			nightOwlKeyCode = KeyCode::Space;
 			break;
 
 		case GLFW_KEY_APOSTROPHE:
-			nightOwlKeyCode = KeyCode::KeyApostrophe;
+			nightOwlKeyCode = KeyCode::Apostrophe;
 			break;
 
 		case GLFW_KEY_COMMA:
@@ -207,15 +209,15 @@ namespace NightOwl::Input
 		case GLFW_KEY_7:
 		case GLFW_KEY_8:
 		case GLFW_KEY_9:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyComma) + glfwKeyCode - GLFW_KEY_COMMA);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::Comma) + glfwKeyCode - GLFW_KEY_COMMA);
 			break;
 
 		case GLFW_KEY_SEMICOLON:
-			nightOwlKeyCode = KeyCode::KeySemicolon;
+			nightOwlKeyCode = KeyCode::Semicolon;
 			break;
 
 		case GLFW_KEY_EQUAL:
-			nightOwlKeyCode = KeyCode::KeyEqual;
+			nightOwlKeyCode = KeyCode::Equal;
 			break;
 
 		case GLFW_KEY_A:
@@ -247,11 +249,11 @@ namespace NightOwl::Input
 		case GLFW_KEY_LEFT_BRACKET:
 		case GLFW_KEY_BACKSLASH:
 		case GLFW_KEY_RIGHT_BRACKET:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyA) + glfwKeyCode - GLFW_KEY_A);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::A) + glfwKeyCode - GLFW_KEY_A);
 			break;
 
 		case GLFW_KEY_GRAVE_ACCENT:
-			nightOwlKeyCode = KeyCode::KeyGraveAccent;
+			nightOwlKeyCode = KeyCode::GraveAccent;
 			break;
 
 		case GLFW_KEY_ESCAPE:
@@ -268,7 +270,7 @@ namespace NightOwl::Input
 		case GLFW_KEY_PAGE_DOWN:
 		case GLFW_KEY_HOME:
 		case GLFW_KEY_END:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyEscape) + glfwKeyCode - GLFW_KEY_ESCAPE);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::Escape) + glfwKeyCode - GLFW_KEY_ESCAPE);
 			break;
 
 		case GLFW_KEY_CAPS_LOCK:
@@ -276,7 +278,7 @@ namespace NightOwl::Input
 		case GLFW_KEY_NUM_LOCK:
 		case GLFW_KEY_PRINT_SCREEN:
 		case GLFW_KEY_PAUSE:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyCapsLock) + glfwKeyCode - GLFW_KEY_CAPS_LOCK);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::CapsLock) + glfwKeyCode - GLFW_KEY_CAPS_LOCK);
 			break;
 
 		case GLFW_KEY_F1:
@@ -304,7 +306,7 @@ namespace NightOwl::Input
 		case GLFW_KEY_F23:
 		case GLFW_KEY_F24:
 		case GLFW_KEY_F25:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyF1) + glfwKeyCode - GLFW_KEY_F1);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::F1) + glfwKeyCode - GLFW_KEY_F1);
 			break;
 
 		case GLFW_KEY_KP_0:
@@ -324,7 +326,7 @@ namespace NightOwl::Input
 		case GLFW_KEY_KP_ADD:
 		case GLFW_KEY_KP_ENTER:
 		case GLFW_KEY_KP_EQUAL:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyNumPad0) + glfwKeyCode - GLFW_KEY_KP_0);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::NumPad0) + glfwKeyCode - GLFW_KEY_KP_0);
 			break;
 
 		case GLFW_KEY_LEFT_SHIFT:
@@ -336,11 +338,11 @@ namespace NightOwl::Input
 		case GLFW_KEY_RIGHT_ALT:
 		case GLFW_KEY_RIGHT_SUPER:
 		case GLFW_KEY_MENU:
-			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::KeyLeftShift) + glfwKeyCode - GLFW_KEY_LEFT_SHIFT);
+			nightOwlKeyCode = static_cast<KeyCode>(static_cast<int>(KeyCode::LeftShift) + glfwKeyCode - GLFW_KEY_LEFT_SHIFT);
 			break;
 
 		default:
-			nightOwlKeyCode = KeyCode::KeyNone;
+			nightOwlKeyCode = KeyCode::None;
 			break;
 		}
 

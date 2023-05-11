@@ -1,56 +1,86 @@
+#include "NightOwlPch.h"
+
 #include "Camera.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Window/WindowApi.h"
 
 namespace NightOwl::Component
 {
-	Camera* Camera::mainCamera{ nullptr };
+	Core::WeakPointer<Camera> Camera::mainCamera{ nullptr };
 
 	Camera::Camera()
 		:	Component(ComponentType::Camera),
 			fieldOfView(90.0f),
 			clippingPlanes(0.01f, 1000.0f),
+			aspectRatio(Window::WindowApi::GetWindow()->GetAspectRatio()),
+			orthographicSize(Window::WindowApi::GetWindow()->GetHeight() / 2.0f),
 			isPerspectiveProjection(true),
-			isProjectionDirty(false)
+			wasAspectRatioSet(false),
+			isProjectionDirty(true)
 	{
 		this->gameObject = gameObject;
-		orthographicSize = static_cast<float>(Window::WindowApi::GetWindow()->GetHeight() / 2);
-		projectionMatrix = Math::Mat4F::Perspective(fieldOfView, Window::WindowApi::GetWindow()->GetAspectRatio(), clippingPlanes.near, clippingPlanes.far);
 		mainCamera = this;
 	}
 
-	void Camera::LookAt(Math::Vec3F pointToLookAt)
+	std::shared_ptr<Component> Camera::Clone()
 	{
-		Math::Mat4F::LookAt(gameObject->GetTransform()->GetPosition(), pointToLookAt, Math::Vec3F::Up());
+		std::shared_ptr<Camera> clone = std::make_shared<Camera>();
+
+		clone->projectionMatrix = projectionMatrix;
+		clone->fieldOfView = fieldOfView;
+		clone->clippingPlanes = clippingPlanes;
+		clone->isPerspectiveProjection = isPerspectiveProjection;
+		clone->orthographicSize = orthographicSize;
+		clone->isProjectionDirty = isProjectionDirty;
+
+		return clone;
 	}
 
-	Math::Mat4F Camera::ViewProjectionMatrix()
+	Math::Mat4F Camera::GetViewProjectionMatrix()
 	{
+		auto* window = Window::WindowApi::GetWindow().get();
+
+		// This optimization will only work with one camera. Must add a collection of cameras
+		// in the camera component to have the window indicate to each camera that the
+		// aspect ratio has changed. Will work for single camera games.
+		if(!isProjectionDirty && !window->HasWindowChangedAspectRatio())
+		{
+			return projectionMatrix;
+		}
+
+		const float aspect = (wasAspectRatioSet) ? aspectRatio : window->GetAspectRatio();
 
 		if (isPerspectiveProjection)
 		{
-			projectionMatrix = Math::Mat4F::Perspective(fieldOfView, Window::WindowApi::GetWindow()->GetAspectRatio(), clippingPlanes.near, clippingPlanes.far);
+			projectionMatrix = Math::Mat4F::Perspective(fieldOfView, aspect, clippingPlanes.near, clippingPlanes.far);
 		}
 		else
 		{
-			const float height = 2.0f * orthographicSize;
-			const float width = height * Window::WindowApi::GetWindow()->GetAspectRatio();
+			float virtualHeight = 2.0f * orthographicSize;
+			float virtualWidth = virtualHeight * aspect;
+
+			float windowAspectRatio = window->GetAspectRatio();
+
+			// Have to map physical screen space to the virtual space of the orthographic camera using the window aspect ratio
+			float height = std::max(virtualWidth / windowAspectRatio, virtualHeight);
+			float width = std::max(windowAspectRatio * virtualHeight, virtualWidth);
+
 			const float halfHeight = height / 2.0f;
 			const float halfWidth = width / 2.0f;
+
 			projectionMatrix = Math::Mat4F::Orthographic(-halfWidth, halfWidth, -halfHeight, halfHeight, clippingPlanes.near, clippingPlanes.far);
 		}
 
-		return projectionMatrix * GetViewMatrix();
+		projectionMatrix *= GetViewMatrix();
+
+		isProjectionDirty = false;
+
+		return projectionMatrix;
 	}
 
-	const Math::Mat4F Camera::GetViewMatrix()
+	Math::Mat4F Camera::GetViewMatrix()
 	{
 		return gameObject->GetTransform()->GetWorldMatrix().GetInverse();
-	}
-
-	const Math::Mat4F Camera::GetViewMatrix() const
-	{
-		return gameObject->GetTransform()->GetWorldMatrix();
 	}
 
 	float Camera::GetNearClippingPlane()
@@ -61,6 +91,7 @@ namespace NightOwl::Component
 	void Camera::SetNearClippingPlane(float nearPlaneDistance)
 	{
 		clippingPlanes.near = nearPlaneDistance;
+		SetProjectionDirtyFlag();
 	}
 
 	float Camera::GetFarClippingPlane()
@@ -71,6 +102,7 @@ namespace NightOwl::Component
 	void Camera::SetFarClippingPlane(float farPlaneDistance)
 	{
 		clippingPlanes.far = farPlaneDistance;
+		SetProjectionDirtyFlag();
 	}
 
 	ClippingPlanes Camera::GetClippingPlanes()
@@ -81,6 +113,7 @@ namespace NightOwl::Component
 	void Camera::SetClippingPlanes(const ClippingPlanes& clippingPlanes)
 	{
 		this->clippingPlanes = clippingPlanes;
+		SetProjectionDirtyFlag();
 	}
 
 	float Camera::FieldOfView() const
@@ -91,11 +124,26 @@ namespace NightOwl::Component
 	void Camera::SetFieldOfView(float fieldOfView)
 	{
 		this->fieldOfView = fieldOfView;
+		SetProjectionDirtyFlag();
 	}
 
-	void Camera::SetProjectionDirtyFlag()
+	void Camera::ResetAspectRatio()
 	{
-		isProjectionDirty = true;
+		aspectRatio = Window::WindowApi::GetWindow()->GetAspectRatio();
+		SetWasAspectRatioSetFlag();
+		SetProjectionDirtyFlag();
+	}
+
+	float Camera::GetAspectRatio() const
+	{
+		return aspectRatio;
+	}
+
+	void Camera::SetAspectRatio(float width, float height)
+	{
+		this->aspectRatio = width / height;
+		SetWasAspectRatioSetFlag();
+		SetProjectionDirtyFlag();
 	}
 
 	float Camera::GetOrthographicSize() const
@@ -116,12 +164,32 @@ namespace NightOwl::Component
 
 	void Camera::SetPerspectiveMode(bool enablePerspectiveProjection)
 	{
-		this->isPerspectiveProjection = enablePerspectiveProjection;
+		isPerspectiveProjection = enablePerspectiveProjection;
+		SetProjectionDirtyFlag();
 	}
 
-	Camera* Camera::GetMainCamera()
+	Core::WeakPointer<Camera> Camera::GetMainCamera()
 	{
 		return mainCamera;
+	}
+
+	void Camera::SetMainCamera(Camera& camera)
+	{
+		mainCamera = &camera;
+	}
+
+	void Camera::Remove()
+	{
+	}
+
+	void Camera::SetProjectionDirtyFlag()
+	{
+		isProjectionDirty = true;
+	}
+
+	void Camera::SetWasAspectRatioSetFlag()
+	{
+		wasAspectRatioSet = true;
 	}
 
 	START_REFLECTION(Camera)

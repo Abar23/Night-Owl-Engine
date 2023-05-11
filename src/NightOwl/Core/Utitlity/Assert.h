@@ -2,24 +2,30 @@
 
 #include <iostream>
 #include <format>
+#include <string>
 #include "Logging/LoggerManager.h"
+#include "NightOwl/Core/Utitlity/Utils.h"
 
 #ifdef DEBUG
 #define ENGINE_ASSERT(condition, message, ...) \
-    if (! (condition)) { \
-		ENGINE_LOG_ASSERT(message, __VA_ARGS__);\
-		std::cerr << "***ENGINE ERROR*** (" << __FILE__ << ": " << __LINE__ << ")\n"; \
-        std::cerr << "Assertion `" #condition "` failed! Error message: " << message << std::endl; \
+    do \
+	if (! (condition)) { \
+		std::string formattedMessage = std::format("Condition \"{0}\" failed! ", #condition); \
+		formattedMessage += std::format(message, __VA_ARGS__); \
+		ENGINE_LOG_ASSERT(formattedMessage);\
         std::terminate(); \
-    }
+    } \
+    while(0)
 
 #define CLIENT_ASSERT(condition, message, ...) \
-    if (! (condition)) { \
-		CLIENT_LOG_ASSERT(message, __VA_ARGS__);\
-		std::cerr << "***CLIENT ERROR*** (" << __FILE__ << ": " << __LINE__ << ")\n"; \
-        std::cerr << "Assertion `" #condition "` failed! Error message: " << message << std::endl; \
+    do \
+	if (! (condition)) { \
+		std::string formattedMessage = std::format("Condition \"{0}\" failed! ", #condition); \
+		formattedMessage += std::format(message, __VA_ARGS__); \
+		CLIENT_LOG_ASSERT(formattedMessage);\
         std::terminate(); \
-    }
+    } \
+    while(0)
 #else
 #define ENGINE_ASSERT(condition, message)
 #define CLIENT_ASSERT(condition, message)

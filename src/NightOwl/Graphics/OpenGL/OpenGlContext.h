@@ -18,16 +18,22 @@ namespace NightOwl::Graphics
 
 		void DrawIndexed(DrawType drawType, int numberOfIndices) override;
 
-		void ClearColor(Math::Vec4F color) override;
+		void ClearColor() override;
 
 		void ClearBuffer() override;
 
 		void SetViewport(int cornerX, int cornerY, int viewWidth, int viewHeight) override;
 
-		void EnableWireframe(bool enabled) override;
+		void EnableWireFrame(bool enabled) override;
+
+		void SetClearColor(const Math::Vec4F& color) override;
 
 	private:
 		GLFWwindow* window;
+
+		Math::Vec4F clearColor;
+
+		const Math::Vec4F DEFAULT_CLEAR_COLOR = Math::Vec4F(0.5f, 0.4f, 0.3f, 1.0f);
 	};
 }
 

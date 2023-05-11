@@ -30,7 +30,7 @@ namespace NightOwl::Graphics
 	private:
 		unsigned int vertexArrayObjectId;
 
-		std::shared_ptr<IVertexBuffer> vertexBuffer; //Update logic to support multiple vertex buffers
+		std::shared_ptr<IVertexBuffer> vertexBuffer;
 
 		std::shared_ptr<IIndexBuffer> indexBuffer;
 	};

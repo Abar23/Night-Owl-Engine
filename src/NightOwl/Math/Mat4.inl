@@ -9,7 +9,7 @@ namespace NightOwl::Math
 {
 	template <typename T>
 	Mat4<T>::Mat4()
-		: data{ 0 }
+		:	data{ 0 }
 	{ }
 
 	template<typename T>
@@ -86,7 +86,7 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Mat4<T>::Mat4(const T diagonal)
-		: data{ 0 }
+		:	data{ 0 }
 	{
 		data[0][0] = diagonal;
 		data[1][1] = diagonal;
@@ -136,7 +136,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	Mat4<T>& Mat4<T>::Inverse()
+	Mat4<T>& Mat4<T>::Invert()
 	{
 		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
 		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);
@@ -221,7 +221,7 @@ namespace NightOwl::Math
 	}
 
 	template <typename T>
-	float Mat4<T>::GetDeterminant() const
+	float Mat4<T>::Determinant() const
 	{
 		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
 		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);

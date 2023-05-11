@@ -9,9 +9,8 @@ namespace NightOwl::Math
 {
 	template <typename T>
 	Vec2<T>::Vec2()
-		: x(0), y(0)
-	{
-	}
+		:	x(0), y(0)
+	{ }
 
 	template<typename T>
 	Vec2<T>::Vec2(std::initializer_list<T> args)
@@ -25,19 +24,17 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Vec2<T>::Vec2(const T x, const T y)
-		: x(x), y(y)
-	{
-	}
+		:	x(x), y(y)
+	{ }
 
 	template <typename T>
 	Vec2<T>::Vec2(const T scalar)
-		: x(scalar), y(scalar)
-	{
-	}
+		:	x(scalar), y(scalar)
+	{ }
 
 	template <typename T>
 	Vec2<T>::Vec2(const Vec2& vector)
-		: x(vector.x), y(vector.y)
+		:	x(vector.x), y(vector.y)
 	{
 	}
 
@@ -86,11 +83,11 @@ namespace NightOwl::Math
 	template <typename T>
 	T Vec2<T>::Magnitude() const
 	{
-		return std::sqrt(SqrMagnitude());
+		return std::sqrt(SquareMagnitude());
 	}
 
 	template <typename T>
-	T Vec2<T>::SqrMagnitude() const
+	T Vec2<T>::SquareMagnitude() const
 	{
 		return x * x + y * y;
 	}
@@ -118,14 +115,14 @@ namespace NightOwl::Math
 	template <typename T>
 	Vec2<T> Vec2<T>::GetRenormalize() const
 	{
-		T inverseMagnitude = FastInverseSquareRootAroundOne(SqrMagnitude());
+		T inverseMagnitude = FastInverseSquareRootAroundOne(SquareMagnitude());
 		return Vec2<T>(x * inverseMagnitude, y * inverseMagnitude);
 	}
 
 	template <typename T>
 	Vec2<T>& Vec2<T>::Renormalize()
 	{
-		T inverseMagnitude = FastInverseSquareRootAroundOne(SqrMagnitude());
+		T inverseMagnitude = FastInverseSquareRootAroundOne(SquareMagnitude());
 		return *this *= inverseMagnitude;
 	}
 

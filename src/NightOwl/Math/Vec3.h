@@ -142,45 +142,75 @@ namespace NightOwl::Math
 		};
 
 		Vec3();
+
 		Vec3(const Vec3<T>& v) = default;
+
 		Vec3(std::initializer_list<T> args);
+
 		Vec3(const T x, const T y, const T z);
+
 		Vec3(const T value);
 
 		~Vec3() = default;
 
 		T Magnitude() const;
-		T SqrMagnitude() const;
+
+		T SquareMagnitude() const;
+
 		Vec3<T> GetNormalize() const;
+
 		Vec3<T>& Normalize();
+
 		Vec3<T> GetRenormalize() const;
+
 		Vec3<T>& Renormalize();
+
 		Vec3<T> GetNegate() const;
+
 		Vec3<T>& Negate();
+
 		const T* GetValuePointer() const;
+
 		const std::string ToString() const;
 
 		static T Dot(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
 		static Vec3<T> Cross(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
 		static Vec3<T> Project(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
 		static Vec3<T> Reject(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
 		static Vec3<T> Lerp(const Vec3<T>& leftVector, const Vec3<T>& rightVector, const float t);
+
 		static Vec3<T> Zero();
+
 		static Vec3<T> XAxis();
+
 		static Vec3<T> YAxis();
+
 		static Vec3<T> ZAxis();
+
 		static Vec3<T> Up();
+
 		static Vec3<T> Down();
+
 		static Vec3<T> Left();
+
 		static Vec3<T> Right();
+
 		static Vec3<T> Back();
+
 		static Vec3<T> Forward();
 
 		Vec3<T>& operator=(const Vec3<T>& vector);
+
 		Vec3<T>& operator+=(const Vec3<T>& vector);
+
 		Vec3<T>& operator-=(const Vec3<T>& vector);
 
 		Vec3<T>& operator*=(const T scalar);
+
 		Vec3<T>& operator/=(const T scalar);
 
 		friend bool operator==(const Vec3<T>& leftVector, const Vec3<T>& rightVector)

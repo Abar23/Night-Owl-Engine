@@ -35,6 +35,7 @@ namespace NightOwl::Utility
         unsigned int id,
         GLenum severity,
         GLsizei length,
+        //these two * Goes into GLcalls 
         const char* message,
         const void* userParam);
 

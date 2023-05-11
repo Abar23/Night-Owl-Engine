@@ -9,7 +9,7 @@ namespace NightOwl::Graphics
 	class OpenGlShader : public IShader
 	{
 	public:
-		OpenGlShader(const std::string& name, const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+		OpenGlShader(const std::string& name, const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
 
 		~OpenGlShader() override;
 
@@ -27,7 +27,9 @@ namespace NightOwl::Graphics
 
 		void SetUniformVec2F(const Math::Vec2F& vec2, const std::string& uniformName) override;
 
-		void SetUniformInt(unsigned int id, const std::string& uniformName) override;
+		void SetUniformInt(int value, const std::string& uniformName) override;
+
+		void SetUniformFloat(float value, const std::string& uniformName) override;
 
 		int GetShaderId() override;
 
@@ -38,7 +40,7 @@ namespace NightOwl::Graphics
 
 		std::string name;
 
-		unsigned int CompileShaderSource(const std::string& sourcePath, GLenum shaderType);
+		unsigned int CompileShaderSource(const std::string& shaderSource, GLenum shaderType);
 
 		unsigned int GetUniformLocation(const std::string& uniformName) const;
 

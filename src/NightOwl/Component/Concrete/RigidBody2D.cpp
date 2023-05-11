@@ -1,19 +1,58 @@
+#include <NightOwlPch.h>
+
 #include "RigidBody2D.h"
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
+#include "NightOwl/Core/Locator/ColliderRendererSystemLocator.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl::Component
 {
 	RigidBody2D::RigidBody2D()
 		:	Component(ComponentType::RigidBody2D),
+			isGravitational(false),
+			isKinematic(false),
+			isTrigger(false),
 			rotation(0.0f),
 			mass(0.0f),
 			inverseMass(0.0f),
+			gravityScale(1.0f),
+			dragCoefficient(0.0f),
+			coefficientOfRestitution(0.0f),
 			position(0.0f),
 			linearVelocity(0.0f),
 			accumulatedForces(0.0f),
+			impulseCounter(0),
 			collider(nullptr)
 	{
 		Core::PhysicsEngine2DLocator::GetPhysicsEngine2D()->AddRigidBody2D(this);
+	}
+
+	std::shared_ptr<Component> RigidBody2D::Clone()
+	{
+		std::shared_ptr<RigidBody2D> clone = std::make_shared<RigidBody2D>();
+
+		clone->velocity = velocity;
+		clone->rotation = rotation;
+		clone->mass = mass;
+		clone->inverseMass = inverseMass;
+		clone->position = position;
+		clone->linearVelocity = linearVelocity;
+		clone->accumulatedForces = accumulatedForces;
+		clone->isGravitational = isGravitational;
+		clone->isKinematic = isKinematic;
+		clone->isTrigger = isTrigger;
+		clone->dragCoefficient = dragCoefficient;
+		clone->gravityScale = gravityScale;
+		clone->coefficientOfRestitution = coefficientOfRestitution;
+
+		if(collider != nullptr)
+		{
+			clone->collider = collider->Clone();
+			clone->collider->rigidBody2D = clone.get();
+			Core::ColliderRendererSystemLocator::GetColliderRendererSystem()->AddCollider(clone->collider.get());
+		}
+		
+		return clone;
 	}
 
 	RigidBody2D::~RigidBody2D()
@@ -24,6 +63,12 @@ namespace NightOwl::Component
 	void RigidBody2D::AddForce(Math::Vec2F forceVector)
 	{
 		accumulatedForces += forceVector;
+	}
+
+	void RigidBody2D::AddImpulse(const Math::Vec2F& impulseVector)
+	{
+		++impulseCounter;
+		accumulatedImpulses += impulseVector;
 	}
 
 	Math::Vec2F RigidBody2D::GetVelocity() const
@@ -62,10 +107,9 @@ namespace NightOwl::Component
 		return inverseMass;
 	}
 
-	// Fix this!!!!!!!!!!!!!!!!
 	Math::Vec2F RigidBody2D::GetPosition() const
 	{
-		return position;
+		return gameObject->GetTransform()->GetPosition().xy;
 	}
 
 	void RigidBody2D::SetPosition(const Math::Vec2F& position)
@@ -73,9 +117,51 @@ namespace NightOwl::Component
 		this->position = position;
 	}
 
+	Math::Vec2F RigidBody2D::GetDifferedPositionChange() const
+	{
+		return differedPositionChange;
+
+	}
+
+	void RigidBody2D::ResetDifferedPositionChange()
+	{
+		differedPositionChange = Math::Vec2F::Zero();
+	}
+
+	void RigidBody2D::AddDifferedPositionChange(Math::Vec2F positionChange)
+	{
+		if (signbit(differedPositionChange.x) ^ signbit(positionChange.x))
+		{
+			differedPositionChange.x += positionChange.x;
+		} else
+		{
+			differedPositionChange.x = std::max(differedPositionChange.x, positionChange.x);
+
+		}
+
+		if (signbit(differedPositionChange.y) ^ signbit(positionChange.y))
+		{
+			differedPositionChange.y += positionChange.y;
+		}
+		else
+		{
+			differedPositionChange.y = std::max(differedPositionChange.y, positionChange.y);
+
+		}
+	}
+
 	Math::Vec2F RigidBody2D::GetAccumulatedForces() const
 	{
 		return accumulatedForces;
+	}
+
+	Math::Vec2F RigidBody2D::GetAccumulatedImpulses() const
+	{
+		if (impulseCounter)
+		{
+			return accumulatedImpulses / static_cast<float>(impulseCounter);
+		}
+		return accumulatedImpulses;
 	}
 
 	void RigidBody2D::ClearForces()
@@ -83,20 +169,110 @@ namespace NightOwl::Component
 		accumulatedForces = Math::Vec2F(0.0f);
 	}
 
-	Physics::Collider2D* RigidBody2D::GetCollider()
+	void RigidBody2D::ClearImpulses()
+	{
+		accumulatedImpulses = Math::Vec2F(0.0f);
+		impulseCounter = 0;
+	}
+
+	Core::WeakPointer<Physics::Collider2D> RigidBody2D::GetCollider()
 	{
 		return collider.get();
 	}
 
-	void RigidBody2D::SetCollider(Physics::Collider2D* collider)
+	bool RigidBody2D::IsKinematic() const
 	{
-		this->collider = std::shared_ptr<Physics::Collider2D>(collider);
+		return isKinematic;
+	}
+
+	void RigidBody2D::SetIsKinematic(bool isKinematic)
+	{
+		this->isKinematic = isKinematic;
+	}
+
+	bool RigidBody2D::IsGravitational() const
+	{
+		return isGravitational;
+	}
+
+	void RigidBody2D::SetIsGravitational(bool isGravitational)
+	{
+		this->isGravitational = isGravitational;
+	}
+
+	bool RigidBody2D::IsTrigger() const
+	{
+		return isTrigger;
+	}
+
+	void RigidBody2D::SetIsTrigger(bool isTrigger)
+	{
+		this->isTrigger = isTrigger;
+	}
+
+	float RigidBody2D::GetGravityScale() const
+	{
+		return gravityScale;
+	}
+
+	void RigidBody2D::SetGravityScale(float gravityScale)
+	{
+		this->gravityScale = gravityScale;
+	}
+
+	void RigidBody2D::SetCollider(Core::WeakPointer<Physics::Collider2D> collider)
+	{
+		if (this->collider != nullptr)
+		{
+			Core::ColliderRendererSystemLocator::GetColliderRendererSystem()->RemoveCollider(this->collider.get());
+		}
+
+		Core::ColliderRendererSystemLocator::GetColliderRendererSystem()->AddCollider(collider);
+		this->collider = std::shared_ptr<Physics::Collider2D>(collider.GetPointer());
 		this->collider->rigidBody2D = this;
+	}
+
+	void RigidBody2D::Remove()
+	{
+		Core::PhysicsEngine2DLocator::GetPhysicsEngine2D()->RemoveRigidBody2D(this);
+
+		if (this->collider != nullptr)
+		{
+			Core::ColliderRendererSystemLocator::GetColliderRendererSystem()->RemoveCollider(this->collider.get());
+		}
+	}
+
+	float RigidBody2D::GetDragCoefficient() const
+	{
+		return dragCoefficient;
+	}
+
+	void RigidBody2D::SetDragCoefficient(float dragCoefficient)
+	{
+		this->dragCoefficient = dragCoefficient;
+	}
+
+	float RigidBody2D::GetCoefficientOfRestitution() const
+	{
+		return coefficientOfRestitution;
+	}
+
+	void RigidBody2D::SetCoefficientOfRestitution(float coefficientOfRestitution)
+	{
+		this->coefficientOfRestitution = coefficientOfRestitution;
+	}
+
+	Math::Vec2F RigidBody2D::GetColliderPosition()
+	{
+		ENGINE_ASSERT(collider != nullptr, "Tried to get collider position on RigidBody2D without collider!");
+
+		const Math::Vec2F colliderOffset = collider->GetOffsetFromCenterOfObject();
+
+		return GetPosition() + colliderOffset;
 	}
 
 	START_REFLECTION(RigidBody2D)
 	CLASS_MEMBER_REFLECTION(velocity)
-	{"rotation", offsetof(T, rotation), NightOwl::Core::TypeResolver<decltype(rotation)>::Get()},
 	CLASS_MEMBER_REFLECTION(mass)
 	CLASS_MEMBER_REFLECTION(inverseMass)
 	CLASS_MEMBER_REFLECTION(position)

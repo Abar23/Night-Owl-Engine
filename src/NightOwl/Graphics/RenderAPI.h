@@ -14,6 +14,7 @@
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
+#include "NightOwl/Core/Memory/WeakPointer.h"
 #include <memory>
 
 namespace NightOwl::Graphics
@@ -37,7 +38,7 @@ namespace NightOwl::Graphics
 			#endif
 		}
 
-		static void CreateContext(Window::IWindow* window)
+		static void CreateContext(Core::WeakPointer <Window::IWindow> window)
 		{
 			if (graphicsContext) return;
 

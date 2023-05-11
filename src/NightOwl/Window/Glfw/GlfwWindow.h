@@ -1,7 +1,10 @@
 #pragma once
 
-#include "WindowProperties.h"
+#include "NightOwl/Window/Structures/WindowProperties.h"
+#include "NightOwl/Window/Structures/MonitorProperties.h"
+#include "NightOwl/Window/Structures/WindowSnapshot.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
+#include "NightOwl/Input/GamePadState.h"
 #include "GLFW/glfw3.h"
 #include <functional>
 
@@ -12,7 +15,7 @@ namespace NightOwl::Window
 	public:
 		GlfwWindow(const std::string& windowName, const unsigned int height, const unsigned int width);
 
-		~GlfwWindow() override;
+		void Shutdown() override;
 
 		bool ShouldWindowClose() override;
 
@@ -22,11 +25,17 @@ namespace NightOwl::Window
 
 		void* GetWindowHandle() override;
 
+		Input::GamePadConnection GetGamePadConnectionStatus(Input::GamePadId gamePadId) override;
+
+		Input::GamePadState GetGamePadState(Input::GamePadId GamePadId) override;
+
 		void Update() override;
 
 		float GetAspectRatio() override;
 
 		const WindowProperties& GetWindowProperties();
+
+		const MonitorProperties& GetMonitorProperties();
 
 		void SetKeyCallback(std::function<void(int, int, int, int)> keyCallback) override;
 
@@ -36,11 +45,42 @@ namespace NightOwl::Window
 
 		void SetMouseScrollCallback(std::function<void(double, double)> mouseScrollCallback) override;
 
+		void SetGamePadConnectionCallback(std::function<void(int, int)> gamepadConnectionCallback) override;
+
+		void ToggleFullScreen() override;
+
+		bool IsFullScreen() override;
+
+		bool IsMinimized() override;
+
+		void SetMonitor(uint32_t index) override;
+
+		int GetTotalMonitors() override;
+
+		void CloseWindow() override;
+
+		void EnableCursor() override;
+
+		void HideCursor() override;
+
+		void DisableCursor() override;
+
+		bool HasWindowChangedAspectRatio() override;
+
 	private:
 		GLFWwindow* windowHandle;
 
-		WindowProperties properties;
+		WindowProperties windowProperties;
 
+		GLFWmonitor* monitorHandle;
+
+		MonitorProperties monitorProperties;
+
+		bool isFullScreen;
+
+		inline static std::function<void(int, int)> gamepadConnectionCallback{nullptr};
+
+		//* in callback function is used by GLFW may not need to be changed?
 		static void ErrorCallback(int errorCode, const char* errorMessage);
 
 		static void ScreenResizeCallback(GLFWwindow* window, int width, int height);
@@ -54,5 +94,9 @@ namespace NightOwl::Window
 		static void MousePositionCallback(GLFWwindow* window, double xPosition, double yPosition);
 
 		static void MouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+
+		static void GamepadConnectionCallback(int gamepadId, int connectionEventType);
+
+		static void WindowMinimizationCallback(GLFWwindow* window, int iconified);
 	};
 }

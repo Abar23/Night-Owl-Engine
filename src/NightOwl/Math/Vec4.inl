@@ -10,15 +10,13 @@ namespace NightOwl::Math
 {
 	template <typename T>
 	Vec4<T>::Vec4()
-		: x(0), y(0), z(0), w(0)
-	{
-	}
+		:	x(0), y(0), z(0), w(0)
+	{ }
 
 	template <typename T>
 	Vec4<T>::Vec4(const Vec4<T>& vector)
-		: x(vector.x), y(vector.y), z(vector.z), w(vector.w)
-	{
-	}
+		:	x(vector.x), y(vector.y), z(vector.z), w(vector.w)
+	{ }
 
 	template<typename T>
 	Vec4<T>::Vec4(std::initializer_list<T> args)
@@ -32,21 +30,18 @@ namespace NightOwl::Math
 
 	template <typename T>
 	Vec4<T>::Vec4(const T x, const T y, const T z, const T w)
-		: x(x), y(y), z(z), w(w)
-	{
-	}
+		:	x(x), y(y), z(z), w(w)
+	{ }
 
 	template <typename T>
 	Vec4<T>::Vec4(const T x, const T y, const T z)
-		: x(x), y(y), z(z), w(0)
-	{
-	}
+		:	x(x), y(y), z(z), w(0)
+	{ }
 
 	template <typename T>
 	Vec4<T>::Vec4(const T scalar)
-		: x(scalar), y(scalar), z(scalar), w(scalar)
-	{
-	}
+		:	x(scalar), y(scalar), z(scalar), w(scalar)
+	{ }
 
 	template <typename T>
 	T Vec4<T>::Magnitude() const

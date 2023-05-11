@@ -23,7 +23,34 @@ namespace NightOwl::Core
 
 		static float GetDeltaTime();
 
+		static float GetUnscaledDeltaTime();
+
 		static int GetFrameCount();
+
+		static int GetFrameRate();
+
+		static void UnlockFrameRate();
+
+		static void LockFrameRate(int maxFrameRate);
+
+		static bool ShouldRenderFrame();
+
+		static void UpdateFixedTime();
+
+		static float GetFixedDeltaTime();
+
+		static float GetUnscaledFixedDeltaTime();
+
+		static float GetMinFrameTime();
+
+		static void SetFixedTime(int maxUpdatePerFrame);
+
+		static void SetTimeScale(float timeScale);
+
+		static float GetTimeScale();
+
+		static bool ShouldExecuteFixedUpdate();
+
 
 	private:
 		Time();
@@ -38,8 +65,28 @@ namespace NightOwl::Core
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> previousTime;
 
+		float minFrameTime;
+
+		float frameTimeCounter;
+
 		float deltaTime;
 
+		float unscaledDeltaTime;
+
+		float calculatedFps;
+
+		float frameTime;
+
+		float unscaledFixedDeltaTime;
+
+		float totalTime;
+
+		float totalFixedTime;
+
+		float timeScale;
+
 		int frameCount;
+
+		bool shouldRender;
 	};
 }

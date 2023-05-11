@@ -50,31 +50,41 @@ namespace NightOwl::Component
 
 		int GetNumberOfChildren();
 
-		const Transform& GetParent();
+		Transform& GetParent();
 
-		void SetParent(Transform* parentTransform);
+		void SetParent(Core::WeakPointer<Transform> parentTransform);
 
-		Transform* RemoveParent();
+		Core::WeakPointer <Transform> RemoveParent();
 
-		void SetChild(Transform& childTransform);
+		void SetChild(Transform* childTransform);
+
+		bool IsChildOf(Transform* parent);
 
 		const Math::Mat4F& GetLocalModelMatrix(bool overrideDirtyFlag = false);
 
 		const Math::Mat4F& GetWorldMatrix();
 
-		Transform* GetChildAtIndex(int index) const;
+		Core::WeakPointer<Transform> GetChildAtIndex(int index) const;
 
-		Math::QuatF GetRotation() const;
+		Math::QuatF GetRotation();
 
 		void SetRotation(const Math::QuatF& newRotation);
 
-		Math::Vec3F GetPosition() const;
+		Math::Vec3F GetPosition();
 
 		void SetPosition(const Math::Vec3F& worldPosition);
 
 		bool HasParent() const;
 
 		bool HasChildren() const;
+
+		Math::Vec3F GetForward();
+
+		Math::Vec3F GetRight();
+
+		Math::Vec3F GetUp();
+
+		void Clone(const Transform& transformToClone);
 
 		REFLECT()
 
@@ -87,7 +97,7 @@ namespace NightOwl::Component
 
 		Math::Mat4F inverseOfOriginalParentLocalModelMatrix;
 
-		std::vector<Transform*> children;
+		std::vector<Core::WeakPointer<Transform>> children;
 
 		Math::Vec3F localScale;
 
@@ -101,9 +111,11 @@ namespace NightOwl::Component
 
 		Math::Vec3F worldPosition;
 
-		Transform* root;
+		Core::WeakPointer<Transform> root;
 
-		Transform* parent;
+		Core::WeakPointer<Transform> parent;
+
+		friend class Core::Scene;
 
 		bool isLocalDirty;
 
@@ -115,10 +127,8 @@ namespace NightOwl::Component
 
 		void SetFlagBasedOnSpace(Space space);
 
-		void RestrictEulerAngles(Math::Vec3F& eulerAngles);
-
 		void PropagateParentLocalTransform(const Math::Mat4F& parentLocalTransform);
 
-		friend class Core::Scene;
+		void Remove() override;
 	};
 }

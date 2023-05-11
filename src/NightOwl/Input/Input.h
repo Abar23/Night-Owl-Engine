@@ -1,9 +1,12 @@
 #pragma once
 
 #include "NightOwl/Math/Vec2.h"
-#include "NightOwl/Input/KeyCode.h"
-#include "NightOwl/Input/InputAction.h"
-#include "NightOwl/Input/MouseButton.h"
+#include "KeyCode.h"
+#include "InputAction.h"
+#include "MouseButton.h"
+#include "GamePadState.h"
+#include "GamePadId.h"
+#include "GamePadAxis.h"
 #include <mutex>
 #include <memory>
 
@@ -34,6 +37,24 @@ namespace NightOwl::Input
 
 		static bool IsMouseButtonHeld(KeyCode nightOwlMouseButton);
 
+		static bool IsGamePadButtonPressed(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton);
+
+		static bool HasAnyGamePadPressedButton(GamePadButton nightOwlGamePadButton);
+
+		static bool IsGamePadButtonRelease(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton);
+
+		static bool HasAnyGamePadReleasedButton(GamePadButton nightOwlGamePadButton);
+
+		static bool IsGamePadButtonHeld(GamePadId nightOwlGamePadId, GamePadButton nightOwlGamePadButton);
+
+		static bool HasAnyGamePadHeldButton(GamePadButton nightOwlGamePadButton);
+
+		static bool IsGamePadConnected(GamePadId nightOwlGamePadId);
+
+		static float GetGamePadAxis(GamePadId nightOwlGamePadId, GamePadAxis nightOwlGamePadAxis);
+
+		static std::array<float, 4> GetAxisOfAllGamePads(GamePadAxis nightOwlGamePadAxis);
+
 		static bool IsAnyKeyHeld();
 
 		static bool IsAnyKeyPressed();
@@ -57,6 +78,8 @@ namespace NightOwl::Input
 
 		std::array<InputAction, static_cast<int>(MouseButton::NumberOfSupportedMouseButtons)> mouseButtonActionArray;
 
+		std::array<GamePadState, 4> gamePads;
+
 		unsigned int anyKeyHeldCounter;
 
 		unsigned int anyKeyPressedCounter;
@@ -65,6 +88,12 @@ namespace NightOwl::Input
 
 		bool isMouseButtonInputDirty;
 
+		static void UpdateKeys();
+
+		static void UpdateMouseButtons();
+
+		static void UpdateGamePads();
+
 		static void KeyCallback(int key, int scancode, int action, int mods);
 
 		static void MouseButtonCallback(int button, int action, int mods);
@@ -72,5 +101,13 @@ namespace NightOwl::Input
 		static void MousePositionCallback(double xPosition, double yPosition);
 
 		static void MouseScrollCallback(double xOffset, double yOffset);
+
+		static void GamePadConnectionCallback(int gamePadId, int connectionEventType);
+
+		static bool DoesAnyGameButtonHaveState(GamePadButton button, InputAction action);
+
+		static void CheckForConnectedControllers();
+
+		static void SetupWindowCallbacks();
 	};
 }

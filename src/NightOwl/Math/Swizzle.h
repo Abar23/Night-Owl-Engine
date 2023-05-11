@@ -21,7 +21,7 @@ namespace NightOwl::Math
 				this->data[indices[i]] = vector[i];
 			}
 
-			return *(vectorType<T>*)this;
+			return *static_cast<vectorType<T>*>(this);
 		}
 
 		unsigned int NumberOfBytes()
