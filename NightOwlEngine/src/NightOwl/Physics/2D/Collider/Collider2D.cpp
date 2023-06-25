@@ -1,0 +1,10 @@
+#include "NightOwlPch.h"
+
+#include "Collider2D.h"
+
+namespace NightOwl
+{
+	START_REFLECTION(Collider2D)
+	CLASS_MEMBER_REFLECTION(rigidBody2D)
+	END_REFLECTION(Collider2D)
+}
