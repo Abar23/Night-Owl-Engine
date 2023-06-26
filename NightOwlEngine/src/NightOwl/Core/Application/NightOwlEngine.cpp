@@ -50,11 +50,6 @@ namespace NightOwl
 		SceneManagerLocator::Provide(sceneManager.get());
 		AssetManagerLocator::Provide(assetManger.get());
 		AudioSystemLocator::Provide(audioSystem.get());
-		
-		#ifdef DEBUG
-		debugTools = std::make_shared<DebugTools::DebugTools>();
-		DebugToolsLocator::Provide(debugTools.get());
-		#endif
 
 		application->Init();
 	}
@@ -94,12 +89,6 @@ namespace NightOwl
 
 				owlBehaviorManager->Update();
 
-				#ifdef DEBUG
-				colliderRendererSystem->Update();
-
-				DebugToolsLocator::GetDebugTools()->RunDebugTools();
-				#endif
-
 				sceneManager->Update();
 
 				meshRendererSystem->Update();
@@ -120,10 +109,6 @@ namespace NightOwl
 		sceneManager->Shutdown();
 
 		audioSystem->Shutdown();
-
-		#ifdef DEBUG
-		debugTools->Shutdown();
-		#endif
 
 		WindowApi::GetWindow()->Shutdown();
 

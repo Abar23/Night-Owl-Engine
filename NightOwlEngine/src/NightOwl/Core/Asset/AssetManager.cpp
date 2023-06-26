@@ -124,7 +124,7 @@ namespace NightOwl
 	{
 		//FMOD::Sound* sound = AudioSystemLocator::GetAudioSystem()->CreateSound(filePath, FMOD_DEFAULT).GetPointer();
 
-		ENGINE_ASSERT(sound != nullptr, "Failed to load sound from file path: {0}", filePath);
+		//ENGINE_ASSERT(sound != nullptr, "Failed to load sound from file path: {0}", filePath);
 
 		const std::string audioClipName = Utility::StripFilePathToName(filePath);
 

@@ -40,7 +40,7 @@ project "Sandbox"
 
 	postbuildcommands 
     { 
-        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\router\\64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
+        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\router\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
         "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
     }
 

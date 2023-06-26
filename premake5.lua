@@ -1,5 +1,5 @@
-workspace "Night-Owl-Engine"  
-    architecture "x64"
+workspace "NightOwlEngine"  
+    architecture "x86_64"
     startproject "Sandbox"
     
     configurations 
