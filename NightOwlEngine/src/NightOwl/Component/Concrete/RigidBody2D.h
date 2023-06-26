@@ -60,7 +60,7 @@ namespace NightOwl
 
 		Collider2D* GetCollider();
 
-		void SetCollider(NightOwl::Collider2D* collider);
+		void SetCollider(Collider2D* collider);
 
 		bool IsKinematic() const;
 

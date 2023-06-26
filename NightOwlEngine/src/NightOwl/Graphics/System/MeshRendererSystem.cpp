@@ -19,7 +19,7 @@ namespace NightOwl
 		}
 	}
 
-	void MeshRendererSystem::AddMeshRenderer(const MeshRenderer* meshRenderer)
+	void MeshRendererSystem::AddMeshRenderer(MeshRenderer* meshRenderer)
 	{
 		meshRenderers.push_back(meshRenderer);
 	}
@@ -42,8 +42,8 @@ namespace NightOwl
 		}
 	}
 
-	bool MeshRendererSystem::Comparator(const MeshRenderer* lhs,
-										const MeshRenderer* rhs)
+	bool MeshRendererSystem::Comparator(MeshRenderer* lhs,
+										MeshRenderer* rhs)
 	{
 		const Vec3F cameraPosition = Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition();
 

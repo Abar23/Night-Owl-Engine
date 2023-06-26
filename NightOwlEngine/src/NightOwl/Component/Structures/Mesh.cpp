@@ -1,10 +1,9 @@
-#include "NightOwlPch.h"
+#include <NightOwlPch.h>
 
 #include "Mesh.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
 #include "NightOwl/Graphics/RenderAPI.h"
-#include "NightOwl/Component/Types/ComponentType.h"
 
 namespace NightOwl
 {
@@ -40,6 +39,11 @@ namespace NightOwl
 	void Mesh::SetVertices(const std::vector<Vec3F>& vertices)
 	{
 		this->vertices = vertices;
+
+		if (isValid)
+		{
+			UploadVerticesData();
+		}
 	}
 
 	std::vector<Vec3F> Mesh::GetColors()
@@ -50,6 +54,18 @@ namespace NightOwl
 	void Mesh::SetColors(const std::vector<Vec3F>& colors)
 	{
 		this->colors = colors;
+
+		if (isValid)
+		{
+			UploadColorData();
+		}
+	}
+
+	void Mesh::SetColorPerVertex(const Vec3F& color)
+	{
+		const std::vector<Vec3F> colors(4, color / 255.0f);
+
+		this->SetColors(colors);
 	}
 
 	std::vector<Vec3UI> Mesh::GetTriangles()
@@ -65,31 +81,7 @@ namespace NightOwl
 
 		ValidateMesh();
 
-		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");
-
-		indexBuffer->SetSize(triangles.size() * sizeof(Vec3UI));
-		indexBuffer->SetData(triangles.data());
-
-		VertexBufferLayout layout;
-		layout.AddVertexBufferDataDefinition(VertexBufferData("Position", VertexDataType::VectorFloat3, 0));
-		if(!colors.empty())
-		{
-			layout.AddVertexBufferDataDefinition(VertexBufferData("Color", VertexDataType::VectorFloat3, 1));
-		}
-		if(!uvs.empty())
-		{
-			layout.AddVertexBufferDataDefinition(VertexBufferData("UV", VertexDataType::VectorFloat2, 2));
-		}
-
-		vertexBuffer->SetVertexBufferLayout(layout);
-		vertexBuffer->SetSize(layout.GetDataPerVertex() * triangles.size() * 3);
-
-		int attributeVertexBufferLayoutIndex = 0;
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, vertices.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * vertices.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, colors.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * colors.size());
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(attributeVertexBufferLayoutIndex, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
-
-		vertexArrayObject->SetupVertexBufferAttributes();
+		UploadMeshData();
 	}
 
 	std::vector<Vec2F> Mesh::GetUVs()
@@ -100,6 +92,11 @@ namespace NightOwl
 	void Mesh::SetUVs(const std::vector<Vec2F>& uvs)
 	{
 		this->uvs = uvs;
+
+		if (isValid)
+		{
+			UploadUvData();
+		}
 	}
 
 	void Mesh::Clear()
@@ -112,22 +109,105 @@ namespace NightOwl
 		isValid = false;
 	}
 
+	void Mesh::UploadMeshData()
+	{
+		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");
+
+		indexBuffer->SetSize(triangles.size() * sizeof(Vec3UI));
+		indexBuffer->SetData(triangles.data());
+
+		VertexBufferLayout layout;
+
+		VertexBufferData data = VertexBufferData("Position", VertexDataType::VectorFloat3, 0);
+		layout.AddVertexBufferDataDefinition(data);
+
+		if (!colors.empty())
+		{
+			data = VertexBufferData("Color", VertexDataType::VectorFloat3, 1);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+		if (!uvs.empty())
+		{
+			data = VertexBufferData("UV", VertexDataType::VectorFloat2, 2);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+
+		vertexBuffer->SetVertexBufferLayout(layout);
+		vertexBuffer->SetSize(layout.GetDataPerVertex() * triangles.size() * 3);
+
+		int indexOfVertexBufferData = 0;
+
+		vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, vertices.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * vertices.size());
+		indexOfVertexBufferData++;
+
+		if (!colors.empty())
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, colors.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * colors.size());
+			indexOfVertexBufferData++;
+		}
+		if (!uvs.empty())
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
+		}
+
+		vertexArrayObject->SetupVertexBufferAttributes();
+	}
+
 	void Mesh::ValidateMesh()
 	{
 		isValid = false;
 
-		const auto expectedNumberOfVerticesPerTriangle = 3 * triangles.size();
+		const int verticesPerTriangle = VertexDataTypeToNumberOfComponents(VertexDataType::VectorFloat3);
 
-		if(expectedNumberOfVerticesPerTriangle <= vertices.size() * VertexDataTypeToNumberOfComponents(VertexDataType::VectorFloat3))
+		const auto expectedNumberOfVerticesPerTriangle = verticesPerTriangle * triangles.size();
+		const auto actualNumberOfVerticesPerTriangle = verticesPerTriangle * vertices.size();
+
+		if (expectedNumberOfVerticesPerTriangle <= actualNumberOfVerticesPerTriangle)
 		{
 			isValid = true;
 		}
 	}
 
+	void Mesh::UploadVerticesData()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Position");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, vertices.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * vertices.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
+	void Mesh::UploadColorData()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Color");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, colors.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * colors.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
+	void Mesh::UploadUvData()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("UV");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
 	START_REFLECTION(Mesh)
-	CLASS_MEMBER_REFLECTION(vertices)
-	CLASS_MEMBER_REFLECTION(colors)
-	CLASS_MEMBER_REFLECTION(triangles)
-	CLASS_MEMBER_REFLECTION(uvs)
-	END_REFLECTION(Mesh)
+		CLASS_MEMBER_REFLECTION(vertices)
+		CLASS_MEMBER_REFLECTION(colors)
+		CLASS_MEMBER_REFLECTION(triangles)
+		CLASS_MEMBER_REFLECTION(uvs)
+		END_REFLECTION(Mesh)
 }

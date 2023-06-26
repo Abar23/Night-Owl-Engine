@@ -70,12 +70,12 @@ namespace NightOwl
 		this->alpha = alpha;
 	}
 
-	void StandardMaterial::SetTexture(WeakPointer<ITexture2D> texture2D)
+	void StandardMaterial::SetTexture(ITexture2D* texture2D)
 	{
 		this->diffuseTexture = texture2D;
 	}
 
-	WeakPointer<ITexture2D> StandardMaterial::GetTexture()
+	ITexture2D* StandardMaterial::GetTexture()
 	{
 		return diffuseTexture;
 	}

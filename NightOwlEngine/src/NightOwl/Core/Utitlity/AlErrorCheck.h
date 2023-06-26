@@ -4,17 +4,17 @@
 #include "AL/alc.h"
 
 #ifdef DEBUG
-#define alCall(func, ...) \
+#define AL_CALL(func, ...) \
 	func(__VA_ARGS__); \
-	checkOpenAlError(__FILE__, __LINE__);
+	checkOpenAlError(__FILE__, __LINE__)
 
-#define alcCall(func, device, ...) \
+#define AL_CONTEXT_CALL(func, device, ...) \
 	func(__VA_ARGS__); \
-	checkOpenAlContextError(__FILE__, __LINE__, device);
+	checkOpenAlContextError(__FILE__, __LINE__, device)
 #else
-#define alCall(func, ...) func(__VA_ARGS__); 
+#define AL_CALL(func, ...) func(__VA_ARGS__)
 
-#define alcCall(func, device, ...) func(__VA_ARGS__); 
+#define AL_CONTEXT_CALL(func, device, ...) func(__VA_ARGS__)
 #endif
 
 // al.h fucntion call error checker

@@ -11,7 +11,7 @@ namespace NightOwl
 	public:
 		void Update();
 
-		void AddCollider(const Collider2D* collider);
+		void AddCollider(Collider2D* collider);
 
 		void RemoveCollider(const Collider2D* collider);
 

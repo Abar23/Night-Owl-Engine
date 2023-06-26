@@ -26,6 +26,8 @@ namespace NightOwl
 
 		void SetColors(const std::vector<Vec3F>& colors);
 
+		void SetColorPerVertex(const Vec3F& color);
+
 		std::vector<Vec3UI> GetTriangles();
 
 		void SetTriangles(const std::vector<Vec3UI>& triangles);
@@ -35,6 +37,8 @@ namespace NightOwl
 		void SetUVs(const std::vector<Vec2F>& uvs);
 
 		void Clear();
+
+		void UploadMeshData();
 
 		REFLECT()
 
@@ -57,5 +61,10 @@ namespace NightOwl
 
 		void ValidateMesh();
 
+		void UploadVerticesData();
+
+		void UploadColorData();
+
+		void UploadUvData();
 	};
 }

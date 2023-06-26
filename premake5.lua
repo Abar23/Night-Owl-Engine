@@ -1,13 +1,15 @@
 workspace "Night-Owl-Engine"  
-    architecture "x86_64"
-    startproject "Dodge Brawler"
+    architecture "x64"
+    startproject "Sandbox"
     
-    configurations { 
+    configurations 
+    { 
         "Debug", 
         "Release"
     } 
 
-    flags {
+    flags  
+    {
         "MultiProcessorCompile"
     }
 

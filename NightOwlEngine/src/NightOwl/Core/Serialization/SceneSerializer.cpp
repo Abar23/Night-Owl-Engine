@@ -1,3 +1,5 @@
+#include "NightOwlPch.h"
+
 #include "SceneSerializer.h"
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/prettywriter.h"

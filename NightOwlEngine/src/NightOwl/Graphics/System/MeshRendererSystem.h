@@ -10,14 +10,14 @@ namespace NightOwl
 	public:
 		void Update();
 
-		void AddMeshRenderer(const MeshRenderer* meshRenderer);
+		void AddMeshRenderer(MeshRenderer* meshRenderer);
 
 		void RemoveMeshRenderer(const MeshRenderer* meshRenderer);
 
 	private:
 		std::vector<MeshRenderer*> meshRenderers;
 
-		static bool Comparator(const MeshRenderer* lhs, const MeshRenderer* rhs);
+		static bool Comparator(MeshRenderer* lhs, MeshRenderer* rhs);
 	};
 }
 

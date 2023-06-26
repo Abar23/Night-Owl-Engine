@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Fmod/fmod.hpp"
 #include "AudioClip.h"
 #include "NightOwl/Component/Concrete/AudioSource.h"
 #include "NightOwl/Component/Concrete/AudioListener.h"
@@ -17,28 +16,30 @@ namespace NightOwl
 
 		void Update();
 
-		void AddAudioSource(const AudioSource* audioSource);
+		void AddAudioSource(AudioSource* audioSource);
 
-		void RemoveAudioSource(const AudioSource*( audioSource);
+		void RemoveAudioSource(const AudioSource* audioSource);
 
 		void SetAudioListenerVolume(float volume);
 
 		float GetAudioListenerVolume() const;
 
-		void SetAudioListener(const AudioListener* audioListener);
+		void SetAudioListener(AudioListener* audioListener);
 
 		std::vector<AudioSource*> GetAudioSources();
 
 		void RemoveAudioListener();
 
-		FMOD::Sound* CreateSound(const std::string& filePath, FMOD_MODE mode = FMOD_DEFAULT);
+		//FMOD::Sound* CreateSound(const std::string& filePath, FMOD_MODE mode = FMOD_DEFAULT);
 
-		FMOD::Channel* PlaySound(const AudioClip& audioClip, bool startInPausedState = false);
+		//FMOD::Channel* PlaySound(const AudioClip& audioClip, bool startInPausedState = false);
 
 	private:
-		FMOD::System* audioSystem;
+		//FMOD::System* audioSystem;
 
 		std::vector<AudioSource*> audioSources;
+
+		std::vector<std::string> deviceNames;
 
 		AudioListener* audioListener;
 	};

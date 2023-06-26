@@ -1,8 +1,6 @@
 #include <NightOwlPch.h>
 
 #include "Scene.h"
-
-#include "NightOwl/Core/Locator/ArchetypeSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 
 namespace NightOwl
@@ -46,15 +44,15 @@ namespace NightOwl
 		return *gameObject;
 	}
 
-	GameObject& Scene::AddArchetype(const std::string& archetypeName, const std::string& name)
-	{
-		auto gameObject = ArchetypeSystemLocator::GetArchetypeSystem()->GetArchetype(archetypeName);
-		gameObject->name = name;
-		gameObject->scene = this;
-		AddClone(gameObject);
-		SetDirtyFlag();
-		return *gameObject;
-	}
+	//GameObject& Scene::AddArchetype(const std::string& archetypeName, const std::string& name)
+	//{
+	//	auto gameObject = ArchetypeSystemLocator::GetArchetypeSystem()->GetArchetype(archetypeName);
+	//	gameObject->name = name;
+	//	gameObject->scene = this;
+	//	AddClone(gameObject);
+	//	SetDirtyFlag();
+	//	return *gameObject;
+	//}
 
 	void Scene::RemoveGameObject(const GameObject& gameObject)
 	{
@@ -116,10 +114,10 @@ namespace NightOwl
 	{
 		for (auto& gameObjectPtr : gameObjectsList | std::views::values)
 		{
-			if (tagComponent->GetTag() == gameObjectTag)
-			{
-				return gameObjectPtr.get();
-			}
+			//if (tagComponent->GetTag() == gameObjectTag)
+			//{
+			//	return gameObjectPtr.get();
+			//}
 		}
 
 		return nullptr;
@@ -130,10 +128,10 @@ namespace NightOwl
 		std::vector<GameObject*> gameObjects;
 		for (auto& gameObjectPtr : gameObjectsList | std::views::values)
 		{
-			if (tagComponent->GetTag() == gameObjectTag)
-			{
-				gameObjects.push_back(gameObjectPtr.get());
-			}
+			//if (tagComponent->GetTag() == gameObjectTag)
+			//{
+			//	gameObjects.push_back(gameObjectPtr.get());
+			//}
 		}
 
 		return gameObjects;
@@ -156,15 +154,16 @@ namespace NightOwl
 		assetManager->ClearAll();
 
 		// Remove any archetypes loaded
-		auto* archetypeSystem = ArchetypeSystemLocator::GetArchetypeSystem();
-		archetypeSystem->ReleaseResources();
+		//auto* archetypeSystem = ArchetypeSystemLocator::GetArchetypeSystem();
+		//archetypeSystem->ReleaseResources();
 
 		// Destroy all game objects in the scene
 		const auto& updatedRootGameObjects = GetRootGameObjects();
-		for (auto it = updatedRootGameObjects.cbegin(); it != updatedRootGameObjects.cend(); ++it)
+		for (const auto& rootGameObject : updatedRootGameObjects)
 		{
-			it->DestroyGameObject();
+			rootGameObject->DestroyGameObject();
 		}
+
 		rootGameObjects.clear();
 	}
 

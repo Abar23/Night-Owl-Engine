@@ -16,7 +16,7 @@ namespace NightOwl
 
 			if (collider->GetRigidBody()->GetGameObject().IsActive())
 			{
-				collider->Draw();
+				//collider->Draw();
 
 				//draw velocity and acceleration lines.
 			}
@@ -25,7 +25,7 @@ namespace NightOwl
 		}
 	}
 
-	void ColliderRendererSystem::AddCollider(const Collider2D* collider)
+	void ColliderRendererSystem::AddCollider(Collider2D* collider)
 	{
 		colliders.push_back(collider);
 	}

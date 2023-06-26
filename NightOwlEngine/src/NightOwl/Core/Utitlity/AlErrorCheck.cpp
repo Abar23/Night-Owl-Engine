@@ -1,10 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "AlErrorCheck.h"
-#include "glad/glad.h"
 #include "AL/al.h"
-#include <utility>
-
 
 bool checkOpenAlError(const std::string& filename, const std::uint32_t line)
 {

@@ -1,7 +1,6 @@
 #include "NightOwlPch.h"
 
 #include "AudioSource.h"
-#include "NightOwl/Core/Utitlity/FmodErrorCheck.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
 #include <algorithm>
 
@@ -10,7 +9,7 @@ namespace NightOwl
 	AudioSource::AudioSource()
 		:	Component(ComponentType::AudioSource),
 			clip{ nullptr },
-			channel{ nullptr },
+			//channel{ nullptr },
 			pitch(1.0f),
 			volume(1.0),
 			frequencyRate(0.0f),
@@ -27,7 +26,7 @@ namespace NightOwl
 		std::shared_ptr<AudioSource> clone = std::make_shared<AudioSource>();
 
 		clone->clip = clip;
-		clone->channel = channel;
+		//clone->channel = channel;
 		clone->pitch = pitch;
 		clone->volume = volume;
 		clone->frequencyRate = frequencyRate;
@@ -49,12 +48,12 @@ namespace NightOwl
 
 			const float audioListenerVolume = audioSystem->GetAudioListenerVolume();
 
-			channel = audioSystem->PlaySound(*clip);
-			FMOD_CALL(channel->setPitch, pitch);
-			FMOD_CALL(channel->setVolume, volume * audioListenerVolume);
-			FMOD_CALL(channel->setVolumeRamp, enableVolumeRamp);
-			FMOD_CALL(channel->setFrequency, frequencyRate);
-			FMOD_CALL(channel->setLoopCount, isLooping ? -1 : 0);
+			//channel = audioSystem->PlaySound(*clip);
+			//FMOD_CALL(channel->setPitch, pitch);
+			//FMOD_CALL(channel->setVolume, volume * audioListenerVolume);
+			//FMOD_CALL(channel->setVolumeRamp, enableVolumeRamp);
+			//FMOD_CALL(channel->setFrequency, frequencyRate);
+			//FMOD_CALL(channel->setLoopCount, isLooping ? -1 : 0);
 		}
 	}
 
@@ -62,12 +61,12 @@ namespace NightOwl
 	{
 		bool isPlaying = false;
 
-		if(channel == nullptr)
-		{
-			return isPlaying;
-		}
+		//if(channel == nullptr)
+		//{
+		//	return isPlaying;
+		//}
 
-		FMOD_CALL(channel->isPlaying, &isPlaying);
+		//FMOD_CALL(channel->isPlaying, &isPlaying);
 
 		return isPlaying;
 	}
@@ -78,7 +77,7 @@ namespace NightOwl
 		
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->getPaused, &isPaused);
+			//FMOD_CALL(channel->getPaused, &isPaused);
 		}
 
 		return isPaused;
@@ -88,7 +87,7 @@ namespace NightOwl
 	{
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->stop);
+			//FMOD_CALL(channel->stop);
 		}
 	}
 
@@ -98,7 +97,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setMute, isMuted);
+			//FMOD_CALL(channel->setMute, isMuted);
 		}
 	}
 
@@ -108,7 +107,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setMute, isMuted);
+			//FMOD_CALL(channel->setMute, isMuted);
 		}
 	}
 
@@ -118,7 +117,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setPaused, isPaused);
+			//FMOD_CALL(channel->setPaused, isPaused);
 		}
 	}
 
@@ -128,7 +127,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setPaused, isPaused);
+			//FMOD_CALL(channel->setPaused, isPaused);
 		}
 	}
 
@@ -138,7 +137,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setPitch, this->pitch);
+			//FMOD_CALL(channel->setPitch, this->pitch);
 		}
 	}
 
@@ -155,7 +154,7 @@ namespace NightOwl
 		{
 			const float audioListenerVolume = AudioSystemLocator::GetAudioSystem()->GetAudioListenerVolume();
 
-			FMOD_CALL(channel->setVolume, this->volume * audioListenerVolume);
+			//FMOD_CALL(channel->setVolume, this->volume * audioListenerVolume);
 		}
 	}
 
@@ -175,7 +174,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setVolumeRamp, enableVolumeRamp);
+			//FMOD_CALL(channel->setVolumeRamp, enableVolumeRamp);
 		}
 	}
 
@@ -185,7 +184,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setFrequency, this->frequencyRate);
+			//FMOD_CALL(channel->setFrequency, this->frequencyRate);
 		}
 	}
 
@@ -205,7 +204,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			FMOD_CALL(channel->setLoopCount, isLooping ? -1 : 0);
+			//FMOD_CALL(channel->setLoopCount, isLooping ? -1 : 0);
 		}
 	}
 
@@ -226,10 +225,10 @@ namespace NightOwl
 		frequencyRate = clip->GetFrequency();
 	}
 
-	FMOD::Channel* AudioSource::GetChannel()
-	{
-		return channel;
-	}
+	//FMOD::Channel* AudioSource::GetChannel()
+	//{
+	//	return channel;
+	//}
 
 	void AudioSource::Remove()
 	{

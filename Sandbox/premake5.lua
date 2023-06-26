@@ -28,6 +28,8 @@ project "Sandbox"
 		"%{wks.location}/NightOwlEngine/vendor/stb/include",
 		"%{wks.location}/NightOwlEngine/vendor/rapidjson/include",
 		"%{wks.location}/NightOwlEngine/vendor/nlohmann/single_include",
+		"%{wks.location}/NightOwlEngine/vendor/OpenAL/include",
+		"%{wks.location}/NightOwlEngine/vendor/libsndfile/include",
 		"%{wks.location}/NightOwlEngine/src"
 	}
 
@@ -36,21 +38,32 @@ project "Sandbox"
 		"NightOwlEngine"
 	}
 
+	postbuildcommands 
+    { 
+        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\router\\64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
+        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
+    }
+
 	filter "system:windows"
 		systemversion "latest"
-
-        prebuildcommands 
-        { 
-            "copy \"..\\NightOwlEngine\\vendor\\fmod\\lib\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\"" 
-        }
 
 	filter "configurations:Debug"
 		defines "DEBUG" 
 		runtime "Debug"
 		symbols "on"
 
+		postbuildcommands 
+        { 
+            "copy \"..\\NightOwlEngine\\vendor\\libsndfile\\Debug\\*.dll\" \"$(ProjectDir)$(OutDir)\""
+        }
+
 	filter "configurations:Release"
 		defines "RELEASE"
 		runtime "Release"
 		optimize "on"
+
+		postbuildcommands 
+        { 
+            "copy \"..\\NightOwlEngine\\vendor\\libsndfile\\Release\\*.dll\" \"$(ProjectDir)$(OutDir)\""
+        }
 		

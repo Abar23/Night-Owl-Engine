@@ -2,7 +2,6 @@
 
 #include "RigidBody2D.h"
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
-#include "NightOwl/Core/Locator/ColliderRendererSystemLocator.h"
 #include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl
@@ -47,9 +46,8 @@ namespace NightOwl
 
 		if(collider != nullptr)
 		{
-			clone->collider = collider->Clone();
+			//clone->collider = collider->Clone();
 			clone->collider->rigidBody2D = clone.get();
-			ColliderRendererSystemLocator::GetColliderRendererSystem()->AddCollider(clone->collider.get());
 		}
 		
 		return clone;
@@ -175,7 +173,7 @@ namespace NightOwl
 		impulseCounter = 0;
 	}
 
-	WeakPointer<Collider2D> RigidBody2D::GetCollider()
+	Collider2D* RigidBody2D::GetCollider()
 	{
 		return collider.get();
 	}
@@ -220,26 +218,15 @@ namespace NightOwl
 		this->gravityScale = gravityScale;
 	}
 
-	void RigidBody2D::SetCollider(WeakPointer<Collider2D> collider)
+	void RigidBody2D::SetCollider(Collider2D* collider)
 	{
-		if (this->collider != nullptr)
-		{
-			ColliderRendererSystemLocator::GetColliderRendererSystem()->RemoveCollider(this->collider.get());
-		}
-
-		ColliderRendererSystemLocator::GetColliderRendererSystem()->AddCollider(collider);
-		this->collider = std::shared_ptr<Collider2D>(collider.GetPointer());
+		this->collider = std::shared_ptr<Collider2D>(collider);
 		this->collider->rigidBody2D = this;
 	}
 
 	void RigidBody2D::Remove()
 	{
 		PhysicsEngine2DLocator::GetPhysicsEngine2D()->RemoveRigidBody2D(this);
-
-		if (this->collider != nullptr)
-		{
-			ColliderRendererSystemLocator::GetColliderRendererSystem()->RemoveCollider(this->collider.get());
-		}
 	}
 
 	float RigidBody2D::GetDragCoefficient() const

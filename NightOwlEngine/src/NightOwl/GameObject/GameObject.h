@@ -7,11 +7,6 @@
 #include <vector>
 #include <set>
 
-namespace NightOwl::Archetype
-{
-	class ArchetypeSystem;
-}
-
 namespace NightOwl
 {
 	class PhysicsEngine2D;
@@ -39,7 +34,7 @@ namespace NightOwl
 
 		void SetName(const std::string& name);
 
-		void SetScene(const Scene*& scene);
+		void SetScene(Scene* scene);
 
 		Transform* GetTransform();
 
@@ -85,8 +80,6 @@ namespace NightOwl
 		friend class SceneSerializer;
 
 		friend class Scene;
-
-		friend class Archetype::ArchetypeSystem;
 
 		template <typename T>
 		int CheckForComponent() const;

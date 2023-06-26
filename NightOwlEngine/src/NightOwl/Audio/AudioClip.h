@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "Fmod/fmod.hpp"
 #include "AudioClipLoadType.h"
 #include "AudioClipLoopType.h"
 
@@ -19,15 +18,15 @@ namespace NightOwl
 
 		const unsigned int GetLengthInMilliseconds() const;
 
-		const FMOD_SOUND_TYPE GetSoundType() const;
+		//const FMOD_SOUND_TYPE GetSoundType() const;
 
-		const FMOD_SOUND_FORMAT GetSoundFormat() const;
+		//const FMOD_SOUND_FORMAT GetSoundFormat() const;
 
 		const int GetChannels() const;
 
 		const int GetBitsPerSample() const;
 
-		FMOD::Sound* GetClip() const;
+		//FMOD::Sound* GetClip() const;
 
 		float GetFrequency() const;
 
@@ -39,18 +38,18 @@ namespace NightOwl
 
 		void SetLoadType(AudioClipLoadType loadType);
 
-		void SetSound(FMOD::Sound* sound);
+		//void SetSound(FMOD::Sound* sound);
 
 	private:
-		FMOD::Sound* sound;
+		//FMOD::Sound* sound;
 
 		std::string name;
 
 		float frequency;
 
-		FMOD_SOUND_TYPE type;
+		//FMOD_SOUND_TYPE type;
 
-		FMOD_SOUND_FORMAT format;
+		//FMOD_SOUND_FORMAT format;
 
 		AudioClipLoopType loopType;
 

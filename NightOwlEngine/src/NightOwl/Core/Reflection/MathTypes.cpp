@@ -1,3 +1,5 @@
+#include "NightOwlPch.h"
+
 #include "MathTypes.h"
 #include "NightOwl/Math/Math.h"
 

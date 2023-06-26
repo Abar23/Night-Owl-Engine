@@ -13,6 +13,7 @@ namespace NightOwl
 		RigidBody2D,
 		AABBBoxCollider2D,
 		AudioListener,
+		AudioSource,
 		OwlBehavior
 	};
 

@@ -52,12 +52,12 @@ namespace NightOwl
 
 		void SetClip(AudioClip* clip);
 
-		FMOD::Channel* GetChannel();
+		//FMOD::Channel* GetChannel();
 		
 	private:
 		AudioClip* clip;
 
-		FMOD::Channel* channel;
+		//FMOD::Channel* channel;
 
 		float pitch;
 

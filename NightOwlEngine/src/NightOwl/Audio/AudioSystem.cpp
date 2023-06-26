@@ -1,26 +1,36 @@
 #include "NightOwlPch.h"
 
 #include "AudioSystem.h"
-#include "Fmod/fmod_errors.h"
+#include "AL/alc.h"
+#include "NightOwl/Core/Utitlity/AlErrorCheck.h"
+#include <sstream>
 
 namespace NightOwl
 {
 	AudioSystem::AudioSystem()
 		:	audioListener{ nullptr }
 	{
-		FMOD_CALL(FMOD::System_Create, &audioSystem);
+		std::stringstream rawDeviceStringNames;
+		rawDeviceStringNames << AL_CALL(alcGetString, nullptr, ALC_ALL_DEVICES_SPECIFIER);
 
-		FMOD_CALL(audioSystem->init, 512, FMOD_INIT_NORMAL, nullptr);
+		std::string deviceName;
+		while(std::getline(rawDeviceStringNames, deviceName, '\0'))
+		{
+			if(deviceName.length() > 0)
+			{
+				deviceNames.push_back(deviceName);
+			}
+		}
 	}
 
 	void AudioSystem::Shutdown()
 	{
-		FMOD_CALL(audioSystem->release);
+
 	}
 
 	void AudioSystem::Update()
 	{
-		FMOD_CALL(audioSystem->update);
+
 
 		if(audioListener == nullptr)
 		{
@@ -42,15 +52,15 @@ namespace NightOwl
 			{
 				if(audioSource->IsPlaying())
 				{
-					FMOD::Channel* audioSourceChannel = audioSource->GetChannel().GetPointer();
-					FMOD_CALL(audioSourceChannel->setVolume, audioSource->GetVolume() * audioListener->GetVolume());	
+					//FMOD::Channel* audioSourceChannel = audioSource->GetChannel().GetPointer();
+					//FMOD_CALL(audioSourceChannel->setVolume, audioSource->GetVolume() * audioListener->GetVolume());	
 				}
 			}
 			audioListener->isVolumeDirty = false;
 		}
 	}
 
-	void AudioSystem::AddAudioSource(const AudioSource* audioSource)
+	void AudioSystem::AddAudioSource(AudioSource* audioSource)
 	{
 		audioSources.push_back(audioSource);
 	}
@@ -83,7 +93,7 @@ namespace NightOwl
 		return audioListener ? audioListener->GetVolume() : 0.0f;
 	}
 
-	void AudioSystem::SetAudioListener(const AudioListener* audioListener)
+	void AudioSystem::SetAudioListener(AudioListener* audioListener)
 	{
 		this->audioListener = audioListener;
 	}
@@ -98,21 +108,21 @@ namespace NightOwl
 		audioListener = nullptr;
 	}
 
-	FMOD::Sound* AudioSystem::CreateSound(const std::string& filePath, FMOD_MODE mode)
-	{
-		FMOD::Sound* sound;
+	//FMOD::Sound* AudioSystem::CreateSound(const std::string& filePath, FMOD_MODE mode)
+	//{
+	//	FMOD::Sound* sound;
 
-		FMOD_CALL(audioSystem->createSound, filePath.c_str(), mode, nullptr, &sound);
+	//	FMOD_CALL(audioSystem->createSound, filePath.c_str(), mode, nullptr, &sound);
 
-		return sound;
-	}
+	//	return sound;
+	//}
 
-	FMOD::Channel* AudioSystem::PlaySound(const AudioClip& audioClip, bool startInPausedState)
-	{
-		FMOD::Channel* channel;
+	//FMOD::Channel* AudioSystem::PlaySound(const AudioClip& audioClip, bool startInPausedState)
+	//{
+	//	FMOD::Channel* channel;
 
-		FMOD_CALL(audioSystem->playSound, audioClip.GetClip().GetPointer(), nullptr, startInPausedState, &channel);
+	//	FMOD_CALL(audioSystem->playSound, audioClip.GetClip(), nullptr, startInPausedState, &channel);
 
-		return channel;
-	}
+	//	return channel;
+	//}
 }

@@ -3,11 +3,8 @@
 #include "NightOwlEngine.h"
 #include "NightOwlEngineConstants.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
-#include "NightOwl/Core/Locator/ArchetypeSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
-#include "NightOwl/Core/Locator/ColliderRendererSystemLocator.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
@@ -40,22 +37,16 @@ namespace NightOwl
 
 		Time::SetFixedTime(FIXED_UPDATE_TIME_STEP);
 
-		colliderRendererSystem = std::make_shared<ColliderRendererSystem>();
 		owlBehaviorManager = std::make_shared<OwlBehaviorManager>();
 		meshRendererSystem = std::make_shared<MeshRendererSystem>();
-		archetypeSystem = std::make_shared<Archetype::ArchetypeSystem>();
-		animatorSystem = std::make_shared<Animation::AnimatorSystem>();
 		physicsEngine2D = std::make_shared<PhysicsEngine2D>();
-		audioSystem = std::make_shared<Audio::AudioSystem>();
+		audioSystem = std::make_shared<AudioSystem>();
 		sceneManager = std::make_shared<SceneManager>();
 		assetManger = std::make_shared<AssetManager>();
 
-		ColliderRendererSystemLocator::Provide(colliderRendererSystem.get());
 		OwlBehaviorManagerLocator::Provide(owlBehaviorManager.get());
 		MeshRendererSystemLocator::Provide(meshRendererSystem.get());
 		PhysicsEngine2DLocator::Provide(physicsEngine2D.get());
-		ArchetypeSystemLocator::Provide(archetypeSystem.get());
-		AnimatorSystemLocator::Provide(animatorSystem.get());
 		SceneManagerLocator::Provide(sceneManager.get());
 		AssetManagerLocator::Provide(assetManger.get());
 		AudioSystemLocator::Provide(audioSystem.get());
@@ -94,8 +85,6 @@ namespace NightOwl
 				sceneManager->Update();
 
 				audioSystem->Update();
-
-				animatorSystem->FixedUpdate();
 			}
 
 			if (Time::ShouldRenderFrame())
@@ -112,8 +101,6 @@ namespace NightOwl
 				#endif
 
 				sceneManager->Update();
-
-				animatorSystem->Update();
 
 				meshRendererSystem->Update();
 

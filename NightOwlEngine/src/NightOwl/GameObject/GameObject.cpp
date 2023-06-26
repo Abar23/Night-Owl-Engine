@@ -63,7 +63,7 @@ namespace NightOwl
 		this->name = name;
 	}
 
-	void GameObject::SetScene(const Scene*& scene)
+	void GameObject::SetScene(Scene* scene)
 	{
 		this->scene = scene;
 	}

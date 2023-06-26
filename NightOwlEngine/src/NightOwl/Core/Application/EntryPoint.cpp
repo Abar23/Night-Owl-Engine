@@ -1,7 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "NightOwlEngine.h"
-#include "NightOwl/Core/Application/IApplication.h"
+#include "IApplication.h"
 #include <windows.h>
 
 int main()

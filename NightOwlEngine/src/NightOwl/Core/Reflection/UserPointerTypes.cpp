@@ -1,3 +1,5 @@
+#include "NightOwlPch.h"
+
 #include "UserPointerTypes.h"
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 
