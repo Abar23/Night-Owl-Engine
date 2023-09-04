@@ -5,8 +5,8 @@ namespace NightOwl
 {
 	enum class AudioClipLoadType
 	{
-		//DecompressOnLoad = FMOD_CREATESAMPLE,
+		DecompressOnLoad,
 		//CompressedInMemory = FMOD_CREATECOMPRESSEDSAMPLE,
-		//Streaming = FMOD_CREATESTREAM
+		Streaming
 	};
 }

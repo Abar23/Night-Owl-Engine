@@ -3,7 +3,10 @@
 #include "AudioClip.h"
 #include "NightOwl/Component/Concrete/AudioSource.h"
 #include "NightOwl/Component/Concrete/AudioListener.h"
+#include <AL/alc.h>
 #include <vector>
+
+#include "Structures/Channel.h"
 
 namespace NightOwl
 {
@@ -30,17 +33,28 @@ namespace NightOwl
 
 		void RemoveAudioListener();
 
-		//FMOD::Sound* CreateSound(const std::string& filePath, FMOD_MODE mode = FMOD_DEFAULT);
-
-		//FMOD::Channel* PlaySound(const AudioClip& audioClip, bool startInPausedState = false);
-
 	private:
-		//FMOD::System* audioSystem;
+		ALCcontext* context{};
+
+		ALCdevice* audioDevice{};
+
+		std::vector<Channel> channels;
 
 		std::vector<AudioSource*> audioSources;
 
-		std::vector<std::string> deviceNames;
+		// Need to write logic for this!! Need to make audio sources are also removed from this vector
+		std::vector<AudioSource*> audioSourcesRequestingToPlay;
+
+		std::vector<std::string> validDeviceNames;
 
 		AudioListener* audioListener;
+
+		void CheckForRequiredExtensions();
+
+		void GetAllDevices();
+
+		void InitializeContextWithDefaultDevice();
+
+		void InitializeAllChannels();
 	};
 }

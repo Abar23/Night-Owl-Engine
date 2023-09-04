@@ -18,6 +18,8 @@ namespace NightOwl
 
 		virtual void DrawIndexed(DrawType drawType, int numberOfIndices) = 0;
 
+		virtual void DrawIndexedBaseVertex(DrawType drawType, int numberOfIndices, int startIndex, int baseVertex) = 0;
+
 		virtual void ClearColor() = 0;
 
 		virtual void ClearBuffer() = 0;

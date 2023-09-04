@@ -17,7 +17,7 @@ namespace NightOwl
 
 		ITexture2D* GetTexture() override;
 
-		void Draw(MeshRenderer& meshRenderer) override;
+		void Draw(Renderer& renderer) override;
 
 		void Draw(Collider2D& collider) override;
 

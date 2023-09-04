@@ -18,6 +18,8 @@ namespace NightOwl
 
 		void DrawIndexed(DrawType drawType, int numberOfIndices) override;
 
+		void DrawIndexedBaseVertex(DrawType drawType, int numberOfIndices, int startIndex, int baseVertex) override;
+
 		void ClearColor() override;
 
 		void ClearBuffer() override;

@@ -3,6 +3,8 @@
 #include <NightOwl/Core/Locator/SceneManagerLocator.h>
 #include <NightOwl/Input/Input.h>
 
+#include "TestScene.h"
+
 namespace Sandbox
 {
 	Application::Application()
@@ -13,7 +15,11 @@ namespace Sandbox
 
 	void Application::Init()
 	{
-		
+		auto* sceneManager = NightOwl::SceneManagerLocator::GetSceneManager();
+
+		sceneManager->AddScene<TestScene>();
+
+		sceneManager->SetNextSceneToLoad(0);
 	}
 
 	void Application::Update()

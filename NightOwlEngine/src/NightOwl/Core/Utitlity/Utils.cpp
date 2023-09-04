@@ -41,6 +41,18 @@ namespace NightOwl::Utility
 		return fileName.substr(0, delimiterPosition);
 	}
 
+	std::string FilePathToDirectory(std::string filePath)
+	{
+		StandardizeFilePathString(filePath);
+
+		return filePath.substr(0, filePath.find_last_of('/'));
+	}
+
+	void StandardizeFilePathString(std::string& filePath)
+	{
+		std::ranges::replace(filePath, '\\', '/');
+	}
+
 	nlohmann::json GetJsonDataFromFilePath(const std::string& path)
 	{
 		std::ifstream jsonFile(path);

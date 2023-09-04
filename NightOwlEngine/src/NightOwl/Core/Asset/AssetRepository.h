@@ -10,17 +10,22 @@ namespace NightOwl
 	class AssetRepository
 	{
 	public:
-		bool HasAsset(std::string assetName)
+		bool HasAsset(const std::string& assetName)
 		{
 			return assetMap.contains(assetName);
 		}
 
-		T* GetAsset(std::string assetName)
+		T* GetAsset(const std::string& assetName)
 		{
+			if (assetMap.contains(assetName) == false)
+			{
+				return nullptr;
+			}
+
 			return assetMap.at(assetName).get();
 		}
 
-		void AddAsset(std::string assetName, std::shared_ptr<T> asset)
+		void AddAsset(const std::string& assetName, std::shared_ptr<T> asset)
 		{
 			if (!HasAsset(assetName))
 			{
@@ -28,7 +33,7 @@ namespace NightOwl
 			}
 		}
 
-		void RemoveAsset(std::string assetName)
+		void RemoveAsset(const std::string& assetName)
 		{
 			assetMap.erase(assetName);
 		}

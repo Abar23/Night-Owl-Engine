@@ -1,9 +1,10 @@
 #pragma once
 
-#include <string>
-
 #include "AudioClipLoadType.h"
-#include "AudioClipLoopType.h"
+#include "AudioSampleType.h"
+#include <string>
+#include <libsndfile/sndfile.hh>
+#include <libsndfile/sndfile.h>
 
 namespace NightOwl
 {
@@ -12,59 +13,53 @@ namespace NightOwl
 	public:
 		AudioClip();
 
+		AudioClip(const std::string& pathToAudioFile, AudioClipLoadType loadType = AudioClipLoadType::DecompressOnLoad);
+
 		~AudioClip();
 
-		const std::string& GetName() const;
+		bool IsAmbisonic();
 
-		const unsigned int GetLengthInMilliseconds() const;
+		int GetChannels() const;
 
-		//const FMOD_SOUND_TYPE GetSoundType() const;
+		int GetFrequency() const;
 
-		//const FMOD_SOUND_FORMAT GetSoundFormat() const;
+		long long GetSamples() const;
 
-		const int GetChannels() const;
+		float GetLengthInMilliseconds() const;
 
-		const int GetBitsPerSample() const;
-
-		//FMOD::Sound* GetClip() const;
-
-		float GetFrequency() const;
-
-		AudioClipLoopType GetLoopType() const;
-
-		void SetLoopType(AudioClipLoopType loopType);
+		AudioSampleType GetSampleType() const;
 
 		AudioClipLoadType GetLoadType() const;
 
-		void SetLoadType(AudioClipLoadType loadType);
-
-		//void SetSound(FMOD::Sound* sound);
+		const std::string& GetName() const;
 
 	private:
-		//FMOD::Sound* sound;
+		long long samples;
+
+		float lengthInMilliseconds;
+
+		// Same as sample rate
+		int frequency;
+
+		int	channels;
+
+		int	format;
+
+		int byteBlockAlignment;
+
+		bool isAmbisonic;
+
+		unsigned int buffer;
+
+		SNDFILE* audioFileHandle;
 
 		std::string name;
 
-		float frequency;
-
-		//FMOD_SOUND_TYPE type;
-
-		//FMOD_SOUND_FORMAT format;
-
-		AudioClipLoopType loopType;
-
 		AudioClipLoadType loadType;
 
-		int channels;
+		AudioSampleType sampleType;
 
-		int bitsPerSample;
-
-		int priority;
-
-		unsigned int lengthInMilliseconds;
-
-		static constexpr int MAX_NAME_SIZE = 256;
-
-		void GetClipInfo();
+		// Should move to separate audio file loader class
+		void LoadAudioFile(const std::string& pathToAudioFile);
 	};
 }

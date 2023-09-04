@@ -7,7 +7,9 @@ namespace NightOwl
 		None,
 		VectorFloat2,
 		VectorInt2,
-		VectorFloat3
+		VectorInt4,
+		VectorFloat3,
+		VectorFloat4,
 	};
 
 	inline unsigned int VertexDataTypeToNumberOfComponents(VertexDataType type)
@@ -21,6 +23,10 @@ namespace NightOwl
 		case VertexDataType::VectorFloat3:
 			return 3;
 
+		case VertexDataType::VectorInt4:
+		case VertexDataType::VectorFloat4:
+			return 4;
+
 		default:
 			return 0;
 		}
@@ -33,11 +39,17 @@ namespace NightOwl
 		case VertexDataType::VectorInt2:
 			return 2 * sizeof(int);
 
+		case VertexDataType::VectorInt4:
+			return 4 * sizeof(int);
+
 		case VertexDataType::VectorFloat2:
 			return 2 * sizeof(float);
 
 		case VertexDataType::VectorFloat3:
 			return 3 * sizeof(float);
+
+		case VertexDataType::VectorFloat4:
+			return 4 * sizeof(float);
 
 		default:
 			return 0;

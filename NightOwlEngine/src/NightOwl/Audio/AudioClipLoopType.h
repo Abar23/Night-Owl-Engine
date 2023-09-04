@@ -5,8 +5,8 @@ namespace NightOwl
 {
 	enum class AudioClipLoopType
 	{
-		//Off = FMOD_LOOP_OFF,
-		//Normal = FMOD_LOOP_NORMAL,
+		Off,
+		Normal
 		//Bidirectional = FMOD_LOOP_BIDI
 	};
 }

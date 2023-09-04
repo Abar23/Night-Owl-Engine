@@ -19,11 +19,7 @@ namespace NightOwl
 			anyKeyPressedCounter(0),
 			isKeyInputDirty(false),
 			isMouseButtonInputDirty(false)
-	{
-		SetupWindowCallbacks();
-
-		CheckForConnectedControllers();
-	}
+	{ }
 
 	Input* Input::GetInstance()
 	{
@@ -31,6 +27,10 @@ namespace NightOwl
 		if(inputInstance == nullptr)
 		{
 			inputInstance = std::unique_ptr<Input>(new Input());
+
+			CheckForConnectedControllers();
+
+			SetupWindowCallbacks();
 		}
 		return inputInstance.get();
 	}

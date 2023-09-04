@@ -7,6 +7,11 @@ in vertexData
     vec3 materialPositon;
     vec3 materialColor;
     vec2 materialUvs;
+    vec3 materialNormals;
+    vec3 materialTangents;
+    vec3 materialBitangents;
+    flat ivec4 materialBoneIds;
+    vec4 materialBoneWeights;
 } inVertexData;
 
 uniform bool isInputTextureSet = false;
@@ -26,5 +31,5 @@ void main(void)
         }
     }
 
-	FragColor = outputColor;
+	FragColor = vec4(inVertexData.materialNormals, 1.0);
 } 

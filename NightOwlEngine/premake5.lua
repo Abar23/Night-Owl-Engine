@@ -39,12 +39,8 @@ project "NightOwlEngine"
         vendorDir .. "/rapidjson/include",
         vendorDir .. "/nlohmann/single_include",
         vendorDir .. "/OpenAL/include",
-        vendorDir .. "/libsndfile/include"   
-    }
-
-    libdirs 
-    {
-        vendorDir .. "/OpenAL/libs/Win64"
+        vendorDir .. "/libsndfile/include",
+        vendorDir .. "/Assimp/include"
     }
 
     links
@@ -53,7 +49,9 @@ project "NightOwlEngine"
         "Glad",
         "ImGui",
         "opengl32.lib",
-        "OpenAl32.lib"
+        "OpenAL32.lib",
+        "sndfile.lib",
+        "assimp-vc143-mt.lib"
     }
 
     filter "system:windows"
@@ -64,7 +62,21 @@ project "NightOwlEngine"
         runtime "Debug"
         symbols "on" 
 
+        libdirs 
+        {
+            vendorDir .. "/OpenAL/libs/Win64",
+            vendorDir .. "/libsndfile/Debug",
+            vendorDir .. "/Assimp/lib/x64"
+        }
+    
     filter "configurations:Release"  
         defines "RELEASE" 
         runtime "Release"
         optimize "on" 
+
+        libdirs 
+        {
+            vendorDir .. "/OpenAL/libs/Win64",
+            vendorDir .. "/libsndfile/Release",
+            vendorDir .. "/Assimp/lib/x64"
+        }

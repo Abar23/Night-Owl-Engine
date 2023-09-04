@@ -74,7 +74,7 @@ namespace NightOwl
 			else if (dynamic_cast<MeshRenderer*>(component.get()))
 			{
 				const MeshRenderer* meshRenderer = dynamic_cast<MeshRenderer*>(component.get());
-				MeshRenderer::classDescription.Serialize(meshRenderer, document, gameObjectJsonObj);
+				//MeshRenderer::classDescription.Serialize(meshRenderer, document, gameObjectJsonObj);
 			}
 		}
 

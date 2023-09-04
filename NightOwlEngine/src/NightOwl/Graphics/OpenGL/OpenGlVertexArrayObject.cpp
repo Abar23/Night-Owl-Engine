@@ -56,21 +56,33 @@ namespace NightOwl
 	{
 		const VertexBufferLayout& layout = vertexBuffer->GetVertexBufferLayout();
 		unsigned int accumulativeOffset = 0;
-		for(const VertexBufferData& data : layout.GetBufferDataDefinitions() )
+		for(const VertexBufferData& data : layout.GetBufferDataDefinitions())
 		{
-			// Only supporting floats for the moment
+			unsigned int openGlDataType;
 			switch (data.GetVertexDataType())
 			{
 			case VertexDataType::VectorFloat2:
 			case VertexDataType::VectorFloat3:
-				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, data.GetAttributeLocation(), 0);
-				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), GL_FLOAT, data.GetNormalize(), accumulativeOffset);
-				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, data.GetAttributeLocation());
-				accumulativeOffset += data.GetSizeofData();
+			case VertexDataType::VectorFloat4:
+				openGlDataType = GL_FLOAT;
+				break;
+
+			case VertexDataType::VectorInt2:
+			case VertexDataType::VectorInt4:
+				openGlDataType = GL_INT;
 				break;
 
 			default:
+				openGlDataType = 0;
 				break;
+			}
+
+			if (openGlDataType > 0)
+			{
+				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, data.GetAttributeLocation(), 0);
+				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), openGlDataType, data.GetNormalize(), accumulativeOffset);
+				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, data.GetAttributeLocation());
+				accumulativeOffset += data.GetSizeofData();
 			}
 		}
 		GL_CALL(glVertexArrayVertexBuffer, vertexArrayObjectId, 0, vertexBuffer->GetVertexBufferId(), 0, layout.GetDataPerVertex());

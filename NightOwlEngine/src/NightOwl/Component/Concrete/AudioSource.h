@@ -63,6 +63,12 @@ namespace NightOwl
 
 		float volume;
 
+		float minDistance;
+
+		float maxDistance;
+
+		float dopplerFactor; 
+
 		float frequencyRate;
 
 		bool isLooping;

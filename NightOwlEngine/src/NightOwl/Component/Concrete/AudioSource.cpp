@@ -9,7 +9,6 @@ namespace NightOwl
 	AudioSource::AudioSource()
 		:	Component(ComponentType::AudioSource),
 			clip{ nullptr },
-			//channel{ nullptr },
 			pitch(1.0f),
 			volume(1.0),
 			frequencyRate(0.0f),
@@ -26,7 +25,6 @@ namespace NightOwl
 		std::shared_ptr<AudioSource> clone = std::make_shared<AudioSource>();
 
 		clone->clip = clip;
-		//clone->channel = channel;
 		clone->pitch = pitch;
 		clone->volume = volume;
 		clone->frequencyRate = frequencyRate;

@@ -9,6 +9,7 @@ namespace NightOwl
 		None,
 		Transform,
 		MeshRenderer,
+		SkinnedMeshRenderer,
 		Camera,
 		RigidBody2D,
 		AABBBoxCollider2D,
@@ -26,6 +27,9 @@ namespace NightOwl
 
 		case ComponentType::MeshRenderer:
 			return std::string{ "MeshRenderer" };
+
+		case ComponentType::SkinnedMeshRenderer:
+			return std::string{ "SkinnedMeshRenderer" };
 
 		case ComponentType::Camera:
 			return std::string{ "Camera" };

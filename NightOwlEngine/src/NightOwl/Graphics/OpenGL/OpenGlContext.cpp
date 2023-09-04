@@ -62,6 +62,12 @@ namespace NightOwl
 		GL_CALL(glDrawElements, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, 0);
 	}
 
+	void OpenGlContext::DrawIndexedBaseVertex(DrawType drawType, int numberOfIndices, int startIndex, int baseVertex)
+	{
+		int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
+		GL_CALL(glDrawElementsBaseVertex, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, reinterpret_cast<void*>(startIndex * sizeof(unsigned int)), baseVertex);
+	}
+
 	void OpenGlContext::ClearColor()
 	{
 		GL_CALL(glClearColor, clearColor.x, clearColor.y, clearColor.z, clearColor.w);

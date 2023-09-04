@@ -3,6 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "AssetManager.h"
+
+#include "AssimpModelLoader.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
@@ -25,6 +27,11 @@ namespace NightOwl
 	AssetRepository<AudioClip>& AssetManager::GetAudioClipRepository()
 	{
 		return audioClipRepository;
+	}
+
+	AssetRepository<Mesh>& AssetManager::GetModelRepository()
+	{
+		return modelRepository;
 	}
 
 	stbi_uc* AssetManager::ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels)
@@ -96,7 +103,7 @@ namespace NightOwl
 		return shader.get();
 	}
 
-	ITexture2D* AssetManager::LoadTexture2D(std::string filePath)
+	ITexture2D* AssetManager::LoadTexture2D(const std::string& filePath)
 	{
 		const std::string textureName = Utility::StripFilePathToName(filePath);
 
@@ -120,7 +127,7 @@ namespace NightOwl
 		return texture.get();
 	}
 
-	AudioClip* AssetManager::LoadAudioClip(std::string filePath)
+	AudioClip* AssetManager::LoadAudioClip(const std::string& filePath)
 	{
 		//FMOD::Sound* sound = AudioSystemLocator::GetAudioSystem()->CreateSound(filePath, FMOD_DEFAULT).GetPointer();
 
@@ -140,5 +147,11 @@ namespace NightOwl
 		audioClipRepository.AddAsset(audioClipName, audioClip);
 
 		return audioClip.get();
+	}
+
+	void AssetManager::LoadModel(const std::string& filePath)
+	{
+		// call assimp model load and add mesh to the repository
+		AssimpModelLoader::LoadModel(filePath);
 	}
 }

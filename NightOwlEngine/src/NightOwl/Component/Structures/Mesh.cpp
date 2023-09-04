@@ -42,7 +42,7 @@ namespace NightOwl
 
 		if (isValid)
 		{
-			UploadVerticesData();
+			UploadVertices();
 		}
 	}
 
@@ -57,20 +57,66 @@ namespace NightOwl
 
 		if (isValid)
 		{
-			UploadColorData();
+			UploadColor();
 		}
 	}
 
+	// TODO: Don't like the divide by 255
 	void Mesh::SetColorPerVertex(const Vec3F& color)
 	{
-		const std::vector<Vec3F> colors(4, color / 255.0f);
+		const std::vector<Vec3F> colors(vertices.size(), color / 255.0f);
 
 		this->SetColors(colors);
+	}
+
+	std::vector<Vec3F> Mesh::GetNormals()
+	{
+		return normals;
+	}
+
+	void Mesh::SetNormals(const std::vector<Vec3F>& normals)
+	{
+		this->normals = normals;
+	}
+
+	std::vector<Vec3F> Mesh::GetTangents()
+	{
+		return tangents;
+	}
+
+	void Mesh::SetRangents(const std::vector<Vec3F>& tangents)
+	{
+		this->tangents = tangents;
+	}
+
+	std::vector<Vec3F> Mesh::GetBitangents()
+	{
+		return bitangents;
+	}
+
+	void Mesh::SetBitangents(const std::vector<Vec3F>& bitangents)
+	{
+		this->bitangents = bitangents;
+	}
+
+	std::vector<BoneWeight> Mesh::GetBoneWeights()
+	{
+		return boneWeights;
+	}
+
+	void Mesh::SetBoneWeights(const std::vector<BoneWeight>& boneWeights)
+	{
+		this->boneWeights = boneWeights;
 	}
 
 	std::vector<Vec3UI> Mesh::GetTriangles()
 	{
 		return triangles;
+	}
+
+	int Mesh::GetNumberOfTriangles()
+	{
+		return triangles.size();
 	}
 
 	void Mesh::SetTriangles(const std::vector<Vec3UI>& triangles)
@@ -99,11 +145,19 @@ namespace NightOwl
 		}
 	}
 
+	const std::vector<SubMeshData>& Mesh::GetSubMeshes()
+	{
+		return subMeshes;
+	}
+
 	void Mesh::Clear()
 	{
 		triangles.clear();
 		vertices.clear();
 		uvs.clear();
+		normals.clear();
+		tangents.clear();
+		bitangents.clear();
 		colors.clear();
 
 		isValid = false;
@@ -126,9 +180,37 @@ namespace NightOwl
 			data = VertexBufferData("Color", VertexDataType::VectorFloat3, 1);
 			layout.AddVertexBufferDataDefinition(data);
 		}
+
 		if (!uvs.empty())
 		{
 			data = VertexBufferData("UV", VertexDataType::VectorFloat2, 2);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+
+		if (!normals.empty())
+		{
+			data = VertexBufferData("Normals", VertexDataType::VectorFloat3, 3);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+
+		if (!normals.empty())
+		{
+			data = VertexBufferData("Tangents", VertexDataType::VectorFloat3, 4);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+
+		if (!normals.empty())
+		{
+			data = VertexBufferData("Bitangents", VertexDataType::VectorFloat3, 5);
+			layout.AddVertexBufferDataDefinition(data);
+		}
+
+		if (!boneWeights.empty())
+		{
+			data = VertexBufferData("BoneIds", VertexDataType::VectorInt4, 6);
+			layout.AddVertexBufferDataDefinition(data);
+		
+			data = VertexBufferData("BoneWeights", VertexDataType::VectorFloat4, 7);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
@@ -148,6 +230,29 @@ namespace NightOwl
 		if (!uvs.empty())
 		{
 			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
+			indexOfVertexBufferData++;
+		}
+		if (!normals.empty())
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, normals.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * normals.size());
+			indexOfVertexBufferData++;
+		}
+		if (!tangents.empty())
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, tangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * tangents.size());
+			indexOfVertexBufferData++;
+		}
+		if (!bitangents.empty())
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, bitangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * bitangents.size());
+			indexOfVertexBufferData++;
+		}
+
+		// Need to test. Don't think this will work!!!!
+		if (!boneWeights.empty())
+		{
+			unsigned int boneWeightsVertexDataSize = VertexDataTypeToDataTypeSize(VertexDataType::VectorInt4) + VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat4);
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size());
 		}
 
 		vertexArrayObject->SetupVertexBufferAttributes();
@@ -157,18 +262,13 @@ namespace NightOwl
 	{
 		isValid = false;
 
-		const int verticesPerTriangle = VertexDataTypeToNumberOfComponents(VertexDataType::VectorFloat3);
-
-		const auto expectedNumberOfVerticesPerTriangle = verticesPerTriangle * triangles.size();
-		const auto actualNumberOfVerticesPerTriangle = verticesPerTriangle * vertices.size();
-
-		if (expectedNumberOfVerticesPerTriangle <= actualNumberOfVerticesPerTriangle)
+		if (triangles.empty() == false && vertices.empty() == false)
 		{
 			isValid = true;
 		}
 	}
 
-	void Mesh::UploadVerticesData()
+	void Mesh::UploadVertices()
 	{
 		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Position");
 		if (index >= 0)
@@ -180,7 +280,7 @@ namespace NightOwl
 		UploadMeshData();
 	}
 
-	void Mesh::UploadColorData()
+	void Mesh::UploadColor()
 	{
 		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Color");
 		if (index >= 0)
@@ -191,6 +291,47 @@ namespace NightOwl
 
 		UploadMeshData();
 	}
+
+	void Mesh::UploadNormals()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Normals");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, normals.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * normals.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
+	void Mesh::UploadTangents()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Tangents");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, tangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * tangents.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
+	void Mesh::UploadBitangents()
+	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Bitangents");
+		if (index >= 0)
+		{
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, bitangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * bitangents.size());
+			return;
+		}
+
+		UploadMeshData();
+	}
+
+	void Mesh::UploadboneWeights()
+	{
+	}
+
 
 	void Mesh::UploadUvData()
 	{
@@ -205,9 +346,9 @@ namespace NightOwl
 	}
 
 	START_REFLECTION(Mesh)
-		CLASS_MEMBER_REFLECTION(vertices)
-		CLASS_MEMBER_REFLECTION(colors)
-		CLASS_MEMBER_REFLECTION(triangles)
-		CLASS_MEMBER_REFLECTION(uvs)
-		END_REFLECTION(Mesh)
+	CLASS_MEMBER_REFLECTION(vertices)
+	CLASS_MEMBER_REFLECTION(colors)
+	CLASS_MEMBER_REFLECTION(triangles)
+	CLASS_MEMBER_REFLECTION(uvs)
+	END_REFLECTION(Mesh)
 }

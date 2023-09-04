@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/MeshRenderer.h"
+#include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"	
 #include "NightOwl/Physics/2D/Collider/Collider2D.h"
 
@@ -19,7 +19,7 @@ namespace NightOwl
 
 		virtual void SetAlpha(float alpha) = 0;
 
-		virtual void Draw(MeshRenderer& meshRenderer) = 0;
+		virtual void Draw(Renderer& renderer) = 0;
 
 		virtual void Draw(Collider2D& collider) = 0;
 	};

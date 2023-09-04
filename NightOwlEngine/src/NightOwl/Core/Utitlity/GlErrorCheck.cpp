@@ -12,11 +12,7 @@ namespace NightOwl::Utility
 		{
 			std::string errorMessage;
 
-			#ifdef _WIN64
-			const std::string fileNameStripped = (strrchr(filename.c_str(), '\\') ? strrchr(filename.c_str(), '\\') + 1 : filename.c_str());
-			#else
-			std::string fileName = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
-			#endif
+			const std::string fileNameStripped = StripFilePathToName(filename);
 
 			switch (glErrorCode)
 			{

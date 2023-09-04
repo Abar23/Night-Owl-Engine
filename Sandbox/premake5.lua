@@ -40,8 +40,8 @@ project "Sandbox"
 
 	postbuildcommands 
     { 
-        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\router\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
+        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
+		"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
     }
 
 	filter "system:windows"

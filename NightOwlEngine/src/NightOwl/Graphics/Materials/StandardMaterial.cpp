@@ -9,10 +9,9 @@
 
 namespace NightOwl
 {
-	class MeshRenderer;
-
 	StandardMaterial::StandardMaterial()
-		:	alpha(1.0f)
+		:	diffuseTexture(nullptr),
+			alpha(1.0f)
 	{
 		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
 		standardShader = assetManager->LoadShader("Standard Shader", "./assets/Shaders/Standard.vert", "./assets/Shaders/Standard.frag");
@@ -28,10 +27,11 @@ namespace NightOwl
 		return clone;
 	}
 
-	void StandardMaterial::Draw(MeshRenderer& meshRenderer)
+	void StandardMaterial::Draw(Renderer& renderer)
 	{
-		auto mesh = meshRenderer.GetMesh();
-		auto transform = meshRenderer.GetGameObject().GetTransform();
+		auto mesh = renderer.GetMesh();
+		auto transform = renderer.GetGameObject().GetTransform();
+
 		standardShader->Bind();
 		standardShader->SetUniformMat4F(transform->GetWorldMatrix(), "modelMatrix");
 		standardShader->SetUniformMat4F(Camera::GetMainCamera()->GetViewProjectionMatrix(), "viewProjectionMatrix");
@@ -50,8 +50,22 @@ namespace NightOwl
 		}
 
 		mesh->Bind();
-		RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, mesh->GetTriangles().size() * sizeof(mesh->GetTriangles()[0]));
+		const std::vector<SubMeshData>& subMeshDatas = mesh->GetSubMeshes();
+		if (subMeshDatas.empty())
+		{
+			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, mesh->GetNumberOfTriangles() * 3);
+		}
+		else
+		{
+			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, subMeshDatas[0].indexCount);
+
+			for (const SubMeshData& subMeshData : subMeshDatas)
+			{
+			 	RenderApi::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMeshData.indexCount, subMeshData.indexStart, subMeshData.baseVertex);
+			}
+		}
 		mesh->Unbind();
+
 
 		if(diffuseTexture != nullptr)
 		{

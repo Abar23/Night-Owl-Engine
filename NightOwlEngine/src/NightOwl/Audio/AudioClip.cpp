@@ -1,26 +1,55 @@
 #include "NightOwlPch.h"
 
 #include "AudioClip.h"
-#include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
+#include <AL/al.h>
+#include <AL/alext.h>
+
+#include "NightOwl/Core/Utitlity/AlErrorCheck.h"
 
 namespace NightOwl
 {
 	AudioClip::AudioClip()
-		:	//sound{ nullptr },
+		:	samples(0),
+			lengthInMilliseconds(0),
 			frequency(0.0f),
-			//type(FMOD_SOUND_TYPE_UNKNOWN),
-			//format(FMOD_SOUND_FORMAT_NONE),
-			//loopType(AudioClipLoopType::Normal),
-			//loadType(AudioClipLoadType::DecompressOnLoad),
 			channels(0),
-			bitsPerSample(0),
-			priority(0),
-			lengthInMilliseconds(0)
-	{ }
+			format(0),
+			byteBlockAlignment(0),
+			isAmbisonic(false),
+			audioFileHandle(nullptr),
+			loadType(AudioClipLoadType::DecompressOnLoad),
+			sampleType(AudioSampleType::None)
+	{
+		AL_CALL(alGenBuffers, 1, &buffer);
+	}
+
+	AudioClip::AudioClip(const std::string& pathToAudioFile, AudioClipLoadType loadType)
+		:	samples(0),
+			lengthInMilliseconds(0),
+			frequency(0.0f),
+			channels(0),
+			format(0),
+			byteBlockAlignment(0),
+			isAmbisonic(false),
+			buffer(0),
+			audioFileHandle(nullptr),
+			loadType(loadType),
+			sampleType(AudioSampleType::None)
+	{
+		AL_CALL(alGenBuffers, 1, &buffer);
+
+		LoadAudioFile(pathToAudioFile);
+	}
 
 	AudioClip::~AudioClip()
 	{
-		//FMOD_CALL(sound->release);
+		AL_CALL(alDeleteBuffers, 1, &buffer);
+	}
+
+	bool AudioClip::IsAmbisonic()
+	{
+		return isAmbisonic;
 	}
 
 	const std::string& AudioClip::GetName() const
@@ -28,58 +57,29 @@ namespace NightOwl
 		return name;
 	}
 
-	const unsigned int AudioClip::GetLengthInMilliseconds() const
+	float AudioClip::GetLengthInMilliseconds() const
 	{
 		return lengthInMilliseconds;
 	}
 
-	//const FMOD_SOUND_TYPE AudioClip::GetSoundType() const
-	//{
-	//	return type;
-	//}
+	AudioSampleType AudioClip::GetSampleType() const
+	{
+		return sampleType;
+	}
 
-	//const FMOD_SOUND_FORMAT AudioClip::GetSoundFormat() const
-	//{
-	//	return format;
-	//}
-
-	const int AudioClip::GetChannels() const
+	int AudioClip::GetChannels() const
 	{
 		return channels;
 	}
 
-	const int AudioClip::GetBitsPerSample() const
+	long long AudioClip::GetSamples() const
 	{
-		return bitsPerSample;
+		return samples;
 	}
 
-	//FMOD::Sound* AudioClip::GetClip() const
-	//{
-	//	return sound;
-	//}
-
-	float AudioClip::GetFrequency() const
+	int AudioClip::GetFrequency() const
 	{
 		return frequency;
-	}
-
-	AudioClipLoopType AudioClip::GetLoopType() const
-	{
-		return loopType;
-	}
-
-	void AudioClip::SetLoopType(const AudioClipLoopType loopType)
-	{
-		//FMOD_MODE currentMode;
-		//FMOD_CALL(sound->getMode, &currentMode);
-
-		//currentMode &= ~static_cast<FMOD_MODE>(this->loopType);
-
-		this->loopType = loopType; 
-
-		//currentMode |= static_cast<FMOD_MODE>(this->loopType);
-
-		//FMOD_CALL(sound->setMode, currentMode);
 	}
 
 	AudioClipLoadType AudioClip::GetLoadType() const
@@ -87,39 +87,152 @@ namespace NightOwl
 		return loadType;
 	}
 
-	void AudioClip::SetLoadType(const AudioClipLoadType loadType)
+	void AudioClip::LoadAudioFile(const std::string& pathToAudioFile)
 	{
-		//FMOD_MODE currentMode;
-		//FMOD_CALL(sound->getMode, &currentMode);
+		SF_INFO audioFileInfo;
+		audioFileHandle = sf_open(pathToAudioFile.c_str(), SFM_READ, &audioFileInfo);
 
-		//currentMode &= ~static_cast<FMOD_MODE>(this->loadType);
+		ENGINE_ASSERT(audioFileHandle != nullptr, "Failed to open audio file {0}! Reported error is {1}", pathToAudioFile, sf_strerror(NULL));
 
-		this->loadType = loadType; 
+		sampleType = AudioSampleType::None;
+		samples = audioFileInfo.frames;
+		frequency = audioFileInfo.samplerate;
+		channels = audioFileInfo.channels;
+		format = audioFileInfo.format;
+		lengthInMilliseconds = static_cast<float>(samples) / static_cast<float>(frequency) * 1000.0f;
 
-		//currentMode |= static_cast<FMOD_MODE>(this->loadType);
+		switch (format & SF_FORMAT_SUBMASK)
+		{
+			case SF_FORMAT_ALAC_16:
+			case SF_FORMAT_PCM_16:
+				sampleType = AudioSampleType::Short;
+				break;
 
-		//FMOD_CALL(sound->setMode, currentMode);
-	}
+			case SF_FORMAT_PCM_24:
+			case SF_FORMAT_PCM_32:
+			case SF_FORMAT_FLOAT:
+			case SF_FORMAT_DOUBLE:
+			case SF_FORMAT_VORBIS:
+			case SF_FORMAT_OPUS:
+			case SF_FORMAT_ALAC_20:
+			case SF_FORMAT_ALAC_24:
+			case SF_FORMAT_ALAC_32:
+					sampleType = AudioSampleType::Float;
+				break;
 
-	//void AudioClip::SetSound(FMOD::Sound* sound)
-	//{
-	//	this->sound = sound;
+			default:
+				ENGINE_LOG_ERROR("Audio format for file {0} not supported!", pathToAudioFile);
+				std::terminate();
+		}
 
-	//	FMOD_CALL(sound->setMode, FMOD_DEFAULT | static_cast<FMOD_MODE>(loopType) | static_cast<FMOD_MODE>(loadType));
+		if (sampleType == AudioSampleType::Short)
+		{
+			this->byteBlockAlignment = channels * 2;
+		}
+		else if (sampleType == AudioSampleType::Float)
+		{
+			this->byteBlockAlignment = channels * 4;
+		}
 
-	//	GetClipInfo();
-	//}
+		format = AL_NONE;
+		if (channels == 1)
+		{
+			if (sampleType == AudioSampleType::Short)
+			{
+				format = AL_FORMAT_MONO16;
+			}
+			if (sampleType == AudioSampleType::Float)
+			{
+				format = AL_FORMAT_MONO_FLOAT32;
+			}
+		}
+		else if (channels == 2)
+		{
+			if (sampleType == AudioSampleType::Short)
+			{
+				format = AL_FORMAT_STEREO16;
+			}
+			else if (sampleType == AudioSampleType::Float)
+			{
+				format = AL_FORMAT_STEREO_FLOAT32;
+			}
+		}
+		else if (channels == 3)
+		{
+			if (sf_command(audioFileHandle, SFC_WAVEX_GET_AMBISONIC, nullptr, 0) == SF_AMBISONIC_B_FORMAT)
+			{
+				if (sampleType == AudioSampleType::Short)
+				{
+					format = AL_FORMAT_BFORMAT2D_16;
+				}
+				else if (sampleType == AudioSampleType::Float)
+				{
+					format = AL_FORMAT_BFORMAT2D_FLOAT32;
+				}
+			}
+		}
+		else if (channels == 4)
+		{
+			if (sf_command(audioFileHandle, SFC_WAVEX_GET_AMBISONIC, nullptr, 0) == SF_AMBISONIC_B_FORMAT)
+			{
+				if (sampleType == AudioSampleType::Short)
+				{
+					format = AL_FORMAT_BFORMAT3D_16;
+				}
+				else if (sampleType == AudioSampleType::Float)
+				{
+					format = AL_FORMAT_BFORMAT3D_FLOAT32;
+				}
+			}
+		}
 
-	void AudioClip::GetClipInfo()
-	{
-		//FMOD_CALL(sound->getFormat, &type, &format, &channels, &bitsPerSample);
+		if (format == AL_NONE)
+		{
+			sf_close(audioFileHandle);
+			ENGINE_LOG_ERROR("Audio file has unsupported number of channels {0}!", channels);
+			std::terminate();
+		}
 
-		//name.resize(MAX_NAME_SIZE);
+		if (loadType == AudioClipLoadType::Streaming)
+		{
+			return;
+		}
 
-		//FMOD_CALL(sound->getName, name.data(), MAX_NAME_SIZE);
+		// load all audio data into OpenAL buffer
+		std::vector<unsigned char> audioDataBuffer(samples * this->byteBlockAlignment);
+		unsigned long long numberOfFramesRead = 0;
 
-		//FMOD_CALL(sound->getLength, &lengthInMilliseconds, FMOD_TIMEUNIT_MS);
+		if (sampleType == AudioSampleType::Short)
+		{
+			numberOfFramesRead = sf_readf_short(audioFileHandle, reinterpret_cast<short*>(audioDataBuffer.data()), samples);
+		}
+		else if (sampleType == AudioSampleType::Float)
+		{
+			numberOfFramesRead = sf_readf_float(audioFileHandle, reinterpret_cast<float*>(audioDataBuffer.data()), samples);
+		}
 
-		//FMOD_CALL(sound->getDefaults, &frequency, &priority);
+		if (numberOfFramesRead < 1 || numberOfFramesRead != samples)
+		{
+			audioDataBuffer.clear();
+
+			ENGINE_LOG_ERROR("Failed to read samples for audio file {0}!", pathToAudioFile);
+
+			const int successfullyCloseAudioFile = sf_close(audioFileHandle);
+			if (successfullyCloseAudioFile > 0)
+			{
+				ENGINE_LOG_ERROR("Failed to close audio file {0}!", pathToAudioFile);
+			}
+			std::terminate();
+		}
+		
+		AL_CALL(alBufferData, buffer, format, audioDataBuffer.data(), audioDataBuffer.size(), frequency);
+
+		audioDataBuffer.clear();
+		const int successfullyCloseAudioFile = sf_close(audioFileHandle);
+		if (successfullyCloseAudioFile > 0)
+		{
+			ENGINE_LOG_ERROR("Failed to close audio file {0}!", pathToAudioFile);
+			std::terminate();
+		}
 	}
 }

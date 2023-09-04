@@ -10,11 +10,11 @@ namespace NightOwl::Utility
 
 	std::string StripFilePathToNameWithoutExtension(const std::string& filePath);
 
+	std::string FilePathToDirectory(std::string filePath);
+
+	void StandardizeFilePathString(std::string& filePath);
+
 	nlohmann::json GetJsonDataFromFilePath(const std::string& path);
 
 	Vec3F GetVec3fFromJsonArray(const nlohmann::json& dataArray);
-
-	std::vector<std::vector<std::string>> GetCSVDataFromFilePath(const std::string& path);
-
-	std::vector<std::string> split(const std::string& stream, char delimiter);
 }
