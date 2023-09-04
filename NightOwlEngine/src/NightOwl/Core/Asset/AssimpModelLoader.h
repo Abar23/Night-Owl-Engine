@@ -20,6 +20,8 @@ namespace NightOwl
 
 		static void ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
 
+		static void ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
+
 	private:
 		static Assimp::Importer modelImporter;
 	};

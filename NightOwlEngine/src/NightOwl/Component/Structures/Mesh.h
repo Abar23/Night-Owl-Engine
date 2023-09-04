@@ -5,10 +5,11 @@
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
+#include "NightOwl/Animation/3D/Structures/BoneWeight.h"
+#include "NightOwl/Animation/3D/Structures/BoneInfo.h"
 #include "SubMeshData.h"
+#include <map>
 #include <vector>
-
-#include "BoneWeight.h"
 
 namespace NightOwl
 {
@@ -89,6 +90,8 @@ namespace NightOwl
 		std::shared_ptr<IIndexBuffer> indexBuffer;
 
 		std::vector<SubMeshData> subMeshes;
+
+		std::map<std::string, BoneInfo> boneInfoMap;
 
 		bool isValid;
 

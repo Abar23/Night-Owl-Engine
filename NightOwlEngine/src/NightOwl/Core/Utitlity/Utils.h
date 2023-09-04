@@ -1,8 +1,9 @@
 #pragma once
 
-#include "NightOwl/Math/Vec3.h"
+#include "NightOwl/Math/Math.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <assimp/matrix4x4.h>
 
 namespace NightOwl::Utility
 {
@@ -17,4 +18,6 @@ namespace NightOwl::Utility
 	nlohmann::json GetJsonDataFromFilePath(const std::string& path);
 
 	Vec3F GetVec3fFromJsonArray(const nlohmann::json& dataArray);
+
+	Mat4F AssimpMat4ToNightOwlMat4(const aiMatrix4x4& assimpMatrix);
 }

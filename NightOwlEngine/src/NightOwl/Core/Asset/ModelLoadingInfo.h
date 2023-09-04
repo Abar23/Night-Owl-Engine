@@ -31,6 +31,8 @@ namespace NightOwl
 
 		std::vector<Vec3F> bitangents;
 
+		std::vector<BoneWeight> boneWeights;
+
 		int numberOfMeshesProcessed = 0;
 	};
 }

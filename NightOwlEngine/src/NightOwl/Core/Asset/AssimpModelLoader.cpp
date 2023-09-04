@@ -40,7 +40,7 @@ namespace NightOwl
 		{
 			const aiNode* currentNode = nodes.top();
 			nodes.pop();
-
+			
 			// process all meshes in the model
 			for (unsigned int meshIndex = 0; meshIndex < currentNode->mNumMeshes; meshIndex++)
 			{
@@ -135,8 +135,13 @@ namespace NightOwl
 			modelLoadingInfo.indices.emplace_back(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
 		}
 
-		const aiMaterial* material = modelLoadingInfo.scene->mMaterials[assimpMesh->mMaterialIndex];
+		if (assimpMesh->HasBones())
+		{
+			ProcessBones(modelLoadingInfo, assimpMesh);
+		}
 
+		const aiMaterial* material = modelLoadingInfo.scene->mMaterials[assimpMesh->mMaterialIndex];
+		
 		std::vector<ITexture2D*> diffuseTextures;
 		for (unsigned int textureIndex = 0; textureIndex < material->GetTextureCount(aiTextureType_DIFFUSE); ++textureIndex)
 		{
@@ -151,5 +156,47 @@ namespace NightOwl
 		}
 
 		modelLoadingInfo.numberOfMeshesProcessed++;
+	}
+
+	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
+	{
+		modelLoadingInfo.boneWeights.resize(modelLoadingInfo.vertices.size());
+
+		for (int boneIndex = 0; boneIndex < assimpMesh->mNumBones; ++boneIndex)
+		{
+			int boneId;
+			const aiBone* bone = assimpMesh->mBones[boneIndex];
+			const std::string boneName = bone->mName.C_Str();
+			if (modelLoadingInfo.modelMesh->boneInfoMap.contains(boneName) == false)
+			{
+				BoneInfo boneInfo;
+				boneId = modelLoadingInfo.modelMesh->boneInfoMap.size();
+				boneInfo.id = boneId;
+				boneInfo.offsetMatrix = Utility::AssimpMat4ToNightOwlMat4(bone->mOffsetMatrix);
+				modelLoadingInfo.modelMesh->boneInfoMap[boneName] = boneInfo;
+			}
+			else
+			{
+				boneId = modelLoadingInfo.modelMesh->boneInfoMap[boneName].id;
+			}
+
+			// assert for valid bone index
+
+			for (int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
+			{
+				const aiVertexWeight& weight = bone->mWeights[weightIndex];
+				BoneWeight* boneWeight = modelLoadingInfo.boneWeights.data() + weight.mVertexId;
+
+				for (int boneWeightIndex = 0; boneWeightIndex < 4; ++boneWeightIndex)
+				{
+					if (boneWeight->boneIds[boneWeightIndex] < 0)
+					{
+						boneWeight->boneIds[boneWeightIndex] = boneId;
+						boneWeight->weights[boneWeightIndex] = weight.mWeight;
+						break;
+					}
+				}
+			}
+		}
 	}
 }
