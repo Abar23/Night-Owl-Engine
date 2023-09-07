@@ -14,19 +14,29 @@ void TestScene::Init()
 {
 	auto* assetManager = NightOwl::AssetManagerLocator::GetAssetManager();
 
-	assetManager->LoadModel("./assets/backpack/backpack.obj");
+	assetManager->LoadModel("./assets/Viking rigged1/Viking rigged1.fbx");
 
-	NightOwl::Mesh* modelMesh = assetManager->GetModelRepository().GetAsset("backpack");
+	NightOwl::Mesh* modelMesh = assetManager->GetModelRepository().GetAsset("Viking rigged1");
 	modelMesh->SetColorPerVertex({0.0f, 255.0f, 0.0f});
 	NightOwl::GameObject& backpack = AddGameObject("backpack");
 	NightOwl::MeshRenderer* backpackRenderer = backpack.AddComponent<NightOwl::MeshRenderer>();
 	backpackRenderer->SetMesh(modelMesh);
-	backpackRenderer->GetMaterial()->SetTexture(assetManager->GetTextureRepository().GetAsset("diffuse.jpg"));
+	//backpackRenderer->GetMaterial()->SetTexture(assetManager->GetTextureRepository().GetAsset("diffuse.jpg"));
 	backpack.GetTransform()->Rotate({0, 9, 0}, NightOwl::Space::World);
+
+	// assetManager->LoadModel("./assets/backpack/backpack.obj");
+	//
+	// NightOwl::Mesh* modelMesh = assetManager->GetModelRepository().GetAsset("backpack");
+	// modelMesh->SetColorPerVertex({ 0.0f, 255.0f, 0.0f });
+	// NightOwl::GameObject& backpack = AddGameObject("backpack");
+	// NightOwl::MeshRenderer* backpackRenderer = backpack.AddComponent<NightOwl::MeshRenderer>();
+	// backpackRenderer->SetMesh(modelMesh);
+	// backpackRenderer->GetMaterial()->SetTexture(assetManager->GetTextureRepository().GetAsset("diffuse.jpg"));
+	// backpack.GetTransform()->Rotate({ 0, 9, 0 }, NightOwl::Space::World);
 
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
 	mainCameraGameObject.AddComponent<NightOwl::Camera>();
-	mainCameraGameObject.GetTransform()->Translate({ 0.0f, 0.0f, 5.0f }, NightOwl::Space::World);
+	mainCameraGameObject.GetTransform()->Translate({ 0.0f, 0.0f, 100.0f }, NightOwl::Space::World);
 }
 
 void TestScene::Reset()

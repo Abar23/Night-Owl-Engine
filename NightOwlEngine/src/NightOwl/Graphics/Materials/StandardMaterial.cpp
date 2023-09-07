@@ -57,7 +57,7 @@ namespace NightOwl
 		}
 		else
 		{
-			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, subMeshDatas[0].indexCount);
+			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, subMeshDatas[0].indexStart);
 
 			for (const SubMeshData& subMeshData : subMeshDatas)
 			{

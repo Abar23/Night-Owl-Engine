@@ -16,13 +16,17 @@ namespace NightOwl
 	public:
 		static void LoadModel(const std::string& filePath);
 
+	private:
+		static Assimp::Importer modelImporter;
+
 		static void ProcessNodes(ModelLoadingInfo& modelLoadingInfo);
 
 		static void ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
 
 		static void ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
 
-	private:
-		static Assimp::Importer modelImporter;
+		static void ProcessArmature(ModelLoadingInfo& modelLoadingInfo);
+
+		static bool HasBones(ModelLoadingInfo& modelLoadingInfo, const aiNode* assimpNode);
 	};
 }

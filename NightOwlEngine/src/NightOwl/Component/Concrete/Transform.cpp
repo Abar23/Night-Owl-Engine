@@ -120,6 +120,13 @@ namespace NightOwl
 		return localRotation.GetEulerAngles();
 	}
 
+	void Transform::SetLocalRotation(const QuatF& rotation)
+	{
+		localRotation = rotation;
+
+		SetLocalDirtyFlag();
+	}
+
 	void Transform::SetLocalEulerAngles(float angleX, float angleY, float angleZ)
 	{
 		localRotation = QuatF::MakeRotationFromEulers(Vec3F(angleX, angleY, angleZ));
@@ -175,7 +182,10 @@ namespace NightOwl
 				childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
 			}
 
-			gameObject->GetScene()->SetDirtyFlag();
+			if (gameObject->GetScene() != nullptr)
+			{
+				gameObject->GetScene()->SetDirtyFlag();
+			}
 		}
 	}
 

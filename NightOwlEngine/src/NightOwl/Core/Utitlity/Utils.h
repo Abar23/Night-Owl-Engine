@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <assimp/matrix4x4.h>
+#include <assimp/quaternion.h>
 
 namespace NightOwl::Utility
 {
@@ -19,5 +20,9 @@ namespace NightOwl::Utility
 
 	Vec3F GetVec3fFromJsonArray(const nlohmann::json& dataArray);
 
-	Mat4F AssimpMat4ToNightOwlMat4(const aiMatrix4x4& assimpMatrix);
+	Mat4F AssimpMat4ToNightOwlMat4F(const aiMatrix4x4& assimpMatrix);
+
+	Vec3F AssimpVec3ToNightOwlVec3F(const aiVector3D& assimpVec3);
+
+	QuatF AssimpQuaternionToNightOwlQuatF(const aiQuaternion& assimpQuaterion);
 }

@@ -31,6 +31,8 @@ namespace NightOwl
 
 		const Vec3F GetLocalEulerAngles();
 
+		void SetLocalRotation(const QuatF& rotation);
+
 		void SetLocalEulerAngles(float angleX, float angleY, float angleZ);
 
 		void SetLocalEulerAngles(const Vec3F& eulers);

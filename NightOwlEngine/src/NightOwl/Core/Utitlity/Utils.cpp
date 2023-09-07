@@ -77,7 +77,7 @@ namespace NightOwl::Utility
 				   dataArray[2].get<float>() };
 	}
 
-	Mat4F AssimpMat4ToNightOwlMat4(const aiMatrix4x4& assimpMatrix)
+	Mat4F AssimpMat4ToNightOwlMat4F(const aiMatrix4x4& assimpMatrix)
 	{
 		Mat4F matrix;
 
@@ -87,5 +87,15 @@ namespace NightOwl::Utility
 		matrix.SetRow(3, { assimpMatrix.d1, assimpMatrix.d2, assimpMatrix.d3, assimpMatrix.d4 });
 
 		return matrix;
+	}
+
+	Vec3F AssimpVec3ToNightOwlVec3F(const aiVector3D& assimpVec3)
+	{
+		return Vec3F(assimpVec3.x, assimpVec3.y, assimpVec3.z);
+	}
+
+	QuatF AssimpQuaternionToNightOwlQuatF(const aiQuaternion& assimpQuaterion)
+	{
+		return QuatF(assimpQuaterion.x, assimpQuaterion.y, assimpQuaterion.z, assimpQuaterion.w);
 	}
 }

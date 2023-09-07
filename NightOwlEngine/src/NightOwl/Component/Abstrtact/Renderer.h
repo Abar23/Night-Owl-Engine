@@ -35,5 +35,7 @@ namespace NightOwl
 		bool isVisible;
 
 		void CloneRenderer(const std::shared_ptr<Renderer>& clone);
+
+		friend class AssimpModelLoader;
 	};
 }
