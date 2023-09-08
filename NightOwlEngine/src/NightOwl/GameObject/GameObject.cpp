@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include <limits>
+#include <stack>
 
 #include "NightOwl/Core/Application/Scene.h"
 
@@ -66,6 +67,16 @@ namespace NightOwl
 	void GameObject::SetScene(Scene* scene)
 	{
 		this->scene = scene;
+
+		if (transform.HasChildren() == false)
+		{
+			return;
+		}
+
+		for (unsigned int childrenIndex = 0; childrenIndex < transform.GetNumberOfChildren(); ++childrenIndex)
+		{
+			transform.GetChildAtIndex(childrenIndex)->gameObject->SetScene(scene);
+		}
 	}
 
 	Transform* GameObject::GetTransform()
@@ -86,11 +97,11 @@ namespace NightOwl
 	std::shared_ptr<GameObject> GameObject::Clone()
 	{
 		auto clonedGameObject = std::make_shared<GameObject>();
-		clonedGameObject->transform.Clone(transform);
-		clonedGameObject->transform.gameObject = clonedGameObject.get();
 		clonedGameObject->scene = scene;
 		clonedGameObject->name = name;
 		clonedGameObject->isActive = true;
+		clonedGameObject->transform.Clone(transform);
+		clonedGameObject->transform.gameObject = clonedGameObject.get();
 
 		for (const auto& component : componentList)
 		{

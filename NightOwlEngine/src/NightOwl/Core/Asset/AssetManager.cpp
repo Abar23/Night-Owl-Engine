@@ -29,7 +29,7 @@ namespace NightOwl
 		return audioClipRepository;
 	}
 
-	AssetRepository<Mesh>& AssetManager::GetModelRepository()
+	AssetRepository<Model>& AssetManager::GetModelRepository()
 	{
 		return modelRepository;
 	}

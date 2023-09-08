@@ -15,9 +15,9 @@ namespace NightOwl
 
 		void Draw();
 
-		Mesh* GetMesh();
+		std::shared_ptr<Mesh> GetMesh();
 
-		void SetMesh(Mesh* mesh);
+		void SetMesh(std::shared_ptr<Mesh> mesh);
 
 		void SetVisible(bool isVisible);
 
@@ -28,7 +28,7 @@ namespace NightOwl
 		void SetMaterial(std::shared_ptr<IMaterial> material);
 
 	protected:
-		Mesh* mesh;
+		std::shared_ptr<Mesh> mesh;
 
 		std::shared_ptr<IMaterial> material;
 

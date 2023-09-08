@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AssetRepository.h"
+#include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
 #include "NightOwl/Component/Structures/Mesh.h"
@@ -19,7 +20,7 @@ namespace NightOwl
 
 		AssetRepository<AudioClip>& GetAudioClipRepository();
 
-		AssetRepository<Mesh>& GetModelRepository();
+		AssetRepository<Model>& GetModelRepository();
 
 		IShader* LoadShader(const std::string& name, const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
 
@@ -38,7 +39,7 @@ namespace NightOwl
 
 		AssetRepository<AudioClip> audioClipRepository;
 
-		AssetRepository<Mesh> modelRepository;
+		AssetRepository<Model> modelRepository;
 
 		stbi_uc* ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels);
 

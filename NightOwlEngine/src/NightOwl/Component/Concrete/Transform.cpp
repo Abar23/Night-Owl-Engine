@@ -410,10 +410,11 @@ namespace NightOwl
 		isLocalDirty = tranformToClone.isLocalDirty;
 		isWorldDirty = tranformToClone.isWorldDirty;
 
-		if(parent != nullptr)
-		{
-			parent->SetChild(this);
-		}
+		// TODO: Figure out if this is needed
+		// if(parent != nullptr)
+		// {
+		// 	parent->SetChild(this);
+		// }
 
 		for (auto& transform : tranformToClone.children)
 		{

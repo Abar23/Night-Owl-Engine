@@ -7,6 +7,7 @@
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include <stack>
 
+#include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/GameObject/GameObject.h"
@@ -35,23 +36,25 @@ namespace NightOwl
 
 	void AssimpModelLoader::ProcessNodes(ModelLoadingInfo& modelLoadingInfo)
 	{
+		const std::shared_ptr<Model> model = std::make_shared<Model>();
+
 		const aiScene* scene = modelLoadingInfo.scene;
 
-		const bool hasBoneData = HasBones(modelLoadingInfo, scene->mRootNode->mChildren[0]);
-
-		std::shared_ptr<Renderer> renderer;
-		if(hasBoneData)
+		if(HasBones(modelLoadingInfo, scene->mRootNode->mChildren[0]))
 		{
-			renderer = std::make_shared<SkinnedMeshRenderer>();
+			modelLoadingInfo.renderer = std::make_shared<SkinnedMeshRenderer>();
 			ProcessArmature(modelLoadingInfo);
 		}
 		else
 		{
-			renderer = std::make_shared<MeshRenderer>();
+			modelLoadingInfo.renderer = std::make_shared<MeshRenderer>();
 		}
-		renderer->Remove();
 
-		modelLoadingInfo.modelMesh = std::make_shared<Mesh>();
+		modelLoadingInfo.renderer->mesh = std::make_shared<Mesh>();
+		modelLoadingInfo.renderer->Remove();
+
+		model->skeleton.swap(modelLoadingInfo.skeleton);
+		model->renderer = modelLoadingInfo.renderer;
 
 		for (int rootChildIndex = 0; rootChildIndex < scene->mRootNode->mNumChildren; ++rootChildIndex)
 		{
@@ -86,16 +89,14 @@ namespace NightOwl
 			}
 		}
 
-		modelLoadingInfo.modelMesh->ValidateMesh();
-		modelLoadingInfo.modelMesh->UploadMeshData();
-		AssetManagerLocator::GetAssetManager()->GetModelRepository().AddAsset(modelLoadingInfo.name, modelLoadingInfo.modelMesh);
-
-		renderer->SetMesh(modelLoadingInfo.modelMesh.get());
+		modelLoadingInfo.renderer->mesh->ValidateMesh();
+		modelLoadingInfo.renderer->mesh->UploadMeshData();
+		AssetManagerLocator::GetAssetManager()->GetModelRepository().AddAsset(modelLoadingInfo.name, model);
 	}
 
 	void AssimpModelLoader::ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
-		Mesh* modelMesh = modelLoadingInfo.modelMesh.get();
+		std::shared_ptr<Mesh> modelMesh = modelLoadingInfo.renderer->mesh;
 		if (modelLoadingInfo.numberOfMeshesProcessed > 0)
 		{
 			SubMeshData subMesh;
@@ -104,7 +105,7 @@ namespace NightOwl
 			subMesh.indexCount = assimpMesh->mNumFaces * 3;
 			subMesh.vertexCount = assimpMesh->mNumVertices;
 			subMesh.firstVertex = modelMesh->triangles[modelMesh->triangles.size() - 1].x;
-			modelLoadingInfo.modelMesh->subMeshes.push_back(subMesh);
+			modelMesh->subMeshes.push_back(subMesh);
 		}
 		
 		// process data for main mesh
@@ -186,24 +187,26 @@ namespace NightOwl
 
 	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
-		modelLoadingInfo.boneWeights.resize(modelLoadingInfo.modelMesh->vertices.size());
+		std::shared_ptr<Mesh>& modelMesh = modelLoadingInfo.renderer->mesh;
+
+		modelLoadingInfo.boneWeights.resize(modelLoadingInfo.renderer->mesh->vertices.size());
 
 		for (int boneIndex = 0; boneIndex < assimpMesh->mNumBones; ++boneIndex)
 		{
 			int boneId;
 			const aiBone* bone = assimpMesh->mBones[boneIndex];
 			const std::string boneName = bone->mName.C_Str();
-			if (modelLoadingInfo.modelMesh->boneInfoMap.contains(boneName) == false)
+			if (modelMesh->boneInfoMap.contains(boneName) == false)
 			{
 				BoneInfo boneInfo;
-				boneId = modelLoadingInfo.modelMesh->boneInfoMap.size();
+				boneId = modelMesh->boneInfoMap.size();
 				boneInfo.id = boneId;
 				boneInfo.offsetMatrix = Utility::AssimpMat4ToNightOwlMat4F(bone->mOffsetMatrix);
-				modelLoadingInfo.modelMesh->boneInfoMap[boneName] = boneInfo;
+				modelMesh->boneInfoMap[boneName] = boneInfo;
 			}
 			else
 			{
-				boneId = modelLoadingInfo.modelMesh->boneInfoMap[boneName].id;
+				boneId = modelMesh->boneInfoMap[boneName].id;
 			}
 
 			// assert for valid bone index
@@ -237,22 +240,28 @@ namespace NightOwl
 			return;
 		}
 
-		const int numberOfBones = scene->mMeshes[0]->mNumBones;
+		// adding one for the root node/bone
+		const int numberOfBones = scene->mMeshes[0]->mNumBones + 1;
 		const aiNode* armatureRoot = scene->mMeshes[0]->mBones[0]->mArmature;
 
-		std::vector<GameObject> gameObjectBoneHierarchy(numberOfBones);
+		modelLoadingInfo.skeleton.resize(numberOfBones);
 
 		std::stack<std::pair<GameObject*, const aiNode*>> armatureNodes;
-		armatureNodes.emplace(gameObjectBoneHierarchy.data(), armatureRoot);
+		armatureNodes.emplace(modelLoadingInfo.skeleton.data(), armatureRoot);
 
 		int processedGameObjects = 0;
-		while (processedGameObjects < gameObjectBoneHierarchy.size())
+		while (armatureNodes.empty() == false)
 		{
 			const std::pair<GameObject*, const aiNode*> armatureNodePair = armatureNodes.top();
 			armatureNodes.pop();
 
 			armatureNodePair.first->SetName(armatureNodePair.second->mName.data);
-			ENGINE_LOG_INFO("Armature node name: {0}", armatureNodePair.second->mName.data);
+			ENGINE_LOG_INFO("Game Object Cloned: {0}", armatureNodePair.first->GetName());
+
+			if (armatureNodePair.first->GetName() == "ik_foot_root")
+			{
+				int i = 0;
+			}
 
 			aiVector3D scale;
 			aiVector3D position;
@@ -263,18 +272,17 @@ namespace NightOwl
 			parentGameObjectTransform->SetLocalScale(Utility::AssimpVec3ToNightOwlVec3F(scale));
 			parentGameObjectTransform->SetLocalPosition(Utility::AssimpVec3ToNightOwlVec3F(position));
 			parentGameObjectTransform->SetLocalRotation(Utility::AssimpQuaternionToNightOwlQuatF(rotation));
-			ENGINE_LOG_INFO("Position: {0}", parentGameObjectTransform->GetPosition().ToString());
 
 			for (unsigned int armatureChildIndex = 0; armatureChildIndex < armatureNodePair.second->mNumChildren; ++armatureChildIndex)
 			{
 				processedGameObjects++;
 
-				if (processedGameObjects >= gameObjectBoneHierarchy.size())
+				if (processedGameObjects == 67)
 				{
-					break;
+					int i = 0;
 				}
 
-				GameObject* childGameObject = gameObjectBoneHierarchy.data() + processedGameObjects;
+				GameObject* childGameObject = &modelLoadingInfo.skeleton.at(processedGameObjects);
 				childGameObject->GetTransform()->SetParent(parentGameObjectTransform);
 
 				armatureNodes.emplace(childGameObject, armatureNodePair.second->mChildren[armatureChildIndex]);

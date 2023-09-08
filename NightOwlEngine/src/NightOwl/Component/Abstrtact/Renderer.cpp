@@ -18,12 +18,12 @@ namespace NightOwl
 		}
 	}
 
-	Mesh* Renderer::GetMesh()
+	std::shared_ptr<Mesh> Renderer::GetMesh()
 	{
 		return mesh;
 	}
 
-	void Renderer::SetMesh(Mesh* mesh)
+	void Renderer::SetMesh(std::shared_ptr<Mesh> mesh)
 	{
 		this->mesh = mesh;
 	}
