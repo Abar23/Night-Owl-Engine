@@ -29,8 +29,8 @@ namespace NightOwl
 
 	void StandardMaterial::Draw(Renderer& renderer)
 	{
-		auto mesh = renderer.GetMesh();
-		auto transform = renderer.GetGameObject().GetTransform();
+		const std::shared_ptr<Mesh> mesh = renderer.GetMesh();
+		Transform* transform = renderer.GetGameObject().GetTransform();
 
 		standardShader->Bind();
 		standardShader->SetUniformMat4F(transform->GetWorldMatrix(), "modelMatrix");

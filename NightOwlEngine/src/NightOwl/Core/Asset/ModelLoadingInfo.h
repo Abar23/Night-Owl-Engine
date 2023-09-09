@@ -3,6 +3,7 @@
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Component/Abstrtact/Renderer.h"
+#include "NightOwl/Animation/3D/Structures/Model.h"
 #include <string>
 #include <assimp/scene.h>
 
@@ -19,11 +20,9 @@ namespace NightOwl
 
 		const aiScene* scene;
 
-		std::shared_ptr<Renderer> renderer;
+		std::shared_ptr<Model> model;
 
 		std::vector<BoneWeight> boneWeights;
-
-		std::vector<GameObject> skeleton;
 
 		int numberOfMeshesProcessed = 0;
 	};

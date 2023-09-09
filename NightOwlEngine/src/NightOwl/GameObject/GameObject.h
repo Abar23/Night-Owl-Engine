@@ -54,7 +54,7 @@ namespace NightOwl
 
 		Scene* GetScene();
 
-		std::shared_ptr<GameObject> Clone();
+		std::shared_ptr<GameObject> Clone(Scene* currentScene = nullptr);
 
 		void Destroy();
 

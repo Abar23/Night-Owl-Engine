@@ -392,7 +392,7 @@ namespace NightOwl
 		return GetRotation().GetRotationMatrix().GetColumn(1);
 	}
 
-	void Transform::Clone(const Transform& tranformToClone)
+	void Transform::Clone(const Transform& tranformToClone, Scene* currentScene /* = nullptr */)
 	{
 		localModelMatrix = tranformToClone.localModelMatrix;
 		worldMatrix = tranformToClone.worldMatrix;
@@ -418,7 +418,7 @@ namespace NightOwl
 
 		for (auto& transform : tranformToClone.children)
 		{
-			auto clonedChild = transform->GetGameObject().Clone();
+			auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr);
 			children.push_back(clonedChild->GetTransform());
 		}
 	}

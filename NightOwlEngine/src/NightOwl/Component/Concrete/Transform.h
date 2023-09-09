@@ -83,7 +83,7 @@ namespace NightOwl
 
 		Vec3F GetUp();
 
-		void Clone(const Transform& transformToClone);
+		void Clone(const Transform& transformToClone, Scene* currentScene = nullptr);	
 
 		REFLECT()
 

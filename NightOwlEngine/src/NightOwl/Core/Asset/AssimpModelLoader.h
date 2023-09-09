@@ -1,11 +1,10 @@
 #pragma once
 
 #include "NightOwl/Component/Structures/Mesh.h"
+#include "ModelLoadingInfo.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include <string>
-
-#include "ModelLoadingInfo.h"
 
 namespace NightOwl
 {
@@ -16,8 +15,10 @@ namespace NightOwl
 	public:
 		static void LoadModel(const std::string& filePath);
 
+		static void LoadAnimation(const std::string& filePath);
+
 	private:
-		static Assimp::Importer modelImporter;
+		static Assimp::Importer assimpImporter;
 
 		static void ProcessNodes(ModelLoadingInfo& modelLoadingInfo);
 
@@ -27,6 +28,8 @@ namespace NightOwl
 
 		static void ProcessArmature(ModelLoadingInfo& modelLoadingInfo);
 
-		static bool HasBones(ModelLoadingInfo& modelLoadingInfo, const aiNode* assimpNode);
+		static void ProcessAnimation(const aiAnimation* assimpAnimation);
+
+		static bool HasBones(const ModelLoadingInfo& modelLoadingInfo);
 	};
 }

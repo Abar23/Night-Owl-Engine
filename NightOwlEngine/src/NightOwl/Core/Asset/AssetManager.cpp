@@ -34,6 +34,11 @@ namespace NightOwl
 		return modelRepository;
 	}
 
+	AssetRepository<Animation>& AssetManager::GetAnimationRepository()
+	{
+		return animationRepository;
+	}
+
 	stbi_uc* AssetManager::ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels)
 	{
 		stbi_set_flip_vertically_on_load(true);
@@ -153,5 +158,10 @@ namespace NightOwl
 	{
 		// call assimp model load and add mesh to the repository
 		AssimpModelLoader::LoadModel(filePath);
+	}
+
+	void AssetManager::LoadAnimation(const std::string& filePath)
+	{
+		AssimpModelLoader::LoadAnimation(filePath);
 	}
 }

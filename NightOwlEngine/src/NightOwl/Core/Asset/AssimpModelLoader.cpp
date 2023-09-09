@@ -5,24 +5,23 @@
 #include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
-#include <stack>
-
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/GameObject/GameObject.h"
-
+#include <stack>
 
 namespace NightOwl
 {
-	Assimp::Importer AssimpModelLoader::modelImporter;
+	Assimp::Importer AssimpModelLoader::assimpImporter;
 
 	void AssimpModelLoader::LoadModel(const std::string& filePath)
 	{
 		ModelLoadingInfo modelLoadingInfo;
 
 		modelLoadingInfo.filePath = filePath;
-		modelLoadingInfo.scene = modelImporter.ReadFile(modelLoadingInfo.filePath, aiProcess_Triangulate | aiProcess_PopulateArmatureData | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+		assimpImporter.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+		modelLoadingInfo.scene = assimpImporter.ReadFile(modelLoadingInfo.filePath, aiProcess_Triangulate | aiProcess_PopulateArmatureData | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 		modelLoadingInfo.name = Utility::StripFilePathToNameWithoutExtension(modelLoadingInfo.filePath);
 		modelLoadingInfo.directory = Utility::FilePathToDirectory(modelLoadingInfo.filePath);
 
@@ -34,27 +33,40 @@ namespace NightOwl
 		}
 	}
 
+	void AssimpModelLoader::LoadAnimation(const std::string& filePath)
+	{
+		const aiScene* scene = assimpImporter.ReadFile(filePath, aiProcess_Triangulate);
+
+		if (scene->mNumAnimations == 0)
+		{
+			return;
+		}
+
+		for (unsigned int animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
+		{
+			ProcessAnimation(scene->mAnimations[animationIndex]);
+		}
+	}
+
 	void AssimpModelLoader::ProcessNodes(ModelLoadingInfo& modelLoadingInfo)
 	{
-		const std::shared_ptr<Model> model = std::make_shared<Model>();
+		modelLoadingInfo.model = std::make_shared<Model>();
+
+		std::shared_ptr<Model> model = modelLoadingInfo.model;
 
 		const aiScene* scene = modelLoadingInfo.scene;
 
-		if(HasBones(modelLoadingInfo, scene->mRootNode->mChildren[0]))
+		if(HasBones(modelLoadingInfo))
 		{
-			modelLoadingInfo.renderer = std::make_shared<SkinnedMeshRenderer>();
+			model->renderer = std::make_shared<SkinnedMeshRenderer>();
 			ProcessArmature(modelLoadingInfo);
 		}
 		else
 		{
-			modelLoadingInfo.renderer = std::make_shared<MeshRenderer>();
+			model->renderer = std::make_shared<MeshRenderer>();
 		}
-
-		modelLoadingInfo.renderer->mesh = std::make_shared<Mesh>();
-		modelLoadingInfo.renderer->Remove();
-
-		model->skeleton.swap(modelLoadingInfo.skeleton);
-		model->renderer = modelLoadingInfo.renderer;
+		model->renderer->mesh = std::make_shared<Mesh>();
+		model->renderer->Remove();
 
 		for (int rootChildIndex = 0; rootChildIndex < scene->mRootNode->mNumChildren; ++rootChildIndex)
 		{
@@ -89,14 +101,14 @@ namespace NightOwl
 			}
 		}
 
-		modelLoadingInfo.renderer->mesh->ValidateMesh();
-		modelLoadingInfo.renderer->mesh->UploadMeshData();
+		model->renderer->mesh->ValidateMesh();
+		model->renderer->mesh->UploadMeshData();
 		AssetManagerLocator::GetAssetManager()->GetModelRepository().AddAsset(modelLoadingInfo.name, model);
 	}
 
 	void AssimpModelLoader::ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
-		std::shared_ptr<Mesh> modelMesh = modelLoadingInfo.renderer->mesh;
+		std::shared_ptr<Mesh> modelMesh = modelLoadingInfo.model->renderer->mesh;
 		if (modelLoadingInfo.numberOfMeshesProcessed > 0)
 		{
 			SubMeshData subMesh;
@@ -187,9 +199,9 @@ namespace NightOwl
 
 	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
-		std::shared_ptr<Mesh>& modelMesh = modelLoadingInfo.renderer->mesh;
+		std::shared_ptr<Mesh>& modelMesh = modelLoadingInfo.model->renderer->mesh;
 
-		modelLoadingInfo.boneWeights.resize(modelLoadingInfo.renderer->mesh->vertices.size());
+		modelLoadingInfo.boneWeights.resize(modelMesh->vertices.size());
 
 		for (int boneIndex = 0; boneIndex < assimpMesh->mNumBones; ++boneIndex)
 		{
@@ -241,13 +253,27 @@ namespace NightOwl
 		}
 
 		// adding one for the root node/bone
-		const int numberOfBones = scene->mMeshes[0]->mNumBones + 1;
+		int numberOfBones = 1;
 		const aiNode* armatureRoot = scene->mMeshes[0]->mBones[0]->mArmature;
+		std::stack<const aiNode*> armatureNodesForFindingDepth;
+		armatureNodesForFindingDepth.push(armatureRoot);
+		while (armatureNodesForFindingDepth.empty() == false)
+		{
+			const aiNode* armatureNode = armatureNodesForFindingDepth.top();
+			armatureNodesForFindingDepth.pop();
 
-		modelLoadingInfo.skeleton.resize(numberOfBones);
+			for (unsigned int armatureChildIndex = 0; armatureChildIndex < armatureNode->mNumChildren; ++armatureChildIndex)
+			{
+				numberOfBones++;
+
+				armatureNodesForFindingDepth.emplace(armatureNode->mChildren[armatureChildIndex]);
+			}
+		}
+
+		modelLoadingInfo.model->skeleton.resize(numberOfBones);
 
 		std::stack<std::pair<GameObject*, const aiNode*>> armatureNodes;
-		armatureNodes.emplace(modelLoadingInfo.skeleton.data(), armatureRoot);
+		armatureNodes.emplace(modelLoadingInfo.model->skeleton.data(), armatureRoot);
 
 		int processedGameObjects = 0;
 		while (armatureNodes.empty() == false)
@@ -256,12 +282,7 @@ namespace NightOwl
 			armatureNodes.pop();
 
 			armatureNodePair.first->SetName(armatureNodePair.second->mName.data);
-			ENGINE_LOG_INFO("Game Object Cloned: {0}", armatureNodePair.first->GetName());
-
-			if (armatureNodePair.first->GetName() == "ik_foot_root")
-			{
-				int i = 0;
-			}
+			ENGINE_LOG_INFO("Armature name: {0}", armatureNodePair.second->mName.data);
 
 			aiVector3D scale;
 			aiVector3D position;
@@ -277,12 +298,7 @@ namespace NightOwl
 			{
 				processedGameObjects++;
 
-				if (processedGameObjects == 67)
-				{
-					int i = 0;
-				}
-
-				GameObject* childGameObject = &modelLoadingInfo.skeleton.at(processedGameObjects);
+				GameObject* childGameObject = &modelLoadingInfo.model->skeleton.at(processedGameObjects);
 				childGameObject->GetTransform()->SetParent(parentGameObjectTransform);
 
 				armatureNodes.emplace(childGameObject, armatureNodePair.second->mChildren[armatureChildIndex]);
@@ -290,7 +306,24 @@ namespace NightOwl
 		}
 	}
 
-	bool AssimpModelLoader::HasBones(ModelLoadingInfo& modelLoadingInfo, const aiNode* assimpNode)
+	void AssimpModelLoader::ProcessAnimation(const aiAnimation* assimpAnimation)
+	{
+		const std::shared_ptr<Animation> animation = std::make_shared<Animation>();
+
+		animation->SetDuration(assimpAnimation->mDuration);
+		animation->SetName(assimpAnimation->mName.data);
+		animation->SetTicksPerSecond(assimpAnimation->mTicksPerSecond);
+
+		for (unsigned int channelIndex = 0; channelIndex < assimpAnimation->mNumChannels; ++channelIndex)
+		{
+			aiNodeAnim* animationChannel = assimpAnimation->mChannels[channelIndex];
+			animation->GetBoneKeyFramesMap().emplace(animationChannel->mNodeName.data, BoneKeyFrames(animationChannel));
+		}
+
+		AssetManagerLocator::GetAssetManager()->GetAnimationRepository().AddAsset(animation->GetName(), animation);
+	}
+
+	bool AssimpModelLoader::HasBones(const ModelLoadingInfo& modelLoadingInfo)
 	{
 		const aiScene* scene = modelLoadingInfo.scene;
 		if (scene == nullptr)
@@ -298,13 +331,17 @@ namespace NightOwl
 			return false;
 		}
 
-		if (assimpNode->mNumMeshes == 0)
+		for (unsigned int childIndex = 0; childIndex < scene->mRootNode->mNumChildren; ++childIndex)
 		{
-			return false;
+			const aiNode* child = scene->mRootNode->mChildren[childIndex];
+			if (child->mNumMeshes > 0)
+			{
+				const unsigned int childMeshIndex = child->mMeshes[0];
+
+				return scene->mMeshes[childMeshIndex]->HasBones();
+			}
 		}
 
-		const aiMesh* baseMesh = scene->mMeshes[assimpNode->mMeshes[0]];
-
-		return baseMesh->HasBones();
+		return false;
 	}
 }

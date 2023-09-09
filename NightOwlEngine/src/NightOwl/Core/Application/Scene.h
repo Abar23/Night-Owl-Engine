@@ -34,6 +34,8 @@ namespace NightOwl
 
 		GameObject& AddGameObject(const std::string& name);
 
+		GameObject& AddCloneOfGameObject(GameObject& gameObject);
+
 		//GameObject& AddArchetype(const std::string& archetypeName, const std::string& name);
 
 		void RemoveGameObject(const GameObject& gameObject);

@@ -44,6 +44,13 @@ namespace NightOwl
 		return *gameObject;
 	}
 
+	GameObject& Scene::AddCloneOfGameObject(GameObject& gameObject)
+	{
+		std::shared_ptr<GameObject> clone = gameObject.Clone(this);
+		SetDirtyFlag();
+		return *clone;
+	}
+
 	//GameObject& Scene::AddArchetype(const std::string& archetypeName, const std::string& name)
 	//{
 	//	auto gameObject = ArchetypeSystemLocator::GetArchetypeSystem()->GetArchetype(archetypeName);
@@ -184,7 +191,7 @@ namespace NightOwl
 	void Scene::AddClone(const std::shared_ptr<GameObject>& clone)
 	{
 		clone->id = idCounter;
-		gameObjectsList.insert({ idCounter, clone });
+		gameObjectsList.emplace(idCounter, clone);
 		idCounter++;
 	}
 }
