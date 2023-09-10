@@ -26,12 +26,6 @@ namespace NightOwl
 	private:
 		float animationTime;
 
-		unsigned int currentKeyPositionIndex;
-
-		unsigned int currentKeyScaleIndex;
-
-		unsigned int currentKeyRotationIndex;
-
 		Vec3F finalPosition;
 
 		Vec3F finalScale;
@@ -52,16 +46,16 @@ namespace NightOwl
 
 		float GetScaleFactor(float previousTimeStamp, float nextTimeStamp, float animationTime);
 
-		void UpdateKeyPositionIndex();
+		int GetKeyPositionIndex();
 
-		void UpdateKeyScaleIndex();
+		int GetKeyScaleIndex();
 
-		void UpdateKeyRotationIndex();
+		int GetKeyRotationIndex();
 
-		Vec3F InterpolateKeyPosition();
+		void InterpolateKeyPosition();
 
-		Vec3F InterpolateKeyScale();
+		void InterpolateKeyScale();
 
-		QuatF InterpolateKeyRotation();
+		void InterpolateKeyRotation();
 	};
 }

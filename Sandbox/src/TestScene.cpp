@@ -1,5 +1,6 @@
 #include "TestScene.h"
 
+#include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
@@ -15,13 +16,14 @@ void TestScene::Init()
 {
 	auto* assetManager = NightOwl::AssetManagerLocator::GetAssetManager();
 
-	assetManager->LoadModel("./assets/Walking.fbx");
-	assetManager->LoadAnimation("./assets/Walking.fbx");
+	assetManager->LoadModel("./assets/Crouch Stop Walking.fbx");
+	assetManager->LoadAnimation("./assets/Crouch Stop Walking.fbx");
 
-	auto model = assetManager->GetModelRepository().GetAsset("Walking");
+	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Crouch Stop Walking");
+	NightOwl::Animation* animation = assetManager->GetAnimationRepository().GetAsset("mixamo.com");
 
-	auto& rootGameObject = AddGameObject("Walking");
-	auto renderer = rootGameObject.AddComponent<NightOwl::MeshRenderer>();
+	auto& rootGameObject = AddGameObject("Crouch Stop Walking");
+	auto* renderer = rootGameObject.AddComponent<NightOwl::MeshRenderer>();
 
 	// Make sure mesh gets a copy
 	renderer->SetMesh(model->renderer->GetMesh());
@@ -29,6 +31,12 @@ void TestScene::Init()
 	renderer->SetMaterial(model->renderer->GetMaterial());
 	NightOwl::GameObject& skeleton = AddCloneOfGameObject(model->skeleton[0]);
 	skeleton.GetTransform()->SetParent(rootGameObject.GetTransform());
+
+	auto* animator = rootGameObject.AddComponent<NightOwl::Animator>();
+	animator->AddAnimation(animation);
+	animator->SetCurrentAnimation("mixamo.com");
+	animator->SetSkeleton(skeleton.GetTransform());
+	animator->Play();
 
 	// modelMesh->SetColorPerVertex({0.0f, 255.0f, 0.0f});
 	// NightOwl::GameObject& backpack = AddGameObject("backpack");
@@ -49,7 +57,7 @@ void TestScene::Init()
 
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
 	mainCameraGameObject.AddComponent<NightOwl::Camera>();
-	mainCameraGameObject.GetTransform()->Translate({ 0.0f, 100.0f, 100.0f }, NightOwl::Space::World);
+	mainCameraGameObject.GetTransform()->Translate({ 0.0f, 100.0f, 325.0f }, NightOwl::Space::World);
 }
 
 void TestScene::Reset()

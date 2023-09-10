@@ -22,8 +22,6 @@ namespace NightOwl
 
 		std::shared_ptr<Model> model;
 
-		std::vector<BoneWeight> boneWeights;
-
 		int numberOfMeshesProcessed = 0;
 	};
 }

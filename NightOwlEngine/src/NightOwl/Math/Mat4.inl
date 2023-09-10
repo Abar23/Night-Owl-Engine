@@ -10,7 +10,12 @@ namespace NightOwl
 	template <typename T>
 	Mat4<T>::Mat4()
 		:	data{ 0 }
-	{ }
+	{
+		data[0][0] = 1.0f;
+		data[1][1] = 1.0f;
+		data[2][2] = 1.0f;
+		data[3][3] = 1.0f;
+	}
 
 	template<typename T>
 	Mat4<T>::Mat4(std::initializer_list<T> args)

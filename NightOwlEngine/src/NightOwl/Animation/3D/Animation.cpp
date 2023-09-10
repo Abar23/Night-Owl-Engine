@@ -10,7 +10,7 @@ namespace NightOwl
 	{
 	}
 
-	float Animation::Duration() const
+	float Animation::GetDuration() const
 	{
 		return duration;
 	}
@@ -40,9 +40,14 @@ namespace NightOwl
 		this->name = name;
 	}
 
-	BoneKeyFrames& Animation::GetBoneKeyFrames(const std::string& boneName)
+	BoneKeyFrames* Animation::GetBoneKeyFrames(const std::string& boneName)
 	{
-		return boneKeyFramesMap.at(boneName);
+		if (boneKeyFramesMap.contains(boneName) == false)
+		{
+			return nullptr;
+		}
+
+		return &boneKeyFramesMap.at(boneName);
 	}
 
 	std::map<std::string, BoneKeyFrames>& Animation::GetBoneKeyFramesMap()

@@ -44,7 +44,7 @@ namespace NightOwl
 		GL_CALL(glNamedBufferData, vertexBufferId, vertexDataSize, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	void OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize)
+	void OpenGlVertexBuffer::OverwriteVertexBufferDataAtIndex(int index, const void* vertexData, unsigned int vertexDataSize, unsigned customDataSize)
 	{
 		ENGINE_ASSERT(index < layout.GetBufferDataDefinitions().size(), "Vertex buffer does not contain a vertex buffer data definition at index {0}", index);
 
@@ -60,6 +60,9 @@ namespace NightOwl
 
 		const VertexBufferData& data = layout.GetBufferDataDefinitions()[index];
 
+		// TODO: Think of better method than custom data size
+		unsigned int dataSize = customDataSize > 0 ? customDataSize : data.GetSizeofData();
+
 		unsigned int offset = data.GetOffset();
 
 		const char* byteVertexDataPointerBegin = static_cast<const char*>(vertexData);
@@ -67,8 +70,8 @@ namespace NightOwl
 
 		while (byteVertexDataPointerBegin < byteVertexDataPointerEnd)
 		{
-			GL_CALL(glNamedBufferSubData, vertexBufferId, offset, data.GetSizeofData(), byteVertexDataPointerBegin);
-			byteVertexDataPointerBegin += data.GetSizeofData();
+			GL_CALL(glNamedBufferSubData, vertexBufferId, offset, dataSize, byteVertexDataPointerBegin);
+			byteVertexDataPointerBegin += dataSize;
 			offset += layout.GetDataPerVertex();
 		}
 	}

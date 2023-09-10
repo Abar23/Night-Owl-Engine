@@ -80,7 +80,16 @@ namespace NightOwl
 			if (openGlDataType > 0)
 			{
 				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, data.GetAttributeLocation(), 0);
-				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), openGlDataType, data.GetNormalize(), accumulativeOffset);
+
+				if (openGlDataType == GL_FLOAT)
+				{
+					GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), openGlDataType, data.GetNormalize(), accumulativeOffset);
+				}
+				else
+				{
+					GL_CALL(glVertexArrayAttribIFormat, vertexArrayObjectId, data.GetAttributeLocation(), data.GetNumberOfComponents(), openGlDataType, accumulativeOffset);
+				}
+
 				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, data.GetAttributeLocation());
 				accumulativeOffset += data.GetSizeofData();
 			}

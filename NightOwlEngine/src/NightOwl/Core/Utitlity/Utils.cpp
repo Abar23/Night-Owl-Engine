@@ -81,7 +81,7 @@ namespace NightOwl::Utility
 	{
 		Mat4F matrix;
 
-		matrix.SetRow(0, { assimpMatrix.a1, assimpMatrix.a2, assimpMatrix.a3, assimpMatrix.a4});
+		matrix.SetRow(0, { assimpMatrix.a1, assimpMatrix.a2, assimpMatrix.a3, assimpMatrix.a4 });
 		matrix.SetRow(1, { assimpMatrix.b1, assimpMatrix.b2, assimpMatrix.b3, assimpMatrix.b4 });
 		matrix.SetRow(2, { assimpMatrix.c1, assimpMatrix.c2, assimpMatrix.c3, assimpMatrix.c4 });
 		matrix.SetRow(3, { assimpMatrix.d1, assimpMatrix.d2, assimpMatrix.d3, assimpMatrix.d4 });

@@ -23,10 +23,14 @@ namespace NightOwl
 
 		void SetAlpha(float alpha) override;
 
+		void SetFinalBoneMatrices(std::vector<Mat4F>& finalBoneMatrices) override;
+
 	private:
 		IShader* standardShader;
 
 		ITexture2D* diffuseTexture;
+
+		std::vector<Mat4F> finalBoneMatrices;
 
 		float alpha;
 	};

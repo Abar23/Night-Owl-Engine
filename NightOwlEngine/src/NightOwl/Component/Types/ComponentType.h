@@ -15,7 +15,8 @@ namespace NightOwl
 		AABBBoxCollider2D,
 		AudioListener,
 		AudioSource,
-		OwlBehavior
+		OwlBehavior,
+		Animator
 	};
 
 	inline std::string ComponentTypeToString(ComponentType type)
@@ -42,6 +43,9 @@ namespace NightOwl
 
 		case ComponentType::OwlBehavior:
 			return std::string{ "OwlBehavior" };
+
+		case ComponentType::Animator:
+			return std::string{ "Animator" };
 
 		default:
 			return std::string{ "Unknown Component" };

@@ -3,6 +3,7 @@
 #include "NightOwlEngine.h"
 #include "NightOwlEngineConstants.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
+#include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
@@ -39,6 +40,7 @@ namespace NightOwl
 
 		owlBehaviorManager = std::make_shared<OwlBehaviorManager>();
 		meshRendererSystem = std::make_shared<MeshRendererSystem>();
+		animatorSystem = std::make_shared<AnimatorSystem>();
 		physicsEngine2D = std::make_shared<PhysicsEngine2D>();
 		audioSystem = std::make_shared<AudioSystem>();
 		sceneManager = std::make_shared<SceneManager>();
@@ -46,6 +48,7 @@ namespace NightOwl
 
 		OwlBehaviorManagerLocator::Provide(owlBehaviorManager.get());
 		MeshRendererSystemLocator::Provide(meshRendererSystem.get());
+		AnimatorSystemLocator::Provide(animatorSystem.get());
 		PhysicsEngine2DLocator::Provide(physicsEngine2D.get());
 		SceneManagerLocator::Provide(sceneManager.get());
 		AssetManagerLocator::Provide(assetManger.get());
@@ -80,6 +83,8 @@ namespace NightOwl
 				sceneManager->Update();
 
 				audioSystem->Update();
+
+				animatorSystem->FixedUpdate();
 			}
 
 			if (Time::ShouldRenderFrame())
@@ -90,6 +95,8 @@ namespace NightOwl
 				owlBehaviorManager->Update();
 
 				sceneManager->Update();
+
+				animatorSystem->Update();
 
 				meshRendererSystem->Update();
 

@@ -22,5 +22,7 @@ namespace NightOwl
 		virtual void Draw(Renderer& renderer) = 0;
 
 		virtual void Draw(Collider2D& collider) = 0;
+
+		virtual void SetFinalBoneMatrices(std::vector<Mat4F>& finalBoneMatrices) = 0;
 	};
 }

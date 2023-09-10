@@ -110,6 +110,7 @@ namespace NightOwl
 		T xSquared = x * x;
 		T ySquared = y * y;
 		T zSquared = z * z;
+		T wSquared = w * w;
 		T xy = x * y;
 		T xz = x * z;
 		T yz = y * z;
@@ -117,17 +118,30 @@ namespace NightOwl
 		T wy = w * y;
 		T wz = w * z;
 
-		matrix(0, 0) = static_cast<T>(1) - static_cast<T>(2) * (ySquared + zSquared);
+		// matrix(0, 0) = static_cast<T>(1) - static_cast<T>(2) * (ySquared + zSquared);
+		// matrix(1, 0) = static_cast<T>(2) * (xy + wz);
+		// matrix(2, 0) = static_cast<T>(2) * (xz - wy);
+		//
+		// matrix(0, 1) = static_cast<T>(2) * (xy - wz);
+		// matrix(1, 1) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + zSquared);
+		// matrix(2, 1) = static_cast<T>(2) * (yz + wx);
+		//
+		// matrix(0, 2) = static_cast<T>(2) * (xz + wy);
+		// matrix(1, 2) = static_cast<T>(2) * (yz - wx);
+		// matrix(2, 2) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + ySquared);
+
+		matrix(0, 0) = xSquared - ySquared - zSquared + wSquared;
+		matrix(1, 1) = -xSquared + ySquared - zSquared + wSquared;
+		matrix(2, 2) = -xSquared - ySquared + zSquared + wSquared;
+
 		matrix(1, 0) = static_cast<T>(2) * (xy + wz);
-		matrix(2, 0) = static_cast<T>(2) * (xz - wy);
-
 		matrix(0, 1) = static_cast<T>(2) * (xy - wz);
-		matrix(1, 1) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + zSquared);
-		matrix(2, 1) = static_cast<T>(2) * (yz + wx);
 
+		matrix(2, 0) = static_cast<T>(2) * (xz - wy);
 		matrix(0, 2) = static_cast<T>(2) * (xz + wy);
+
+		matrix(2, 1) = static_cast<T>(2) * (yz + wx);
 		matrix(1, 2) = static_cast<T>(2) * (yz - wx);
-		matrix(2, 2) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + ySquared);
 
 		return matrix;
 	}
@@ -335,17 +349,19 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
-
+		float dot = Quaternion<T>::Dot(leftQuaternion.GetNormalize(), rightQuaternion.GetNormalize());
+		
 		if (dot > DOT_THRESHOLD)
 		{
 			return Nlerp(leftQuaternion, rightQuaternion, t);
 		}
-
+		
 		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));
 		T theta = std::acos(dot) * t; // Angle between leftQuaternion and new quaternion at t
-		Quaternion<T> nlerpedQuaternion = Nlerp(leftQuaternion, rightQuaternion, dot);
-		return leftQuaternion * std::cos(theta) + nlerpedQuaternion * std::sin(theta);
+		Quaternion<T> newQuaternion = rightQuaternion - leftQuaternion * dot;
+		newQuaternion.Normalize();
+
+		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);
 	}
 
 	template <typename T>

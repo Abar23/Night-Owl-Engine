@@ -2,6 +2,7 @@
 
 #include "IApplication.h"
 #include "SceneManager.h"
+#include "NightOwl/Animation/3D/System/AnimatorSystem.h"
 #include "NightOwl/Audio/AudioSystem.h"
 #include "NightOwl/Behavior/OwlBehaviorManager.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
@@ -35,6 +36,8 @@ namespace NightOwl
 		std::shared_ptr<OwlBehaviorManager> owlBehaviorManager;
 
 		std::shared_ptr<MeshRendererSystem> meshRendererSystem;
+
+		std::shared_ptr<AnimatorSystem> animatorSystem;
 
 		//std::shared_ptr<ArchetypeSystem> archetypeSystem;
 

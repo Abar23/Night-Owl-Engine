@@ -51,7 +51,7 @@ namespace NightOwl
 
 		Transform& GetParent();
 
-		void SetParent(Transform* parentTransform);
+		void SetParent(Transform* parentTransform, bool shouldSetInverse = true);
 
 		Transform* RemoveParent();
 

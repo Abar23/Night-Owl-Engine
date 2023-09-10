@@ -134,10 +134,6 @@ namespace NightOwl
 
 	AudioClip* AssetManager::LoadAudioClip(const std::string& filePath)
 	{
-		//FMOD::Sound* sound = AudioSystemLocator::GetAudioSystem()->CreateSound(filePath, FMOD_DEFAULT).GetPointer();
-
-		//ENGINE_ASSERT(sound != nullptr, "Failed to load sound from file path: {0}", filePath);
-
 		const std::string audioClipName = Utility::StripFilePathToName(filePath);
 
 		if (audioClipRepository.HasAsset(audioClipName))
@@ -156,12 +152,24 @@ namespace NightOwl
 
 	void AssetManager::LoadModel(const std::string& filePath)
 	{
+		const std::string modelName = Utility::StripFilePathToNameWithoutExtension(filePath);
+		if (modelRepository.HasAsset(modelName))
+		{
+			return;
+		}
+
 		// call assimp model load and add mesh to the repository
 		AssimpModelLoader::LoadModel(filePath);
 	}
 
 	void AssetManager::LoadAnimation(const std::string& filePath)
 	{
+		const std::string animationName = Utility::StripFilePathToNameWithoutExtension(filePath);
+		if (modelRepository.HasAsset(animationName))
+		{
+			return;
+		}
+
 		AssimpModelLoader::LoadAnimation(filePath);
 	}
 }

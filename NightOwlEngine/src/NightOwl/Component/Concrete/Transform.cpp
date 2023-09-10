@@ -170,13 +170,18 @@ namespace NightOwl
 		return *parent;
 	}
 
-	void Transform::SetParent(Transform* parentTransform)
+	void Transform::SetParent(Transform* parentTransform, bool shouldSetInverse /* = false */)
 	{
 		if(parentTransform != nullptr && parentTransform != parent)
 		{
 			parent = parentTransform;
 			parent->SetChild(this);
-			inverseOfOriginalParentLocalModelMatrix = parent->GetWorldMatrix().GetInverse();
+
+			if (shouldSetInverse)
+			{
+				inverseOfOriginalParentLocalModelMatrix = parent->GetWorldMatrix().GetInverse();
+			}
+
 			for (const auto& childTransform : parentTransform->children)
 			{
 				childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());

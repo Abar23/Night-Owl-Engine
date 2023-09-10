@@ -150,6 +150,11 @@ namespace NightOwl
 		return subMeshes;
 	}
 
+	const std::map<std::string, BoneInfo>& Mesh::GetBoneInfoMap()
+	{
+		return boneInfoMap;
+	}
+
 	void Mesh::Clear()
 	{
 		triangles.clear();
@@ -159,6 +164,7 @@ namespace NightOwl
 		tangents.clear();
 		bitangents.clear();
 		colors.clear();
+		boneWeights.clear();
 
 		isValid = false;
 	}
@@ -248,11 +254,11 @@ namespace NightOwl
 			indexOfVertexBufferData++;
 		}
 
-		// Need to test. Don't think this will work!!!!
+		// TODO: Does work, but should be cleaner
 		if (!boneWeights.empty())
 		{
 			unsigned int boneWeightsVertexDataSize = VertexDataTypeToDataTypeSize(VertexDataType::VectorInt4) + VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat4);
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size());
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size(), boneWeightsVertexDataSize);
 		}
 
 		vertexArrayObject->SetupVertexBufferAttributes();
@@ -330,6 +336,15 @@ namespace NightOwl
 
 	void Mesh::UploadboneWeights()
 	{
+		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("BoneIds");
+		if (index >= 0)
+		{
+			unsigned int boneWeightsVertexDataSize = VertexDataTypeToDataTypeSize(VertexDataType::VectorInt4) + VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat4);
+			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size());
+			return;
+		}
+
+		UploadMeshData();
 	}
 
 

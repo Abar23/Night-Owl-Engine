@@ -60,6 +60,8 @@ namespace NightOwl
 
 		const std::vector<SubMeshData>& GetSubMeshes();
 
+		const std::map<std::string, BoneInfo>& GetBoneInfoMap();
+
 		void Clear();
 
 		void UploadMeshData();

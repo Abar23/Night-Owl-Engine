@@ -12,7 +12,7 @@ namespace NightOwl
 	public:
 		Animation();
 
-		float Duration() const;
+		float GetDuration() const;
 
 		void SetDuration(float duration);
 
@@ -24,7 +24,7 @@ namespace NightOwl
 
 		void SetName(const std::string& name);
 
-		BoneKeyFrames& GetBoneKeyFrames(const std::string& boneName);
+		BoneKeyFrames* GetBoneKeyFrames(const std::string& boneName);
 
 		std::map<std::string, BoneKeyFrames>& GetBoneKeyFramesMap();
 

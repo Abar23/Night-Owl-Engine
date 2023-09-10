@@ -3,13 +3,11 @@
 #include "BoneKeyFrames.h"
 
 #include "NightOwl/Core/Utitlity/Utils.h"
+#include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 
 namespace NightOwl
 {
 	BoneKeyFrames::BoneKeyFrames(const aiNodeAnim* assimpAnimationNode)
-		: currentKeyPositionIndex(0),
-		  currentKeyScaleIndex(0),
-		  currentKeyRotationIndex(0)
 	{
 		FillKeyPositionsData(assimpAnimationNode);
 		FillKeyScalesData(assimpAnimationNode);
@@ -20,9 +18,9 @@ namespace NightOwl
 	{
 		this->animationTime = animationTime;
 
-		finalPosition = InterpolateKeyPosition();
-		finalScale = InterpolateKeyScale();
-		finalRotation = InterpolateKeyRotation();
+		InterpolateKeyPosition();
+		InterpolateKeyScale();
+		InterpolateKeyRotation();
 	}
 
 	const Vec3F& BoneKeyFrames::GetFinalPosition()
@@ -81,105 +79,102 @@ namespace NightOwl
 
 	float BoneKeyFrames::GetScaleFactor(float previousTimeStamp, float nextTimeStamp, float animationTime)
 	{
-		const float midWayLength = nextTimeStamp - animationTime;
+		const float midWayLength = animationTime - previousTimeStamp;
 		const float timeDifferenceBetweenFrames = nextTimeStamp - previousTimeStamp;
 
 		return midWayLength / timeDifferenceBetweenFrames;
 	}
 
-	void BoneKeyFrames::UpdateKeyPositionIndex()
+	int BoneKeyFrames::GetKeyPositionIndex()
 	{
-		if (currentKeyPositionIndex > keyPositions.size() - 1)
+		for (unsigned int keyPositionIndex = 0; keyPositionIndex < keyPositions.size() - 1; ++keyPositionIndex)
 		{
-			currentKeyPositionIndex = 0;
+			if (animationTime < keyPositions[keyPositionIndex + 1].timeStamp)
+			{
+				return keyPositionIndex;
+			}
 		}
 
-		if (animationTime > keyPositions[currentKeyPositionIndex + 1].timeStamp)
-		{
-			currentKeyPositionIndex++;
-		}
+		return 0;
 	}
 
-	void BoneKeyFrames::UpdateKeyScaleIndex()
+	int BoneKeyFrames::GetKeyScaleIndex()
 	{
-		if (currentKeyScaleIndex > keyScales.size() - 1)
+		for (unsigned int keyScaleIndex = 0; keyScaleIndex < keyScales.size() - 1; ++keyScaleIndex)
 		{
-			currentKeyScaleIndex = 1;
+			if (animationTime < keyScales[keyScaleIndex + 1].timeStamp)
+			{
+				return keyScaleIndex;
+			}
 		}
 
-		if (animationTime > keyScales[currentKeyScaleIndex + 1].timeStamp)
-		{
-			currentKeyScaleIndex++;
-		}
+		return 0;
 	}
 
-	void BoneKeyFrames::UpdateKeyRotationIndex()
+	int BoneKeyFrames::GetKeyRotationIndex()
 	{
-		if (currentKeyRotationIndex > keyRotations.size() - 1)
+		for (unsigned int keyRotationIndex = 0; keyRotationIndex < keyRotations.size() - 1; ++keyRotationIndex)
 		{
-			currentKeyRotationIndex = 1;
+			if (animationTime < keyRotations[keyRotationIndex + 1].timeStamp)
+			{
+				 return keyRotationIndex;
+			}
 		}
 
-		if (animationTime > keyRotations[currentKeyRotationIndex + 1].timeStamp)
-		{
-			currentKeyRotationIndex++;
-		}
+		return 0;
 	}
 
-	Vec3F BoneKeyFrames::InterpolateKeyPosition()
+	void BoneKeyFrames::InterpolateKeyPosition()
 	{
 		if (keyPositions.size() == 1)
 		{
-			return keyPositions[0].position;
+			finalPosition = keyPositions[0].position;
+			return;
 		}
 
-		UpdateKeyPositionIndex();
+		const int index = GetKeyPositionIndex();
 
-		const KeyPosition& previousKey = keyPositions.at(currentKeyPositionIndex);
-		const KeyPosition& nextKey = keyPositions.at(currentKeyPositionIndex + 1);
-
+		const KeyPosition& previousKey = keyPositions.at(index);
+		const KeyPosition& nextKey = keyPositions.at(index + 1);
+		
 		const float scaleFactor = GetScaleFactor(previousKey.timeStamp, nextKey.timeStamp, animationTime);
 
-		Vec3F finalPosition = Vec3F::Lerp(previousKey.position, nextKey.position, scaleFactor);
-
-		return finalPosition;
+		finalPosition = Vec3F::Lerp(previousKey.position, nextKey.position, scaleFactor);
 	}
 
-	Vec3F BoneKeyFrames::InterpolateKeyScale()
+	void BoneKeyFrames::InterpolateKeyScale()
 	{
 		if (keyScales.size() == 1)
 		{
-			return keyScales[0].scale;
+			finalScale = keyScales[0].scale;
+			return;
 		}
 
-		UpdateKeyScaleIndex();
+		const int index = GetKeyScaleIndex();
 
-		const KeyScale& previousKey = keyScales.at(currentKeyPositionIndex);
-		const KeyScale& nextKey = keyScales.at(currentKeyPositionIndex + 1);
-
+		const KeyScale& previousKey = keyScales.at(index);
+		const KeyScale& nextKey = keyScales.at(index + 1);
+		
 		const float scaleFactor = GetScaleFactor(previousKey.timeStamp, nextKey.timeStamp, animationTime);
 
-		Vec3F finalScale = Vec3F::Lerp(previousKey.scale, nextKey.scale, scaleFactor);
-
-		return finalScale;
+		finalScale = Vec3F::Lerp(previousKey.scale, nextKey.scale, scaleFactor);
 	}
 
-	QuatF BoneKeyFrames::InterpolateKeyRotation()
+	void BoneKeyFrames::InterpolateKeyRotation()
 	{
 		if (keyRotations.size() == 1)
 		{
-			return keyRotations[0].orientation;
+			finalRotation = keyRotations[0].orientation;
+			return;
 		}
 
-		UpdateKeyRotationIndex();
+		const int index = GetKeyRotationIndex();
 
-		const KeyRotation& previousKey = keyRotations.at(currentKeyPositionIndex);
-		const KeyRotation& nextKey = keyRotations.at(currentKeyPositionIndex + 1);
+		const KeyRotation& previousKey = keyRotations.at(index);
+		const KeyRotation& nextKey = keyRotations.at(index + 1);
 
 		const float scaleFactor = GetScaleFactor(previousKey.timeStamp, nextKey.timeStamp, animationTime);
 
-		QuatF finalRotation = QuatF::Slerp(previousKey.orientation, nextKey.orientation, scaleFactor);
-
-		return finalRotation;
+		finalRotation = QuatF::Slerp(previousKey.orientation, nextKey.orientation, scaleFactor);
 	}
 }

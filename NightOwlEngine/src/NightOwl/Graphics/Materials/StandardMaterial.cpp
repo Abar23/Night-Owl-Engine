@@ -49,6 +49,9 @@ namespace NightOwl
 			standardShader->SetUniformInt(0, "isInputTextureSet");
 		}
 
+		for (int i = 0; i < finalBoneMatrices.size(); ++i)
+			standardShader->SetUniformMat4F(finalBoneMatrices[i], "finalBonesMatrices[" + std::to_string(i) + "]");
+
 		mesh->Bind();
 		const std::vector<SubMeshData>& subMeshDatas = mesh->GetSubMeshes();
 		if (subMeshDatas.empty())
@@ -82,6 +85,11 @@ namespace NightOwl
 	void StandardMaterial::SetAlpha(float alpha)
 	{
 		this->alpha = alpha;
+	}
+
+	void StandardMaterial::SetFinalBoneMatrices(std::vector<Mat4F>& finalBoneMatrices)
+	{
+		this->finalBoneMatrices.swap(finalBoneMatrices);
 	}
 
 	void StandardMaterial::SetTexture(ITexture2D* texture2D)
