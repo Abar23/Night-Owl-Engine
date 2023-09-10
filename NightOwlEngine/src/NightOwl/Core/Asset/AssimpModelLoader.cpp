@@ -178,6 +178,16 @@ namespace NightOwl
 			}
 			modelMesh->bitangents.push_back(bitangent);
 			modelMesh->tangents.push_back(tangent);
+
+			Vec3F color;
+			if (assimpMesh->HasVertexColors(vertexIndex))
+			{
+				const aiColor4D* assimpColor = assimpMesh->mColors[0];
+				color.x = assimpColor->r;
+				color.x = assimpColor->g;
+				color.x = assimpColor->b;
+			}
+			modelMesh->colors.push_back(color);
 		}
 
 		for (unsigned int faceIndicesIndex = 0; faceIndicesIndex < assimpMesh->mNumFaces; ++faceIndicesIndex)

@@ -349,7 +349,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		float dot = Quaternion<T>::Dot(leftQuaternion.GetNormalize(), rightQuaternion.GetNormalize());
+		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 		
 		if (dot > DOT_THRESHOLD)
 		{
@@ -360,7 +360,7 @@ namespace NightOwl
 		T theta = std::acos(dot) * t; // Angle between leftQuaternion and new quaternion at t
 		Quaternion<T> newQuaternion = rightQuaternion - leftQuaternion * dot;
 		newQuaternion.Normalize();
-
+		
 		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);
 	}
 

@@ -4,7 +4,7 @@ out vec4 FragColor;
 
 in vertexData
 {
-    vec3 materialPositon;
+    vec3 materialPosition;
     vec3 materialColor;
     vec2 materialUvs;
     vec3 materialNormals;

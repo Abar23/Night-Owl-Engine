@@ -12,9 +12,13 @@ layout (location = 7) in vec4 boneWeights;
 uniform mat4 modelMatrix;
 uniform mat4 viewProjectionMatrix;
 
+const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 4;
+uniform mat4 finalBonesMatrices[MAX_BONES];
+
 out vertexData
 {
-    vec3 materialPositon;
+    vec3 materialPosition;
     vec3 materialColor;
     vec2 materialUvs;
     vec3 materialNormals;
@@ -26,7 +30,7 @@ out vertexData
 
 void main(void)
 {
-    outVertexData.materialPositon = materialPosition;
+    outVertexData.materialPosition = materialPosition;
     outVertexData.materialColor = materialColor;
     outVertexData.materialUvs = materialUvs;
     outVertexData.materialNormals = materialNormals;
@@ -35,5 +39,22 @@ void main(void)
     outVertexData.materialBoneIds = boneIds;
     outVertexData.materialBoneWeights = boneWeights;
 
-    gl_Position = viewProjectionMatrix * modelMatrix * vec4(materialPosition, 1.0);
+    vec4 totalPosition = vec4(0.0);
+    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
+    {
+        if(boneIds[i] == -1) 
+        {
+            continue;
+        }
+        if(boneIds[i] >= MAX_BONES) 
+        {
+            totalPosition = vec4(materialPosition, 1.0);
+            break;
+        }
+
+        vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(materialPosition, 1.0);
+        totalPosition += localPosition * boneWeights[i];
+    }
+
+    gl_Position = viewProjectionMatrix * modelMatrix * totalPosition;
 } 

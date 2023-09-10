@@ -70,7 +70,7 @@ namespace NightOwl
 		{
 			return;
 		}
-
+		
 		auto& bonInfoMap = renderer->GetMesh()->GetBoneInfoMap();
 		std::vector<Mat4F> finalBoneOffsetMatrices(100);
 
@@ -91,7 +91,7 @@ namespace NightOwl
 				skeletonTransform->SetLocalRotation(boneKeyFrames->GetFinalRotation());
 
 				const auto& boneName = skeletonTransform->GetGameObject().GetName();
-				const BoneInfo& boneInfo = bonInfoMap.at(boneName);
+				BoneInfo boneInfo = bonInfoMap.at(boneName);
 				const Mat4F finalBoneOffsetMatrix = skeletonTransform->GetWorldMatrix() * boneInfo.offsetMatrix;
 				finalBoneOffsetMatrices[boneInfo.id] = finalBoneOffsetMatrix;
 			}
