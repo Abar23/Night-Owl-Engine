@@ -23,6 +23,8 @@ namespace NightOwl
 		unsigned int GetTextureId() override;
 
 	private:
+		unsigned long long textureHandle;
+
 		unsigned int textureId;
 
 		int height;

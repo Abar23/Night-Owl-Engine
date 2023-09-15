@@ -350,10 +350,17 @@ namespace NightOwl
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
 		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
-		
+
+		Quaternion<T> newRightQuaternion = rightQuaternion;
+		if (dot < static_cast<T>(0))
+		{
+			dot = -dot;
+			newRightQuaternion = rightQuaternion * static_cast<T>(-1);
+		}
+
 		if (dot > DOT_THRESHOLD)
 		{
-			return Nlerp(leftQuaternion, rightQuaternion, t);
+			return Nlerp(leftQuaternion, newRightQuaternion, t);
 		}
 		
 		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));

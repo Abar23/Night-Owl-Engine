@@ -49,24 +49,21 @@ namespace NightOwl
 			standardShader->SetUniformInt(0, "isInputTextureSet");
 		}
 
-		for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			standardShader->SetUniformMat4F(finalBoneMatrices[i], "finalBonesMatrices[" + std::to_string(i) + "]");
-
-		mesh->Bind();
-		const std::vector<SubMeshData>& subMeshDatas = mesh->GetSubMeshes();
-		if (subMeshDatas.empty())
+		if (finalBoneMatrices.empty() == false)
 		{
-			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, mesh->GetNumberOfTriangles() * 3);
+			for (int i = 0; i < finalBoneMatrices.size(); ++i)
+				standardShader->SetUniformMat4F(finalBoneMatrices[i], "finalBonesMatrices[" + std::to_string(i) + "]");
+			standardShader->SetUniformInt(1, "hasBones");
 		}
 		else
 		{
-			RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, subMeshDatas[0].indexStart);
-
-			for (const SubMeshData& subMeshData : subMeshDatas)
-			{
-			 	RenderApi::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMeshData.indexCount, subMeshData.indexStart, subMeshData.baseVertex);
-			}
+			standardShader->SetUniformInt(0, "hasBones");
 		}
+
+		mesh->Bind();
+		//const std::vector<SubMeshData>& subMeshDatas = mesh->GetSubMeshes();
+		//glMultiDrawElements(DrawType::Triangles, );
+		RenderApi::GetContext()->DrawIndexed(DrawType::Triangles, mesh->GetNumberOfTriangles() * 3);
 		mesh->Unbind();
 
 

@@ -125,6 +125,7 @@ namespace NightOwl
 	void AssimpModelLoader::ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
 		std::shared_ptr<Mesh> modelMesh = modelLoadingInfo.model->renderer->mesh;
+		unsigned int indexOffset = 0;
 		if (modelLoadingInfo.numberOfMeshesProcessed > 0)
 		{
 			SubMeshData subMesh;
@@ -134,6 +135,8 @@ namespace NightOwl
 			subMesh.vertexCount = assimpMesh->mNumVertices;
 			subMesh.firstVertex = modelMesh->triangles[modelMesh->triangles.size() - 1].x;
 			modelMesh->subMeshes.push_back(subMesh);
+
+			indexOffset = subMesh.baseVertex;
 		}
 		
 		// process data for main mesh
@@ -197,7 +200,9 @@ namespace NightOwl
 			{
 				// engine assert since we only should process triangles
 			}
-			modelMesh->triangles.emplace_back(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
+			modelMesh->triangles.emplace_back(face.mIndices[0] + indexOffset,
+											  face.mIndices[1] + indexOffset, 
+											  face.mIndices[2] + indexOffset);
 		}
 
 		if (assimpMesh->HasBones())

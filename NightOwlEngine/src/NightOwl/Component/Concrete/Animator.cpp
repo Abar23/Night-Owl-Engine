@@ -57,7 +57,7 @@ namespace NightOwl
 		else
 		{
 			// TODO: figure out rotation shit tomorrow
-			elapsedTime += Time::GetDeltaTime() * currentAnimation->GetTicksPerSecond() / 10.0f;
+			elapsedTime += Time::GetDeltaTime() * currentAnimation->GetTicksPerSecond();
 		}
 
 		if (elapsedTime > currentAnimation->GetDuration())

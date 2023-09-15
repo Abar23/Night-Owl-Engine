@@ -16,7 +16,7 @@ namespace NightOwl
 		void Bind() override;
 
 		void Unbind() override;
-
+		
 		void SetSize(unsigned indexDataSize) override;
 
 		void SetData(const void* indexData) override;
