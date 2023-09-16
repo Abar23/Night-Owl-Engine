@@ -1,7 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "Renderer.h"
-#include "NightOwl/Graphics/Materials/IMaterial.h"
+#include "NightOwl/Graphics/Materials/Material.h"
 
 namespace NightOwl
 {
@@ -38,12 +38,12 @@ namespace NightOwl
 		return isVisible;
 	}
 
-	const std::shared_ptr<IMaterial> Renderer::GetMaterial()
+	const std::shared_ptr<Material> Renderer::GetMaterial()
 	{
 		return material;
 	}
 
-	void Renderer::SetMaterial(std::shared_ptr<IMaterial> material)
+	void Renderer::SetMaterial(std::shared_ptr<Material> material)
 	{
 		this->material = material;
 	}

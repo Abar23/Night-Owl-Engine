@@ -5,7 +5,7 @@
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
-#include "NightOwl/Graphics/Materials/IMaterial.h"
+#include "NightOwl/Graphics/Materials/Material.h"
 
 TestScene::TestScene()
 	: Scene("TestScene")

@@ -19,17 +19,33 @@ namespace NightOwl
 
 		void SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName) override;
 
+		void SetUniformMat4F(const Mat4F& mat4, const int uniformId) override;
+
 		void SetUniformVec4F(const Vec4F& vec4, const std::string& uniformName) override;
+
+		void SetUniformVec4F(const Vec4F& vec4, const int uniformId) override;
 
 		void SetUniformVec3F(const Vec3F& vec3, const std::string& uniformName) override;
 
+		void SetUniformVec3F(const Vec3F& vec4, const int uniformId) override;
+
 		void SetUniformVec3UI(const Vec3UI& vec3, const std::string& uniformName) override;
+
+		void SetUniformVec3UI(const Vec3UI& vec3, const int uniformId) override;
 
 		void SetUniformVec2F(const Vec2F& vec2, const std::string& uniformName) override;
 
+		void SetUniformVec2F(const Vec2F& vec2, const int uniformId) override;
+
 		void SetUniformInt(int value, const std::string& uniformName) override;
 
+		void SetUniformInt(const int value, const int uniformId) override;
+
 		void SetUniformFloat(float value, const std::string& uniformName) override;
+
+		void SetUniformFloat(const float value, const int uniformId) override;
+
+		unsigned int GetUniformLocation(const std::string& uniformName) const override;
 
 		int GetShaderId() override;
 
@@ -40,11 +56,8 @@ namespace NightOwl
 
 		std::string name;
 
+
+
 		unsigned int CompileShaderSource(const std::string& shaderSource, GLenum shaderType);
-
-		unsigned int GetUniformLocation(const std::string& uniformName) const;
-
-		static std::string GetShaderSource(const std::string& sourcePath);
-
 	};
 }

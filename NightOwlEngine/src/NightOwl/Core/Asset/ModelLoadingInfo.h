@@ -21,7 +21,5 @@ namespace NightOwl
 		const aiScene* scene;
 
 		std::shared_ptr<Model> model;
-
-		int numberOfMeshesProcessed = 0;
 	};
 }

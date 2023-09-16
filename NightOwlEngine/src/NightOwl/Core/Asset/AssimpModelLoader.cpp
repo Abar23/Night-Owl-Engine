@@ -125,19 +125,13 @@ namespace NightOwl
 	void AssimpModelLoader::ProcessMesh(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
 	{
 		std::shared_ptr<Mesh> modelMesh = modelLoadingInfo.model->renderer->mesh;
-		unsigned int indexOffset = 0;
-		if (modelLoadingInfo.numberOfMeshesProcessed > 0)
-		{
-			SubMeshData subMesh;
-			subMesh.baseVertex = modelMesh->vertices.size();
-			subMesh.indexStart = modelMesh->triangles.size() * 3;
-			subMesh.indexCount = assimpMesh->mNumFaces * 3;
-			subMesh.vertexCount = assimpMesh->mNumVertices;
-			subMesh.firstVertex = modelMesh->triangles[modelMesh->triangles.size() - 1].x;
-			modelMesh->subMeshes.push_back(subMesh);
 
-			indexOffset = subMesh.baseVertex;
-		}
+		SubMeshData subMesh;
+		subMesh.baseVertex = modelMesh->vertices.size();
+		subMesh.indexStart = modelMesh->triangles.size() * 3;
+		subMesh.indexCount = assimpMesh->mNumFaces * 3;
+		subMesh.vertexCount = assimpMesh->mNumVertices;
+		modelMesh->subMeshes.push_back(subMesh);
 		
 		// process data for main mesh
 		for (unsigned int vertexIndex = 0; vertexIndex < assimpMesh->mNumVertices; ++vertexIndex)
@@ -149,7 +143,7 @@ namespace NightOwl
 			// process texture coordinates first channel, some models have 8 channels
 			if (assimpMesh->mTextureCoords[0])
 			{
-				const aiVector3D assimpTextureCoordinate = assimpMesh->mTextureCoords[0][vertexIndex];
+				const aiVector3D& assimpTextureCoordinate = assimpMesh->mTextureCoords[0][vertexIndex];
 				textureCoordinates.x = assimpTextureCoordinate.x;
 				textureCoordinates.y = assimpTextureCoordinate.y;
 			}
@@ -158,7 +152,7 @@ namespace NightOwl
 			Vec3F normal;
 			if (assimpMesh->HasNormals())
 			{
-				const aiVector3D assimpNormal = assimpMesh->mNormals[vertexIndex];
+				const aiVector3D& assimpNormal = assimpMesh->mNormals[vertexIndex];
 				normal.x = assimpNormal.x;
 				normal.y = assimpNormal.y;
 				normal.z = assimpNormal.z;
@@ -169,15 +163,15 @@ namespace NightOwl
 			Vec3F tangent;
 			if (assimpMesh->HasTangentsAndBitangents())
 			{
-				aiVector3D assimpNormal = assimpMesh->mBitangents[vertexIndex];
+				aiVector3D& assimpNormal = assimpMesh->mBitangents[vertexIndex];
 				bitangent.x = assimpNormal.x;
 				bitangent.y = assimpNormal.y;
 				bitangent.z = assimpNormal.z;
 
-				assimpNormal = assimpMesh->mTangents[vertexIndex];
-				tangent.x = assimpNormal.x;
-				tangent.y = assimpNormal.y;
-				tangent.z = assimpNormal.z;
+				aiVector3D& assimpTangent = assimpMesh->mTangents[vertexIndex];
+				tangent.x = assimpTangent.x;
+				tangent.y = assimpTangent.y;
+				tangent.z = assimpTangent.z;
 			}
 			modelMesh->bitangents.push_back(bitangent);
 			modelMesh->tangents.push_back(tangent);
@@ -200,9 +194,9 @@ namespace NightOwl
 			{
 				// engine assert since we only should process triangles
 			}
-			modelMesh->triangles.emplace_back(face.mIndices[0] + indexOffset,
-											  face.mIndices[1] + indexOffset, 
-											  face.mIndices[2] + indexOffset);
+			modelMesh->triangles.emplace_back(face.mIndices[0],
+											  face.mIndices[1], 
+											  face.mIndices[2]);
 		}
 
 		if (assimpMesh->HasBones())
@@ -224,8 +218,6 @@ namespace NightOwl
 		//
 		// 	diffuseTextures.push_back(AssetManagerLocator::GetAssetManager()->LoadTexture2D(textureFilePath));
 		// }
-
-		modelLoadingInfo.numberOfMeshesProcessed++;
 	}
 
 	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)

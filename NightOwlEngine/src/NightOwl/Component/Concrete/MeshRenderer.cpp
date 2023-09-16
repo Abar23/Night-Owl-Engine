@@ -1,7 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "MeshRenderer.h"
-#include "NightOwl/Graphics/Materials/StandardMaterial.h"
+#include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 
 namespace NightOwl
@@ -9,7 +9,7 @@ namespace NightOwl
 	MeshRenderer::MeshRenderer()
 	{
 		type = ComponentType::MeshRenderer;
-		material = std::make_shared<StandardMaterial>();
+		material = std::make_shared<Material>();
 		MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);
 	}
 

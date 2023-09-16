@@ -1,13 +1,12 @@
 #include "NightOwlPch.h"
 
 #include "Animator.h"
+#include "MeshRenderer.h"
+#include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
-
-#include "MeshRenderer.h"
-#include "NightOwl/Graphics/Materials/IMaterial.h"
 
 namespace NightOwl
 {
@@ -102,7 +101,8 @@ namespace NightOwl
 			}
 		}
 
-		renderer->GetMaterial()->SetFinalBoneMatrices(finalBoneOffsetMatrices);
+		// TODO: Do this in a buffer
+		//renderer->GetMaterial()->SetFinalBoneMatrices(finalBoneOffsetMatrices);
 	}
 
 	void Animator::Play()

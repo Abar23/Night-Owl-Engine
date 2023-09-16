@@ -6,7 +6,7 @@
 
 namespace NightOwl
 {
-	class IMaterial;
+	class Material;
 
 	class Renderer : public Component
 	{
@@ -23,14 +23,14 @@ namespace NightOwl
 
 		bool IsVisible();
 
-		const std::shared_ptr<IMaterial> GetMaterial();
+		const std::shared_ptr<Material> GetMaterial();
 
-		void SetMaterial(std::shared_ptr<IMaterial> material);
+		void SetMaterial(std::shared_ptr<Material> material);
 
 	protected:
 		std::shared_ptr<Mesh> mesh;
 
-		std::shared_ptr<IMaterial> material;
+		std::shared_ptr<Material> material;
 
 		bool isVisible;
 

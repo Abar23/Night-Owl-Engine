@@ -19,6 +19,48 @@ namespace NightOwl
 		CHECK_PROGRAM_LINKER_ERRORS(programId);
 		glDeleteShader(vertexShaderId);
 		glDeleteShader(fragmentShaderId);
+
+		GLint uniformCount;
+		glGetProgramiv(programId, GL_ACTIVE_UNIFORMS, &uniformCount);
+
+		// Loop through all uniform variables
+		for (GLuint i = 0; i < static_cast<GLuint>(uniformCount); ++i) {
+			GLsizei nameLength;
+			GLint size;
+			GLenum type;
+			GLchar uniformName[256]; // Adjust the size as needed
+
+			// Get information about the current uniform variable
+			glGetActiveUniform(programId, i, sizeof(uniformName) - 1,
+				&nameLength, &size, &type, uniformName);
+
+			// Ensure the uniform name is null-terminated
+			uniformName[nameLength] = '\0';
+
+			// 'uniformName' now contains the name of the uniform variable, and 'type' contains its data type
+			// You can print or store this information as needed
+			printf("Uniform Name: %s, Type: %u, Location: %d\n", uniformName, type, glGetUniformLocation(programId, uniformName));
+		}
+
+		GLint numUniformBlocks;
+		glGetProgramiv(programId, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
+		for (int i = 0; i < numUniformBlocks; ++i) {
+			char blockName[64];
+			glGetActiveUniformBlockName(programId, i, sizeof(blockName), NULL, blockName);
+
+			// Use blockName to identify the uniform block.
+			GLint blockSize;
+			glGetActiveUniformBlockiv(programId, i, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+			// Get the binding point for the uniform block.
+			GLint blockBinding;
+			glGetActiveUniformBlockiv(programId, i, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
+
+			printf("Uniform Block %d:\n", i);
+			printf("  Name: %s\n", blockName);
+			printf("  Size: %d bytes\n", blockSize);
+			printf("  Binding Point: %d\n", blockBinding);
+		}
 	}
 
 	OpenGlShader::~OpenGlShader()
@@ -42,9 +84,19 @@ namespace NightOwl
 		GL_CALL(glUniformMatrix4fv, GetUniformLocation(uniformName), 1, false, mat4.GetValuePointer());
 	}
 
+	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const int uniformId)
+	{
+		GL_CALL(glUniformMatrix4fv, uniformId, 1, false, mat4.GetValuePointer());
+	}
+
 	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const std::string& uniformName)
 	{
 		GL_CALL(glUniform4fv, GetUniformLocation(uniformName), 1, vec4.GetValuePointer());
+	}
+
+	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const int uniformId)
+	{
+		GL_CALL(glUniform4fv, uniformId, 1, vec4.GetValuePointer());
 	}
 
 	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const std::string& uniformName)
@@ -52,9 +104,19 @@ namespace NightOwl
 		GL_CALL(glUniform3fv, GetUniformLocation(uniformName), 1, vec3.GetValuePointer());
 	}
 
+	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const int uniformId)
+	{
+		GL_CALL(glUniformMatrix4fv, uniformId, 1, false, vec3.GetValuePointer());
+	}
+
 	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const std::string& uniformName)
 	{
 		GL_CALL(glUniform3uiv, GetUniformLocation(uniformName), 1, vec3.GetValuePointer());
+	}
+
+	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const int uniformId)
+	{
+		GL_CALL(glUniform3uiv, uniformId, 1, vec3.GetValuePointer());
 	}
 
 	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const std::string& uniformName)
@@ -62,14 +124,29 @@ namespace NightOwl
 		GL_CALL(glUniform2fv, GetUniformLocation(uniformName), 1, vec2.GetValuePointer());
 	}
 
+	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const int uniformId)
+	{
+		GL_CALL(glUniform2fv, uniformId, 1, vec2.GetValuePointer());
+	}
+
 	void OpenGlShader::SetUniformInt(int value, const std::string& uniformName)
 	{
 		GL_CALL(glUniform1i, GetUniformLocation(uniformName), value);
 	}
 
+	void OpenGlShader::SetUniformInt(const int value, const int uniformId)
+	{
+		GL_CALL(glUniform1i, uniformId, value);
+	}
+
 	void OpenGlShader::SetUniformFloat(float value, const std::string& uniformName)
 	{
 		GL_CALL(glUniform1f, GetUniformLocation(uniformName), value);
+	}
+
+	void OpenGlShader::SetUniformFloat(const float value, const int uniformId)
+	{
+		GL_CALL(glUniform1f, uniformId, value);
 	}
 
 	int OpenGlShader::GetShaderId()
@@ -94,7 +171,6 @@ namespace NightOwl
 
 	unsigned int OpenGlShader::GetUniformLocation(const std::string& uniformName) const
 	{
-		int i = glGetUniformLocation(programId, uniformName.c_str());
 		return GL_CALL(glGetUniformLocation, programId, uniformName.c_str());
 	}
 }

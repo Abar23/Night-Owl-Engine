@@ -7,8 +7,6 @@ namespace NightOwl
 	public:
 		int baseVertex;
 
-		unsigned int firstVertex;
-
 		int indexCount;
 
 		int indexStart;
