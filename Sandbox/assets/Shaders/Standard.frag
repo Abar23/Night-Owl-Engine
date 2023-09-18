@@ -17,7 +17,17 @@ in vertexData
     vec4 materialBoneWeights;
 } inVertexData;
 
-uniform bool isInputTextureSet = false;
+uniform vec4 diffuseColor;
+uniform vec4 specularColor;
+uniform vec4 emissiveColor;
+uniform vec4 transparentColor;
+uniform vec4 reflectiveColor;
+uniform vec4 ambientColor;
+
+uniform float shininess;
+uniform float shininessStrength;
+
+uniform bool isInputTextureSet;
 uniform sampler2D inputTexture;
 
 void main(void)
@@ -34,5 +44,5 @@ void main(void)
         }
     }
 
-	FragColor = vec4(inVertexData.materialNormals, 1.0);
+	FragColor = vec4(diffuseColor.xyz, 1.0);
 } 

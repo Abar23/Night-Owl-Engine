@@ -13,13 +13,11 @@ namespace NightOwl
 
 		std::shared_ptr<Material> Clone();
 
-		void SetTexture(ITexture2D* texture2D);
-
-		ITexture2D* GetTexture();
-
 		void Draw(Renderer& renderer);
 
 		void Bind();
+
+		void UnBind();
 
 		void SetMat4F(const Mat4F& matrix, const std::string& uniformName);
 
@@ -41,6 +39,8 @@ namespace NightOwl
 
 		ITexture2D* GetTexture(const std::string& uniformName);
 
+		std::vector<Mat4F>& GetFinalBoneMatrices();
+
 	private:
 		IShader* shader;
 
@@ -54,10 +54,8 @@ namespace NightOwl
 
 		std::map<std::string, std::pair<int, Mat4F>> matrixUniformMap;
 
-		ITexture2D* diffuseTexture;
-
 		std::vector<Mat4F> finalBoneMatrices;
 
-		float alpha;
+		void ProcessShaderUniforms();
 	};
 }

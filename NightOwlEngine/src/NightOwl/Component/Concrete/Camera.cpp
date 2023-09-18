@@ -45,7 +45,7 @@ namespace NightOwl
 		// aspect ratio has changed. Will work for single camera games.
 		if(!isProjectionDirty && !window->HasWindowChangedAspectRatio())
 		{
-			return projectionMatrix;
+			return projectionMatrix * GetViewMatrix();
 		}
 
 		const float aspect = (wasAspectRatioSet) ? aspectRatio : window->GetAspectRatio();
@@ -71,11 +71,9 @@ namespace NightOwl
 			projectionMatrix = Mat4F::Orthographic(-halfWidth, halfWidth, -halfHeight, halfHeight, clippingPlanes.near, clippingPlanes.far);
 		}
 
-		projectionMatrix *= GetViewMatrix();
-
 		isProjectionDirty = false;
 
-		return projectionMatrix;
+		return projectionMatrix * GetViewMatrix();
 	}
 
 	Mat4F Camera::GetViewMatrix()

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <map>
+
 #include "glad/glad.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Types/ShaderTypes.h"
+#include "NightOwl/Graphics/Types/UniformDataTypes.h"
 
 namespace NightOwl
 {
@@ -45,19 +48,23 @@ namespace NightOwl
 
 		void SetUniformFloat(const float value, const int uniformId) override;
 
-		unsigned int GetUniformLocation(const std::string& uniformName) const override;
+		int GetUniformLocation(const std::string& uniformName) const override;
 
 		int GetShaderId() override;
 
 		const std::string& GetShaderName() override;
+
+		const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& GetUniformDataMap() override;
 
 	private:
 		unsigned int programId;
 
 		std::string name;
 
-
+		std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)> uniformTypeToDataMap;
 
 		unsigned int CompileShaderSource(const std::string& shaderSource, GLenum shaderType);
+
+		void ProcessUniforms();
 	};
 }

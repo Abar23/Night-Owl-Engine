@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NightOwl/Graphics/Types/UniformDataTypes.h"
 #include "NightOwl/Math/Math.h"
 
 namespace NightOwl
@@ -41,10 +42,12 @@ namespace NightOwl
 
 		virtual void SetUniformFloat(const float value, const int uniformId) = 0;
 
-		virtual unsigned int GetUniformLocation(const std::string& uniformName) const = 0;
+		virtual int GetUniformLocation(const std::string& uniformName) const = 0;
 
 		virtual int GetShaderId() = 0;
 
 		virtual const std::string& GetShaderName() = 0;
+
+		virtual const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& GetUniformDataMap() = 0;
 	};
 }

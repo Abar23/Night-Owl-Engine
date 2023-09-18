@@ -26,6 +26,8 @@ namespace NightOwl
 
 		static void ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
 
+		static void ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
+
 		static void ProcessArmature(ModelLoadingInfo& modelLoadingInfo);
 
 		static void ProcessAnimation(const aiAnimation* assimpAnimation);

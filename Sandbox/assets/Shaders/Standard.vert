@@ -21,12 +21,6 @@ const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
-layout(std140) uniform MyBlock {
-    vec4 color;    // 16 bytes (4 floats)
-    mat4 transform; // 64 bytes (16 floats)
-    float intensity; // 4 bytes (1 float)
-};
-
 out vertexData
 {
     vec3 materialPosition;

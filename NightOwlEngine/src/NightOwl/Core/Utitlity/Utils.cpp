@@ -94,6 +94,11 @@ namespace NightOwl::Utility
 		return Vec3F(assimpVec3.x, assimpVec3.y, assimpVec3.z);
 	}
 
+	Vec4F AssimpColor3DToNightOwlVec4F(const aiColor3D& assimpColor)
+	{
+		return Vec4F(assimpColor.r, assimpColor.g, assimpColor.b, 1.0f);
+	}
+
 	QuatF AssimpQuaternionToNightOwlQuatF(const aiQuaternion& assimpQuaterion)
 	{
 		return QuatF(assimpQuaterion.x, assimpQuaterion.y, assimpQuaterion.z, assimpQuaterion.w);

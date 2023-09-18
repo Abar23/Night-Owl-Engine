@@ -1,8 +1,6 @@
 #pragma once
 
-#include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/GameObject/GameObject.h"
-#include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include <string>
 #include <assimp/scene.h>

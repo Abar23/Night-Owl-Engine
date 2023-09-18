@@ -117,19 +117,7 @@ namespace NightOwl
 		T wx = w * x;
 		T wy = w * y;
 		T wz = w * z;
-
-		// matrix(0, 0) = static_cast<T>(1) - static_cast<T>(2) * (ySquared + zSquared);
-		// matrix(1, 0) = static_cast<T>(2) * (xy + wz);
-		// matrix(2, 0) = static_cast<T>(2) * (xz - wy);
-		//
-		// matrix(0, 1) = static_cast<T>(2) * (xy - wz);
-		// matrix(1, 1) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + zSquared);
-		// matrix(2, 1) = static_cast<T>(2) * (yz + wx);
-		//
-		// matrix(0, 2) = static_cast<T>(2) * (xz + wy);
-		// matrix(1, 2) = static_cast<T>(2) * (yz - wx);
-		// matrix(2, 2) = static_cast<T>(1) - static_cast<T>(2) * (xSquared + ySquared);
-
+		
 		matrix(0, 0) = xSquared - ySquared - zSquared + wSquared;
 		matrix(1, 1) = -xSquared + ySquared - zSquared + wSquared;
 		matrix(2, 2) = -xSquared - ySquared + zSquared + wSquared;

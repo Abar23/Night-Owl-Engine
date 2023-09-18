@@ -23,6 +23,7 @@ namespace NightOwl
 
 		bool IsVisible();
 
+		// TODO: convert to list of materials, each mesh will point to one of these materials which could be shared
 		const std::shared_ptr<Material> GetMaterial();
 
 		void SetMaterial(std::shared_ptr<Material> material);
@@ -30,6 +31,7 @@ namespace NightOwl
 	protected:
 		std::shared_ptr<Mesh> mesh;
 
+		// TODO: turn into a vector
 		std::shared_ptr<Material> material;
 
 		bool isVisible;

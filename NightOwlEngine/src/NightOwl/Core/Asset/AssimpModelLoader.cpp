@@ -11,6 +11,8 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
 
+#include "NightOwl/Graphics/Materials/Material.h"
+
 namespace NightOwl
 {
 	Assimp::Importer AssimpModelLoader::assimpImporter;
@@ -31,6 +33,8 @@ namespace NightOwl
 		{
 			ProcessNodes(modelLoadingInfo);
 		}
+
+		assimpImporter.FreeScene();
 	}
 
 	void AssimpModelLoader::LoadAnimation(const std::string& filePath)
@@ -204,20 +208,42 @@ namespace NightOwl
 			ProcessBones(modelLoadingInfo, assimpMesh);
 		}
 
-		// const aiMaterial* material = modelLoadingInfo.scene->mMaterials[assimpMesh->mMaterialIndex];
-		//
-		// std::vector<ITexture2D*> diffuseTextures;
-		// for (unsigned int textureIndex = 0; textureIndex < material->GetTextureCount(aiTextureType_DIFFUSE); ++textureIndex)
-		// {
-		// 	aiString str;
-		// 	material->GetTexture(aiTextureType_DIFFUSE, textureIndex, &str);
-		//
-		// 	std::string textureFilePath(str.C_Str());
-		// 	Utility::StandardizeFilePathString(textureFilePath);
-		// 	textureFilePath = modelLoadingInfo.directory + '/' + textureFilePath;
-		//
-		// 	diffuseTextures.push_back(AssetManagerLocator::GetAssetManager()->LoadTexture2D(textureFilePath));
-		// }
+		const aiMaterial* material = modelLoadingInfo.scene->mMaterials[assimpMesh->mMaterialIndex];
+		
+		std::vector<ITexture2D*> diffuseTextures;
+		for (unsigned int textureIndex = 0; textureIndex < material->GetTextureCount(aiTextureType_DIFFUSE); ++textureIndex)
+		{
+			// aiString str;
+			// material->GetTexture(aiTextureType_DIFFUSE, textureIndex, &str);
+			//
+			// std::string textureFilePath(str.C_Str());
+			// Utility::StandardizeFilePathString(textureFilePath);
+			// textureFilePath = modelLoadingInfo.directory + '/' + textureFilePath;
+			//
+			// diffuseTextures.push_back(AssetManagerLocator::GetAssetManager()->LoadTexture2D(textureFilePath));
+		}
+
+		auto& rendererMaterial = modelLoadingInfo.model->renderer->GetMaterial();
+
+		aiColor3D color;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "diffuseColor");
+		material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "specularColor");
+		material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "emissiveColor");
+		material->Get(AI_MATKEY_COLOR_TRANSPARENT, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "transparentColor");
+		material->Get(AI_MATKEY_COLOR_REFLECTIVE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "reflectiveColor");
+		material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "ambientColor");
+
+		float materialProperty;
+		material->Get(AI_MATKEY_SHININESS, materialProperty);
+		rendererMaterial->SetFloat(materialProperty, "shininess");
+		material->Get(AI_MATKEY_SHININESS_STRENGTH, materialProperty);
+		rendererMaterial->SetFloat(materialProperty, "shininessStrength");
 	}
 
 	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
@@ -269,6 +295,11 @@ namespace NightOwl
 				}
 			}
 		}
+	}
+
+	void AssimpModelLoader::ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
+	{
+
 	}
 
 	void AssimpModelLoader::ProcessArmature(ModelLoadingInfo& modelLoadingInfo)

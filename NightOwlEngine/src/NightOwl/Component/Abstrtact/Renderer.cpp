@@ -14,6 +14,7 @@ namespace NightOwl
 	{
 		if (isVisible)
 		{
+			// TODO: move all of the material draw functionality into this method
 			material->Draw(*this);
 		}
 	}

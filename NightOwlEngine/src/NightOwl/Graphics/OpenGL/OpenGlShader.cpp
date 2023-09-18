@@ -19,48 +19,7 @@ namespace NightOwl
 		CHECK_PROGRAM_LINKER_ERRORS(programId);
 		glDeleteShader(vertexShaderId);
 		glDeleteShader(fragmentShaderId);
-
-		GLint uniformCount;
-		glGetProgramiv(programId, GL_ACTIVE_UNIFORMS, &uniformCount);
-
-		// Loop through all uniform variables
-		for (GLuint i = 0; i < static_cast<GLuint>(uniformCount); ++i) {
-			GLsizei nameLength;
-			GLint size;
-			GLenum type;
-			GLchar uniformName[256]; // Adjust the size as needed
-
-			// Get information about the current uniform variable
-			glGetActiveUniform(programId, i, sizeof(uniformName) - 1,
-				&nameLength, &size, &type, uniformName);
-
-			// Ensure the uniform name is null-terminated
-			uniformName[nameLength] = '\0';
-
-			// 'uniformName' now contains the name of the uniform variable, and 'type' contains its data type
-			// You can print or store this information as needed
-			printf("Uniform Name: %s, Type: %u, Location: %d\n", uniformName, type, glGetUniformLocation(programId, uniformName));
-		}
-
-		GLint numUniformBlocks;
-		glGetProgramiv(programId, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
-		for (int i = 0; i < numUniformBlocks; ++i) {
-			char blockName[64];
-			glGetActiveUniformBlockName(programId, i, sizeof(blockName), NULL, blockName);
-
-			// Use blockName to identify the uniform block.
-			GLint blockSize;
-			glGetActiveUniformBlockiv(programId, i, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-
-			// Get the binding point for the uniform block.
-			GLint blockBinding;
-			glGetActiveUniformBlockiv(programId, i, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
-
-			printf("Uniform Block %d:\n", i);
-			printf("  Name: %s\n", blockName);
-			printf("  Size: %d bytes\n", blockSize);
-			printf("  Binding Point: %d\n", blockBinding);
-		}
+		ProcessUniforms();
 	}
 
 	OpenGlShader::~OpenGlShader()
@@ -159,6 +118,11 @@ namespace NightOwl
 		return name;
 	}
 
+	const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& OpenGlShader::GetUniformDataMap()
+	{
+		return uniformTypeToDataMap;
+	}
+
 	unsigned int OpenGlShader::CompileShaderSource(const std::string& shaderSource, GLenum shaderType)
 	{
 		const char* acceptableShaderSource = shaderSource.c_str();
@@ -169,7 +133,56 @@ namespace NightOwl
 		return shaderId;
 	}
 
-	unsigned int OpenGlShader::GetUniformLocation(const std::string& uniformName) const
+	void OpenGlShader::ProcessUniforms()
+	{
+		char bufferName[256];
+
+		// Loop through all uniform variables
+		int uniformCount;
+		GL_CALL(glGetProgramiv, programId, GL_ACTIVE_UNIFORMS, &uniformCount);
+		for (int activeUniformIndex = 0; activeUniformIndex < uniformCount; ++activeUniformIndex) {
+			int nameLength;
+			int size;
+			unsigned int type;
+
+			// Get information about the current uniform variable
+			GL_CALL(glGetActiveUniform, programId, activeUniformIndex, sizeof(bufferName) - 1, &nameLength, &size, &type, bufferName);
+
+			// TODO: use size to determine if a uniform is an array of values
+
+			// Ensure the uniform name is null-terminated
+			bufferName[nameLength] = '\0';
+
+			const int uniformLocation = GetUniformLocation(bufferName);
+			if (uniformLocation == -1)
+			{
+				continue;
+			}
+
+			UniformDataTypes uniformDataType = OpenGlUniformToUniformDataType(type);
+			std::pair nameToLocationPair = std::make_pair(bufferName, uniformLocation);
+
+			uniformTypeToDataMap[static_cast<int>(uniformDataType)].push_back(nameToLocationPair);
+		}
+
+		// Loop through all uniform blocks
+		int numUniformBlocks;
+		GL_CALL(glGetProgramiv, programId, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
+		for (int activeUniformBlockIndex = 0; activeUniformBlockIndex < numUniformBlocks; ++activeUniformBlockIndex) {
+			glGetActiveUniformBlockName(programId, activeUniformBlockIndex, sizeof(bufferName), NULL, bufferName);
+
+			// Get the binding point for the uniform block.
+			int blockBinding;
+			GL_CALL(glGetActiveUniformBlockiv, programId, activeUniformBlockIndex, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
+
+			UniformDataTypes uniformDataType = UniformDataTypes::Buffer;
+			std::pair nameToLocationPair = std::make_pair(bufferName, blockBinding);
+
+			uniformTypeToDataMap[static_cast<int>(uniformDataType)].push_back(nameToLocationPair);
+		}
+	}
+
+	int OpenGlShader::GetUniformLocation(const std::string& uniformName) const
 	{
 		return GL_CALL(glGetUniformLocation, programId, uniformName.c_str());
 	}

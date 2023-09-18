@@ -51,16 +51,6 @@ namespace NightOwl
 		return *clone;
 	}
 
-	//GameObject& Scene::AddArchetype(const std::string& archetypeName, const std::string& name)
-	//{
-	//	auto gameObject = ArchetypeSystemLocator::GetArchetypeSystem()->GetArchetype(archetypeName);
-	//	gameObject->name = name;
-	//	gameObject->scene = this;
-	//	AddClone(gameObject);
-	//	SetDirtyFlag();
-	//	return *gameObject;
-	//}
-
 	void Scene::RemoveGameObject(const GameObject& gameObject)
 	{
 		unsigned int id = gameObject.GetId();
@@ -159,10 +149,6 @@ namespace NightOwl
 		// Remove resources loaded in asset manager
 		auto* assetManager = AssetManagerLocator::GetAssetManager();
 		assetManager->ClearAll();
-
-		// Remove any archetypes loaded
-		//auto* archetypeSystem = ArchetypeSystemLocator::GetArchetypeSystem();
-		//archetypeSystem->ReleaseResources();
 
 		// Destroy all game objects in the scene
 		const auto& updatedRootGameObjects = GetRootGameObjects();

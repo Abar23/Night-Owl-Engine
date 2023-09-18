@@ -71,7 +71,8 @@ namespace NightOwl
 		}
 		
 		auto& bonInfoMap = renderer->GetMesh()->GetBoneInfoMap();
-		std::vector<Mat4F> finalBoneOffsetMatrices(100);
+		// TODO: Do this in a buffer
+		std::vector<Mat4F>& finalBoneOffsetMatrices = renderer->GetMaterial()->GetFinalBoneMatrices();
 
 		std::stack<Transform*> skeletonTransforms;
 		skeletonTransforms.push(skeleton);
@@ -100,9 +101,6 @@ namespace NightOwl
 				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
 			}
 		}
-
-		// TODO: Do this in a buffer
-		//renderer->GetMaterial()->SetFinalBoneMatrices(finalBoneOffsetMatrices);
 	}
 
 	void Animator::Play()
