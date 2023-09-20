@@ -114,6 +114,18 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Vec3<T> Vec3<T>::Max(const Vec3<T>& leftVector, const Vec3<T>& rightVector)
+	{
+		return Vec3<T>(std::max(leftVector.x, rightVector.x), std::max(leftVector.y, rightVector.y), std::max(leftVector.z, rightVector.z));
+	}
+
+	template <typename T>
+	Vec3<T> Vec3<T>::Min(const Vec3<T>& leftVector, const Vec3<T>& rightVector)
+	{
+		return Vec3<T>(std::min(leftVector.x, rightVector.x), std::min(leftVector.y, rightVector.y), std::min(leftVector.z, rightVector.z));
+	}
+
+	template <typename T>
 	Vec3<T> Vec3<T>::Cross(const Vec3& leftVector, const Vec3& rightVector)
 	{
 		return Vec3(leftVector.y * rightVector.z - leftVector.z * rightVector.y,

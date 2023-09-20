@@ -175,6 +175,10 @@ namespace NightOwl
 
 		static T Dot(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 
+		static Vec3<T> Max(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
+		static Vec3<T> Min(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
 		static Vec3<T> Cross(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 
 		static Vec3<T> Project(const Vec3<T>& leftVector, const Vec3<T>& rightVector);

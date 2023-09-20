@@ -88,6 +88,10 @@ namespace NightOwl
 
 		const std::string ToString() const;
 
+		static Vec2<T> Max(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
+
+		static Vec2<T> Min(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
+
 		static T Dot(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
 
 		static Vec2<T> Project(const Vec2<T>& leftVector, const Vec2<T>& rightVector);

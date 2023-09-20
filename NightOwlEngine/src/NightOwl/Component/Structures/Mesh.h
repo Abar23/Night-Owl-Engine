@@ -38,7 +38,7 @@ namespace NightOwl
 
 		std::vector<Vec3F> GetTangents();
 
-		void SetRangents(const std::vector<Vec3F>& tangents);
+		void SetTangents(const std::vector<Vec3F>& tangents);
 
 		std::vector<Vec3F> GetBitangents();
 
@@ -60,7 +60,11 @@ namespace NightOwl
 
 		const std::vector<SubMeshData>& GetSubMeshes();
 
+		void SetSubMeshes(const std::vector<SubMeshData>& subMeshes);
+
 		const std::map<std::string, BoneInfo>& GetBoneInfoMap();
+
+		void SetBoneInfoMap(const std::map<std::string, BoneInfo>& boneInfoMap);
 
 		void Clear();
 
@@ -109,7 +113,7 @@ namespace NightOwl
 
 		void UploadBitangents();
 
-		void UploadboneWeights();
+		void UploadBoneWeights();
 
 		void UploadUvData();
 

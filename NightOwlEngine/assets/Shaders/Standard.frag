@@ -1,5 +1,8 @@
 #version 460 core
 
+#extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shading_language_include : require
+
 out vec4 FragColor;
 
 in vertexData
@@ -14,21 +17,31 @@ in vertexData
     vec4 materialBoneWeights;
 } inVertexData;
 
-uniform bool isInputTextureSet = false;
-uniform sampler2D inputTexture;
+uniform vec4 diffuseColor;
+uniform vec4 specularColor;
+uniform vec4 emissiveColor;
+uniform vec4 transparentColor;
+uniform vec4 reflectiveColor;
+uniform vec4 ambientColor;
+
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D ambientOcclusionsTexture;
+uniform sampler2D normalsTexture;
+uniform sampler2D roughnessTexture;
+
+uniform float shininess;
+uniform float shininessStrength;
 
 void main(void)
 {
-    vec4 outputColor = vec4(inVertexData.materialColor, 1.0);
+    vec4 outputColor = diffuseColor;
 
-    if(isInputTextureSet)
+    outputColor *= texture(diffuseTexture, inVertexData.materialUvs);
+    
+    if(outputColor.a < 0.1)
     {
-        outputColor = texture(inputTexture, inVertexData.materialUvs);
-
-        if(outputColor.a < 0.1)
-        {
-            discard;
-        }
+        discard;
     }
 
 	FragColor = vec4(inVertexData.materialNormals, 1.0);

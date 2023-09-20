@@ -72,7 +72,11 @@ namespace NightOwl
 		
 		auto& bonInfoMap = renderer->GetMesh()->GetBoneInfoMap();
 		// TODO: Do this in a buffer
-		std::vector<Mat4F>& finalBoneOffsetMatrices = renderer->GetMaterial()->GetFinalBoneMatrices();
+		std::vector<Mat4F>& finalBoneOffsetMatrices = renderer->GetFinalBoneMatrices();
+		if (finalBoneOffsetMatrices.empty() == true)
+		{
+			finalBoneOffsetMatrices.resize(100);
+		}
 
 		std::stack<Transform*> skeletonTransforms;
 		skeletonTransforms.push(skeleton);

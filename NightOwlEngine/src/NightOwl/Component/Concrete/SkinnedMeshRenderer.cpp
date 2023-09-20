@@ -8,7 +8,7 @@ namespace NightOwl
 	SkinnedMeshRenderer::SkinnedMeshRenderer()
 	{
 		type = ComponentType::SkinnedMeshRenderer;
-		material = std::make_shared<Material>();
+		materials.push_back(std::make_shared<Material>());
 	}
 
 	std::shared_ptr<Component> SkinnedMeshRenderer::Clone()

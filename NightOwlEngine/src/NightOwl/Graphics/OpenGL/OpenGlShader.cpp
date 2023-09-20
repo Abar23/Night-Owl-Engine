@@ -28,97 +28,97 @@ namespace NightOwl
 		GL_CALL(glDeleteProgram, programId);
 	}
 
-	void OpenGlShader::Bind()
+	void OpenGlShader::Bind() const
 	{
 		GL_CALL(glUseProgram, programId);
 	}
 
-	void OpenGlShader::Unbind()
+	void OpenGlShader::Unbind() const
 	{
 		GL_CALL(glUseProgram, 0);
 	}
 
-	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName)
+	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName) const
 	{
 		GL_CALL(glUniformMatrix4fv, GetUniformLocation(uniformName), 1, false, mat4.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const int uniformId)
+	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const int uniformId) const
 	{
 		GL_CALL(glUniformMatrix4fv, uniformId, 1, false, mat4.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const std::string& uniformName)
+	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform4fv, GetUniformLocation(uniformName), 1, vec4.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const int uniformId)
+	void OpenGlShader::SetUniformVec4F(const Vec4F& vec4, const int uniformId) const
 	{
 		GL_CALL(glUniform4fv, uniformId, 1, vec4.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const std::string& uniformName)
+	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform3fv, GetUniformLocation(uniformName), 1, vec3.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const int uniformId)
+	void OpenGlShader::SetUniformVec3F(const Vec3F& vec3, const int uniformId) const
 	{
 		GL_CALL(glUniformMatrix4fv, uniformId, 1, false, vec3.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const std::string& uniformName)
+	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform3uiv, GetUniformLocation(uniformName), 1, vec3.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const int uniformId)
+	void OpenGlShader::SetUniformVec3UI(const Vec3UI& vec3, const int uniformId) const
 	{
 		GL_CALL(glUniform3uiv, uniformId, 1, vec3.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const std::string& uniformName)
+	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform2fv, GetUniformLocation(uniformName), 1, vec2.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const int uniformId)
+	void OpenGlShader::SetUniformVec2F(const Vec2F& vec2, const int uniformId) const
 	{
 		GL_CALL(glUniform2fv, uniformId, 1, vec2.GetValuePointer());
 	}
 
-	void OpenGlShader::SetUniformInt(int value, const std::string& uniformName)
+	void OpenGlShader::SetUniformInt(int value, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform1i, GetUniformLocation(uniformName), value);
 	}
 
-	void OpenGlShader::SetUniformInt(const int value, const int uniformId)
+	void OpenGlShader::SetUniformInt(const int value, const int uniformId) const
 	{
 		GL_CALL(glUniform1i, uniformId, value);
 	}
 
-	void OpenGlShader::SetUniformFloat(float value, const std::string& uniformName)
+	void OpenGlShader::SetUniformFloat(float value, const std::string& uniformName) const
 	{
 		GL_CALL(glUniform1f, GetUniformLocation(uniformName), value);
 	}
 
-	void OpenGlShader::SetUniformFloat(const float value, const int uniformId)
+	void OpenGlShader::SetUniformFloat(const float value, const int uniformId) const
 	{
 		GL_CALL(glUniform1f, uniformId, value);
 	}
 
-	int OpenGlShader::GetShaderId()
+	int OpenGlShader::GetShaderId() const
 	{
 		return programId;
 	}
 
-	const std::string& OpenGlShader::GetShaderName()
+	const std::string& OpenGlShader::GetShaderName() const
 	{
 		return name;
 	}
 
-	const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& OpenGlShader::GetUniformDataMap()
+	const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& OpenGlShader::GetUniformDataMap() const
 	{
 		return uniformTypeToDataMap;
 	}

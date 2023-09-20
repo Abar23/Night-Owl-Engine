@@ -393,6 +393,10 @@ namespace NightOwl
 
 		static T Dot(const Vec4<T>& leftVector, const Vec4<T>& rightVector);
 
+		Vec4<T> Max(const Vec4<T>& leftVector, const Vec4<T>& rightVector);
+
+		Vec4<T> Min(const Vec4<T>& leftVector, const Vec4<T>& rightVector);
+
 		static Vec4<T> Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t);
 
 		static Vec4<T> Zero();

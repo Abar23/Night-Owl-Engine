@@ -13,8 +13,6 @@ namespace NightOwl
 
 		std::shared_ptr<Material> Clone();
 
-		void Draw(Renderer& renderer);
-
 		void Bind();
 
 		void UnBind();
@@ -35,16 +33,16 @@ namespace NightOwl
 
 		float GetFloat(const std::string& uniformName);
 
-		void SetTexture(const std::shared_ptr<ITexture2D>& texture, const std::string& uniformName);
+		void SetTexture(const ITexture2D* texture, const std::string& uniformName);
 
-		ITexture2D* GetTexture(const std::string& uniformName);
+		const ITexture2D* GetTexture(const std::string& uniformName);
 
-		std::vector<Mat4F>& GetFinalBoneMatrices();
+		const IShader* GetShader() const;
 
 	private:
 		IShader* shader;
 
-		std::map<std::string, std::pair<int, ITexture2D*>> textureUniformMap;
+		std::map<std::string, std::pair<int, const ITexture2D*>> textureUniformMap;
 
 		std::map<std::string, std::pair<int, float>> floatUniformMap;
 
@@ -53,8 +51,6 @@ namespace NightOwl
 		std::map<std::string, std::pair<int, Vec4F>> vectorUniformMap;
 
 		std::map<std::string, std::pair<int, Mat4F>> matrixUniformMap;
-
-		std::vector<Mat4F> finalBoneMatrices;
 
 		void ProcessShaderUniforms();
 	};

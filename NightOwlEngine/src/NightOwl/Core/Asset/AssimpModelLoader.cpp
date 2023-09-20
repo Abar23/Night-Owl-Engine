@@ -23,7 +23,7 @@ namespace NightOwl
 
 		modelLoadingInfo.filePath = filePath;
 		assimpImporter.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-		modelLoadingInfo.scene = assimpImporter.ReadFile(modelLoadingInfo.filePath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+		modelLoadingInfo.scene = assimpImporter.ReadFile(modelLoadingInfo.filePath, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_PopulateArmatureData);
 		modelLoadingInfo.name = Utility::StripFilePathToNameWithoutExtension(modelLoadingInfo.filePath);
 		modelLoadingInfo.directory = Utility::FilePathToDirectory(modelLoadingInfo.filePath);
 
@@ -46,9 +46,11 @@ namespace NightOwl
 			return;
 		}
 
+		const std::string animationName = Utility::StripFilePathToNameWithoutExtension(filePath);
+
 		for (unsigned int animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
 		{
-			ProcessAnimation(scene->mAnimations[animationIndex]);
+			ProcessAnimation(scene->mAnimations[animationIndex], animationName);
 		}
 	}
 
@@ -58,7 +60,7 @@ namespace NightOwl
 
 		modelLoadingInfo.model = std::make_shared<Model>();
 
-		std::shared_ptr<Model> model = modelLoadingInfo.model;
+		const std::shared_ptr<Model>& model = modelLoadingInfo.model;
 
 		const aiScene* scene = modelLoadingInfo.scene;
 
@@ -73,20 +75,6 @@ namespace NightOwl
 		}
 		model->renderer->mesh = std::make_shared<Mesh>();
 		model->renderer->Remove();
-
-		if (scene->HasAnimations())
-		{
-			for (unsigned int animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
-			{
-				const aiAnimation* animation = scene->mAnimations[animationIndex];
-				if (assetManager->GetAnimationRepository().HasAsset(animation->mName.data))
-				{
-					continue;
-				}
-
-				ProcessAnimation(scene->mAnimations[animationIndex]);
-			}
-		}
 
 		for (int rootChildIndex = 0; rootChildIndex < scene->mRootNode->mNumChildren; ++rootChildIndex)
 		{
@@ -121,6 +109,13 @@ namespace NightOwl
 			}
 		}
 
+		model->renderer->materials.clear();
+		model->renderer->materials.resize(scene->mNumMaterials);
+		for (int materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex)
+		{
+			ProcessMaterials(modelLoadingInfo, scene->mMaterials[materialIndex], materialIndex);
+		}
+
 		model->renderer->mesh->ValidateMesh();
 		model->renderer->mesh->UploadMeshData();
 		assetManager->GetModelRepository().AddAsset(modelLoadingInfo.name, model);
@@ -135,13 +130,15 @@ namespace NightOwl
 		subMesh.indexStart = modelMesh->triangles.size() * 3;
 		subMesh.indexCount = assimpMesh->mNumFaces * 3;
 		subMesh.vertexCount = assimpMesh->mNumVertices;
+		subMesh.materialId = assimpMesh->mMaterialIndex;
 		modelMesh->subMeshes.push_back(subMesh);
 		
 		// process data for main mesh
 		for (unsigned int vertexIndex = 0; vertexIndex < assimpMesh->mNumVertices; ++vertexIndex)
 		{
-			const aiVector3D assimpVertex = assimpMesh->mVertices[vertexIndex];
-			modelMesh->vertices.emplace_back(assimpVertex.x, assimpVertex.y, assimpVertex.z);
+			Vec3F vertex = Utility::AssimpVec3ToNightOwlVec3F(assimpMesh->mVertices[vertexIndex]);
+			//vertex += modelLoadingInfo.modelCenterOffset;
+			modelMesh->vertices.emplace_back(vertex);
 
 			Vec2F textureCoordinates;
 			// process texture coordinates first channel, some models have 8 channels
@@ -207,43 +204,6 @@ namespace NightOwl
 		{
 			ProcessBones(modelLoadingInfo, assimpMesh);
 		}
-
-		const aiMaterial* material = modelLoadingInfo.scene->mMaterials[assimpMesh->mMaterialIndex];
-		
-		std::vector<ITexture2D*> diffuseTextures;
-		for (unsigned int textureIndex = 0; textureIndex < material->GetTextureCount(aiTextureType_DIFFUSE); ++textureIndex)
-		{
-			// aiString str;
-			// material->GetTexture(aiTextureType_DIFFUSE, textureIndex, &str);
-			//
-			// std::string textureFilePath(str.C_Str());
-			// Utility::StandardizeFilePathString(textureFilePath);
-			// textureFilePath = modelLoadingInfo.directory + '/' + textureFilePath;
-			//
-			// diffuseTextures.push_back(AssetManagerLocator::GetAssetManager()->LoadTexture2D(textureFilePath));
-		}
-
-		auto& rendererMaterial = modelLoadingInfo.model->renderer->GetMaterial();
-
-		aiColor3D color;
-		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "diffuseColor");
-		material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "specularColor");
-		material->Get(AI_MATKEY_COLOR_EMISSIVE, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "emissiveColor");
-		material->Get(AI_MATKEY_COLOR_TRANSPARENT, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "transparentColor");
-		material->Get(AI_MATKEY_COLOR_REFLECTIVE, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "reflectiveColor");
-		material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "ambientColor");
-
-		float materialProperty;
-		material->Get(AI_MATKEY_SHININESS, materialProperty);
-		rendererMaterial->SetFloat(materialProperty, "shininess");
-		material->Get(AI_MATKEY_SHININESS_STRENGTH, materialProperty);
-		rendererMaterial->SetFloat(materialProperty, "shininessStrength");
 	}
 
 	void AssimpModelLoader::ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
@@ -297,9 +257,75 @@ namespace NightOwl
 		}
 	}
 
-	void AssimpModelLoader::ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh)
+	void AssimpModelLoader::ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMaterial* assimpMaterial, const unsigned int materialIndex)
 	{
+		if (modelLoadingInfo.model->renderer->materials[materialIndex] != nullptr)
+		{
+			return;
+		}
 
+		modelLoadingInfo.model->renderer->materials[materialIndex] = std::make_shared<Material>();
+
+		const auto& rendererMaterial = modelLoadingInfo.model->renderer->materials[materialIndex];
+
+		aiColor3D color;
+		assimpMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "diffuseColor");
+		assimpMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "specularColor");
+		assimpMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "emissiveColor");
+		assimpMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "transparentColor");
+		assimpMaterial->Get(AI_MATKEY_COLOR_REFLECTIVE, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "reflectiveColor");
+		assimpMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		rendererMaterial->SetVec4F(Utility::AssimpColor3DToNightOwlVec4F(color), "ambientColor");
+
+		float materialProperty;
+		assimpMaterial->Get(AI_MATKEY_SHININESS, materialProperty);
+		rendererMaterial->SetFloat(materialProperty, "shininess");
+		assimpMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, materialProperty);
+		rendererMaterial->SetFloat(materialProperty, "shininessStrength");
+
+		LoadTextureFromMaterial(modelLoadingInfo, rendererMaterial, assimpMaterial, aiTextureType_DIFFUSE, "diffuseTexture");
+		LoadTextureFromMaterial(modelLoadingInfo, rendererMaterial, assimpMaterial, aiTextureType_SPECULAR, "specularTexture");
+		LoadTextureFromMaterial(modelLoadingInfo, rendererMaterial, assimpMaterial, aiTextureType_AMBIENT_OCCLUSION, "ambientOcclusionTexture");
+		LoadTextureFromMaterial(modelLoadingInfo, rendererMaterial, assimpMaterial, aiTextureType_NORMALS, "normalsTexture");
+		LoadTextureFromMaterial(modelLoadingInfo, rendererMaterial, assimpMaterial, aiTextureType_DIFFUSE_ROUGHNESS, "roughnessTexture");
+	}
+
+	void AssimpModelLoader::LoadTextureFromMaterial(const ModelLoadingInfo& modelLoadingInfo, const std::shared_ptr<Material>& rendererMaterial, const aiMaterial* assimpMaterial, aiTextureType textureType, const std::string& uniformName)
+	{
+		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+
+		if (assimpMaterial->GetTextureCount(textureType) > 0)
+		{
+			aiString str;
+			assimpMaterial->GetTexture(textureType, 0, &str);
+
+			std::string textureFilePath(str.C_Str());
+			Utility::StandardizeFilePathString(textureFilePath);
+			textureFilePath = modelLoadingInfo.directory + '/' + textureFilePath;
+			std::string assetName = Utility::StripFilePathToName(textureFilePath);
+
+			ITexture2D* loadedTexture;
+			if (assetManager->GetTextureRepository().HasAsset(assetName))
+			{
+				loadedTexture = assetManager->GetTextureRepository().GetAsset(assetName);
+			}
+			else
+			{
+				loadedTexture = assetManager->LoadTexture2D(textureFilePath);
+			}
+
+			rendererMaterial->SetTexture(loadedTexture, uniformName);
+		}
+		else
+		{
+			const ITexture2D* invalidTexture = assetManager->LoadTexture2D("./assets/Textures/Invalid.png");
+			rendererMaterial->SetTexture(invalidTexture, uniformName);
+		}
 	}
 
 	void AssimpModelLoader::ProcessArmature(ModelLoadingInfo& modelLoadingInfo)
@@ -354,25 +380,24 @@ namespace NightOwl
 			parentGameObjectTransform->SetLocalScale(Utility::AssimpVec3ToNightOwlVec3F(scale));
 			parentGameObjectTransform->SetLocalPosition(Utility::AssimpVec3ToNightOwlVec3F(position));
 			parentGameObjectTransform->SetLocalRotation(Utility::AssimpQuaternionToNightOwlQuatF(rotation));
-
+			
 			for (unsigned int armatureChildIndex = 0; armatureChildIndex < armatureNodePair.second->mNumChildren; ++armatureChildIndex)
 			{
-				processedGameObjects++;
+				++processedGameObjects;
 
 				GameObject* childGameObject = &modelLoadingInfo.model->skeleton.at(processedGameObjects);
 				childGameObject->GetTransform()->SetParent(parentGameObjectTransform, false);
-
 				armatureNodes.emplace(childGameObject, armatureNodePair.second->mChildren[armatureChildIndex]);
 			}
 		}
 	}
 
-	void AssimpModelLoader::ProcessAnimation(const aiAnimation* assimpAnimation)
+	void AssimpModelLoader::ProcessAnimation(const aiAnimation* assimpAnimation, const std::string& animationName)
 	{
 		const std::shared_ptr<Animation> animation = std::make_shared<Animation>();
 
+		animation->SetName(animationName);
 		animation->SetDuration(assimpAnimation->mDuration);
-		animation->SetName(assimpAnimation->mName.data);
 		animation->SetTicksPerSecond(assimpAnimation->mTicksPerSecond);
 
 		for (unsigned int channelIndex = 0; channelIndex < assimpAnimation->mNumChannels; ++channelIndex)
@@ -381,7 +406,7 @@ namespace NightOwl
 			animation->GetBoneKeyFramesMap().emplace(animationChannel->mNodeName.data, BoneKeyFrames(animationChannel));
 		}
 
-		AssetManagerLocator::GetAssetManager()->GetAnimationRepository().AddAsset(animation->GetName(), animation);
+		AssetManagerLocator::GetAssetManager()->GetAnimationRepository().AddAsset(animationName, animation);
 	}
 
 	bool AssimpModelLoader::HasBones(const ModelLoadingInfo& modelLoadingInfo)

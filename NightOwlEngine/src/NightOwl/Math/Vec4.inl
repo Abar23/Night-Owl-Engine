@@ -125,6 +125,18 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Vec4<T> Vec4<T>::Max(const Vec4<T>& leftVector, const Vec4<T>& rightVector)
+	{
+		return Vec2<T>(std::max(leftVector.x, rightVector.x), std::max(leftVector.y, rightVector.y), std::max(leftVector.z, rightVector.z), std::max(leftVector.w, rightVector.w));
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Min(const Vec4<T>& leftVector, const Vec4<T>& rightVector)
+	{
+		return Vec2<T>(std::min(leftVector.x, rightVector.x), std::min(leftVector.y, rightVector.y), std::min(leftVector.z, rightVector.z), std::min(leftVector.w, rightVector.w));
+	}
+
+	template <typename T>
 	Vec4<T> Vec4<T>::Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t)
 	{
 		return leftVector * (static_cast<T>(1) - t) + rightVector * t;

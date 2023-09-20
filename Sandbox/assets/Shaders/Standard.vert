@@ -44,9 +44,10 @@ void main(void)
     outVertexData.materialBoneIds = boneIds;
     outVertexData.materialBoneWeights = boneWeights;
 
-    vec4 totalPosition = vec4(0.0);
+    vec4 totalPosition = vec4(materialPosition, 1.0);
     if (hasBones)
     {    
+        totalPosition = vec4(0.0);
         for(int i = 0 ; i < MAX_BONE_INFLUENCE; ++i)
         {
             if(boneIds[i] == -1) 
@@ -57,10 +58,6 @@ void main(void)
             vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(materialPosition, 1.0);
             totalPosition += localPosition * boneWeights[i];
         }
-    }
-    else
-    {
-        totalPosition = vec4(materialPosition, 1.0);
     }
 
     gl_Position = viewProjectionMatrix * modelMatrix * totalPosition;

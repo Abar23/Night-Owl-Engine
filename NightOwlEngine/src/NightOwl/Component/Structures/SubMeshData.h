@@ -12,5 +12,7 @@ namespace NightOwl
 		int indexStart;
 
 		int vertexCount;
+
+		unsigned int materialId;
 	};
 }

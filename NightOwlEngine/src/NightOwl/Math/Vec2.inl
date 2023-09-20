@@ -153,6 +153,18 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Vec2<T> Vec2<T>::Max(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
+	{
+		return Vec2<T>(std::max(leftVector.x, rightVector.x), std::max(leftVector.y, rightVector.y));
+	}
+
+	template <typename T>
+	Vec2<T> Vec2<T>::Min(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
+	{
+		return Vec2<T>(std::min(leftVector.x, rightVector.x), std::min(leftVector.y, rightVector.y));
+	}
+
+	template <typename T>
 	T Vec2<T>::Dot(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
 	{
 		return leftVector.x * rightVector.x + leftVector.y * rightVector.y;

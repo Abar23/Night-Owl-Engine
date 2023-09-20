@@ -8,13 +8,15 @@ namespace NightOwl
 	class OpenGlTexture2D : public ITexture2D
 	{
 	public:
+		OpenGlTexture2D();
+
 		OpenGlTexture2D(const void* pixelData, int height, int width, int numberOfChannels);
 
 		~OpenGlTexture2D() override;
 
-		void Bind(unsigned int textureUnit) override;
+		void Bind(unsigned int textureUnit) const override;
 
-		void Unbind() override;
+		void Unbind() const override;
 
 		int GetWidth() override;
 

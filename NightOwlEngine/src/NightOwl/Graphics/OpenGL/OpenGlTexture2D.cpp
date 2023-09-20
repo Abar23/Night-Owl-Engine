@@ -5,6 +5,15 @@
 
 namespace NightOwl
 {
+	OpenGlTexture2D::OpenGlTexture2D()
+		: textureHandle(0),
+		  textureId(0), 
+		  height(0), 
+		  width(0), 
+		  numberOfChannels(0)
+	{
+	}
+
 	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, int numberOfChannels)
 		:	height(height),
 			width(width),
@@ -27,13 +36,13 @@ namespace NightOwl
 		GL_CALL(glDeleteTextures, 1, &textureId);
 	}
 
-	void OpenGlTexture2D::Bind(unsigned int textureUnit)
+	void OpenGlTexture2D::Bind(unsigned int textureUnit) const
 	{
 		GL_CALL(glActiveTexture, GL_TEXTURE0 + textureUnit);
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, textureId);
 	}
 
-	void OpenGlTexture2D::Unbind()
+	void OpenGlTexture2D::Unbind() const
 	{
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
 	}

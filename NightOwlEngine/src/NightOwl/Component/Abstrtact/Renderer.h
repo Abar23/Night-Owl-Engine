@@ -13,6 +13,8 @@ namespace NightOwl
 	public:
 		Renderer();
 
+		void CloneRenderer(const std::shared_ptr<Renderer>& clone);
+
 		void Draw();
 
 		std::shared_ptr<Mesh> GetMesh();
@@ -23,20 +25,24 @@ namespace NightOwl
 
 		bool IsVisible();
 
-		// TODO: convert to list of materials, each mesh will point to one of these materials which could be shared
 		const std::shared_ptr<Material> GetMaterial();
 
-		void SetMaterial(std::shared_ptr<Material> material);
+		void SetMaterial(const std::shared_ptr<Material>& material);
+
+		const std::vector<std::shared_ptr<Material>>& GetMaterials();
+
+		void SetMaterials(const std::vector<std::shared_ptr<Material>>& materials);
+
+		std::vector<Mat4F>& GetFinalBoneMatrices();
 
 	protected:
 		std::shared_ptr<Mesh> mesh;
 
-		// TODO: turn into a vector
-		std::shared_ptr<Material> material;
+		std::vector<std::shared_ptr<Material>> materials;
 
 		bool isVisible;
 
-		void CloneRenderer(const std::shared_ptr<Renderer>& clone);
+		std::vector<Mat4F> finalBoneMatrices;
 
 		friend class AssimpModelLoader;
 	};

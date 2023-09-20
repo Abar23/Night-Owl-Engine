@@ -26,11 +26,13 @@ namespace NightOwl
 
 		static void ProcessBones(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
 
-		static void ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMesh* assimpMesh);
+		static void ProcessMaterials(ModelLoadingInfo& modelLoadingInfo, const aiMaterial* assimpMaterial, const unsigned int materialIndex);
+
+		static void LoadTextureFromMaterial(const ModelLoadingInfo& modelLoadingInfo, const std::shared_ptr<Material>& rendererMaterial, const aiMaterial* assimpMaterial, aiTextureType textureType, const std::string& uniformName);
 
 		static void ProcessArmature(ModelLoadingInfo& modelLoadingInfo);
 
-		static void ProcessAnimation(const aiAnimation* assimpAnimation);
+		static void ProcessAnimation(const aiAnimation* assimpAnimation, const std::string& animationName);
 
 		static bool HasBones(const ModelLoadingInfo& modelLoadingInfo);
 	};

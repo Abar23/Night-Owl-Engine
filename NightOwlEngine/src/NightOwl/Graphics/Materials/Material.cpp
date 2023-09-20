@@ -6,11 +6,11 @@
 #include "NightOwl/Graphics/RenderAPI.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 
 namespace NightOwl
 {
 	Material::Material()
-		: finalBoneMatrices(100)
 	{
 		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
 		shader = assetManager->LoadShader("Standard Shader", "./assets/Shaders/Standard.vert", "./assets/Shaders/Standard.frag");
@@ -21,55 +21,18 @@ namespace NightOwl
 	{
 		std::shared_ptr<Material> clone = std::make_shared<Material>();
 
+		clone->textureUniformMap = textureUniformMap;
+		clone->floatUniformMap = floatUniformMap;
+		clone->integerUniformMap = integerUniformMap;
+		clone->vectorUniformMap = vectorUniformMap;
+		clone->matrixUniformMap = matrixUniformMap;
 		clone->shader = shader;
 
 		return clone;
 	}
 
-	void Material::Draw(Renderer& renderer)
-	{
-		const std::shared_ptr<Mesh> mesh = renderer.GetMesh();
-		Transform* transform = renderer.GetGameObject().GetTransform();
-
-		shader->Bind();
-
-		SetMat4F(transform->GetWorldMatrix(), "modelMatrix");
-		SetMat4F(Camera::GetMainCamera()->GetViewProjectionMatrix(), "viewProjectionMatrix");
-
-		SetInteger(0, "isInputTextureSet");
-
-		if (finalBoneMatrices.empty() == false)
-		{
-			for (int i = 0; i < finalBoneMatrices.size(); ++i)
-			{
-				if (i == 0)
-				{
-					SetMat4F(finalBoneMatrices[0], "finalBonesMatrices[0]");
-				}
-				shader->SetUniformMat4F(finalBoneMatrices[i], "finalBonesMatrices[" + std::to_string(i) + "]");
-			}
-			SetInteger(1, "hasBones");
-		}
-		else
-		{
-			SetInteger(0, "hasBones");
-		}
-
-		mesh->Bind();
-		for (const auto& subMesh : mesh->GetSubMeshes())
-		{
-			Bind();
-			RenderApi::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
-			UnBind();
-		}
-		mesh->Unbind();
-		shader->Unbind();
-	}
-
 	void Material::Bind()
 	{
-		//shader->Bind();
-
 		for (const auto& uniformIdValuePair : vectorUniformMap | std::views::values)
 		{
 			shader->SetUniformVec4F(uniformIdValuePair.second, uniformIdValuePair.first);
@@ -195,17 +158,17 @@ namespace NightOwl
 		return floatUniformMap[uniformName] .second;
 	}
 
-	void Material::SetTexture(const std::shared_ptr<ITexture2D>& texture, const std::string& uniformName)
+	void Material::SetTexture(const ITexture2D* texture, const std::string& uniformName)
 	{
 		if (textureUniformMap.contains(uniformName) == false)
 		{
 			return;
 		}
 
-		textureUniformMap[uniformName].second = texture.get();
+		textureUniformMap[uniformName].second = texture;
 	}
 
-	ITexture2D* Material::GetTexture(const std::string& uniformName)
+	const ITexture2D* Material::GetTexture(const std::string& uniformName)
 	{
 		if (textureUniformMap.contains(uniformName) == false)
 		{
@@ -215,9 +178,9 @@ namespace NightOwl
 		return textureUniformMap[uniformName].second;
 	}
 
-	std::vector<Mat4F>& Material::GetFinalBoneMatrices()
+	const IShader* Material::GetShader() const
 	{
-		return finalBoneMatrices;
+		return shader;
 	}
 
 	void Material::ProcessShaderUniforms()
@@ -236,7 +199,7 @@ namespace NightOwl
 					break;
 
 				case UniformDataTypes::Vec4F:
-					vectorUniformMap[uniformName] = std::make_pair(uniformLocation, Vec4F::Zero());
+					vectorUniformMap[uniformName] = std::make_pair(uniformLocation, Vec4F(1.0f));
 					break;
 
 				case UniformDataTypes::Mat4F:

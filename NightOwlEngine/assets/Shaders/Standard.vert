@@ -1,5 +1,8 @@
 #version 460 core
 
+#extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shading_language_include : require
+
 layout (location = 0) in vec3 materialPosition;
 layout (location = 1) in vec3 materialColor;
 layout (location = 2) in vec2 materialUvs;
@@ -11,6 +14,8 @@ layout (location = 7) in vec4 boneWeights;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewProjectionMatrix;
+
+uniform bool hasBones;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
@@ -39,21 +44,20 @@ void main(void)
     outVertexData.materialBoneIds = boneIds;
     outVertexData.materialBoneWeights = boneWeights;
 
-    vec4 totalPosition = vec4(0.0);
-    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-    {
-        if(boneIds[i] == -1) 
+    vec4 totalPosition = vec4(materialPosition, 1.0);
+    if (hasBones)
+    {    
+        totalPosition = vec4(0.0);
+        for(int i = 0 ; i < MAX_BONE_INFLUENCE; ++i)
         {
-            continue;
-        }
-        if(boneIds[i] >= MAX_BONES) 
-        {
-            totalPosition = vec4(materialPosition, 1.0);
-            break;
-        }
+            if(boneIds[i] == -1) 
+            {
+                break;
+            }
 
-        vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(materialPosition, 1.0);
-        totalPosition += localPosition * boneWeights[i];
+            vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(materialPosition, 1.0);
+            totalPosition += localPosition * boneWeights[i];
+        }
     }
 
     gl_Position = viewProjectionMatrix * modelMatrix * totalPosition;

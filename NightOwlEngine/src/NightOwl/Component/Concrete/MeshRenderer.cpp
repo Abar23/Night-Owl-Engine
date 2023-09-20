@@ -9,7 +9,7 @@ namespace NightOwl
 	MeshRenderer::MeshRenderer()
 	{
 		type = ComponentType::MeshRenderer;
-		material = std::make_shared<Material>();
+		materials.push_back(std::make_shared<Material>());
 		MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);
 	}
 

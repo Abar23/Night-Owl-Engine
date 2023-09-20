@@ -24,25 +24,25 @@ uniform vec4 transparentColor;
 uniform vec4 reflectiveColor;
 uniform vec4 ambientColor;
 
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D ambientOcclusionsTexture;
+uniform sampler2D normalsTexture;
+uniform sampler2D roughnessTexture;
+
 uniform float shininess;
 uniform float shininessStrength;
 
-uniform bool isInputTextureSet;
-uniform sampler2D inputTexture;
-
 void main(void)
 {
-    vec4 outputColor = vec4(inVertexData.materialColor, 1.0);
+    vec4 outputColor = diffuseColor;
 
-    if(isInputTextureSet)
+    outputColor *= texture(diffuseTexture, inVertexData.materialUvs);
+    
+    if(outputColor.a < 0.1)
     {
-        outputColor = texture(inputTexture, inVertexData.materialUvs);
-
-        if(outputColor.a < 0.1)
-        {
-            discard;
-        }
+        discard;
     }
 
-	FragColor = vec4(diffuseColor.xyz, 1.0);
+	FragColor = vec4(inVertexData.materialNormals, 1.0);
 } 

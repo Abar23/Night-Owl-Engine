@@ -84,7 +84,7 @@ namespace NightOwl
 		return tangents;
 	}
 
-	void Mesh::SetRangents(const std::vector<Vec3F>& tangents)
+	void Mesh::SetTangents(const std::vector<Vec3F>& tangents)
 	{
 		this->tangents = tangents;
 	}
@@ -150,9 +150,19 @@ namespace NightOwl
 		return subMeshes;
 	}
 
+	void Mesh::SetSubMeshes(const std::vector<SubMeshData>& subMeshes)
+	{
+		this->subMeshes = subMeshes;
+	}
+
 	const std::map<std::string, BoneInfo>& Mesh::GetBoneInfoMap()
 	{
 		return boneInfoMap;
+	}
+
+	void Mesh::SetBoneInfoMap(const std::map<std::string, BoneInfo>& boneInfoMap)
+	{
+		this->boneInfoMap = boneInfoMap;
 	}
 
 	void Mesh::Clear()
@@ -334,7 +344,7 @@ namespace NightOwl
 		UploadMeshData();
 	}
 
-	void Mesh::UploadboneWeights()
+	void Mesh::UploadBoneWeights()
 	{
 		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("BoneIds");
 		if (index >= 0)
