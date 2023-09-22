@@ -6,7 +6,7 @@ namespace NightOwl
 
 	constexpr float F_PI = static_cast<float>(M_PI);
 
-	constexpr float DOT_THRESHOLD = 0.99f;
+	constexpr float DOT_THRESHOLD = 0.9f;
 
 	constexpr float THREE_HUNDRED_SIXTY_DEGREES = 360.0f;
 

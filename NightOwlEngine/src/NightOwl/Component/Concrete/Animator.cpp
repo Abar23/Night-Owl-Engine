@@ -45,19 +45,17 @@ namespace NightOwl
 			return;
 		}
 
+		float deltaTime = Time::GetDeltaTime();
 		if (updateMode == AnimatorUpdateMode::AnimatePhysics)
 		{
-			elapsedTime += Time::GetFixedDeltaTime() * currentAnimation->GetTicksPerSecond();
+			deltaTime = Time::GetFixedDeltaTime();
 		}
 		else if (updateMode == AnimatorUpdateMode::UnscaledTime)
 		{
-			elapsedTime += Time::GetUnscaledDeltaTime() * currentAnimation->GetTicksPerSecond();
+			deltaTime = Time::GetUnscaledDeltaTime();
 		}
-		else
-		{
-			// TODO: figure out rotation shit tomorrow
-			elapsedTime += Time::GetDeltaTime() * currentAnimation->GetTicksPerSecond();
-		}
+
+		elapsedTime += deltaTime * currentAnimation->GetTicksPerSecond();
 
 		if (elapsedTime > currentAnimation->GetDuration())
 		{
@@ -71,6 +69,7 @@ namespace NightOwl
 		}
 		
 		auto& bonInfoMap = renderer->GetMesh()->GetBoneInfoMap();
+
 		// TODO: Do this in a buffer
 		std::vector<Mat4F>& finalBoneOffsetMatrices = renderer->GetFinalBoneMatrices();
 		if (finalBoneOffsetMatrices.empty() == true)
@@ -85,24 +84,24 @@ namespace NightOwl
 			Transform* skeletonTransform = skeletonTransforms.top();
 			skeletonTransforms.pop();
 
+			for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
+			{
+				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
+			}
+
 			BoneKeyFrames* boneKeyFrames = currentAnimation->GetBoneKeyFrames(skeletonTransform->GetGameObject().GetName());
 			if (boneKeyFrames != nullptr)
 			{
 				boneKeyFrames->Update(elapsedTime);
-				
+
 				skeletonTransform->SetLocalPosition(boneKeyFrames->GetFinalPosition());
-				skeletonTransform->SetLocalScale(boneKeyFrames->GetFinalScale());
 				skeletonTransform->SetLocalRotation(boneKeyFrames->GetFinalRotation());
+				skeletonTransform->SetLocalScale(boneKeyFrames->GetFinalScale());
 
 				const auto& boneName = skeletonTransform->GetGameObject().GetName();
 				BoneInfo boneInfo = bonInfoMap.at(boneName);
 				const Mat4F finalBoneOffsetMatrix = skeletonTransform->GetWorldMatrix() * boneInfo.offsetMatrix;
 				finalBoneOffsetMatrices[boneInfo.id] = finalBoneOffsetMatrix;
-			}
-
-			for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
-			{
-				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
 			}
 		}
 	}
@@ -135,6 +134,11 @@ namespace NightOwl
 
 	void Animator::AddAnimation(Animation* animation)
 	{
+		if (animationCollection.animationsMap.contains(animation->GetName()))
+		{
+			return;
+		}
+
 		animationCollection.animationsMap.emplace(animation->GetName(), animation);
 	}
 

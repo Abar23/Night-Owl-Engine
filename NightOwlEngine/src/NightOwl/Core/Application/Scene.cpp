@@ -67,7 +67,7 @@ namespace NightOwl
 		if (isDirty)
 		{
 			rootGameObjects.clear();
-			for (auto& pair : gameObjectsList)
+			for (const auto& pair : gameObjectsList)
 			{
 				const Transform* transform = pair.second->GetTransform();
 				if (!transform->HasParent())
@@ -148,7 +148,7 @@ namespace NightOwl
 	{
 		// Remove resources loaded in asset manager
 		auto* assetManager = AssetManagerLocator::GetAssetManager();
-		assetManager->ClearAll();
+		assetManager->ClearSceneAll();
 
 		// Destroy all game objects in the scene
 		const auto& updatedRootGameObjects = GetRootGameObjects();

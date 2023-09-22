@@ -39,6 +39,8 @@ namespace NightOwl
 
 		const IShader* GetShader() const;
 
+		void SetShader(IShader* shader);
+
 	private:
 		IShader* shader;
 
@@ -53,5 +55,7 @@ namespace NightOwl
 		std::map<std::string, std::pair<int, Mat4F>> matrixUniformMap;
 
 		void ProcessShaderUniforms();
+
+		void ClearUniformMaps();
 	};
 }

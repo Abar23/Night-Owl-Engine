@@ -12,38 +12,73 @@ namespace NightOwl
 	public:
 		bool HasAsset(const std::string& assetName)
 		{
-			return assetMap.contains(assetName);
+			if (sceneAssetMap.contains(assetName) || engineAssetMap.contains(assetName))
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		T* GetAsset(const std::string& assetName)
 		{
-			if (assetMap.contains(assetName) == false)
+			if (sceneAssetMap.contains(assetName))
 			{
-				return nullptr;
+				return sceneAssetMap.at(assetName).get();
 			}
 
-			return assetMap.at(assetName).get();
+			if (engineAssetMap.contains(assetName))
+			{
+				return engineAssetMap.at(assetName).get();
+			}
+
+			return nullptr;
 		}
 
-		void AddAsset(const std::string& assetName, std::shared_ptr<T> asset)
+		void AddAsset(const std::string& assetName, std::shared_ptr<T> asset, bool isEngineAsset = false)
 		{
-			if (!HasAsset(assetName))
+			if (HasAsset(assetName) == true)
 			{
-				assetMap[assetName] = asset;
+				return;
 			}
+
+			if (isEngineAsset)
+			{
+				engineAssetMap[assetName] = asset;
+				return;
+			}
+
+			sceneAssetMap[assetName] = asset;
 		}
 
 		void RemoveAsset(const std::string& assetName)
 		{
-			assetMap.erase(assetName);
+			if (sceneAssetMap.contains(assetName))
+			{
+				sceneAssetMap.erase(assetName);
+				return;
+			}
+
+			if (engineAssetMap.contains(assetName))
+			{
+				engineAssetMap.erase(assetName);
+			}
 		}
 
-		void ClearAssets()
+		void ClearSceneAssets()
 		{
-			assetMap.clear();
+			sceneAssetMap.clear();
+		}
+
+		void ClearAllAssets()
+		{
+			sceneAssetMap.clear();
+			engineAssetMap.clear();
 		}
 
 	private:
-		std::unordered_map<std::string,std::shared_ptr<T>> assetMap;
+		std::unordered_map<std::string,std::shared_ptr<T>> sceneAssetMap;
+
+		std::unordered_map<std::string, std::shared_ptr<T>> engineAssetMap;
 	};
 }

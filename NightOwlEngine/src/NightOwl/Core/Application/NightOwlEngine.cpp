@@ -26,8 +26,8 @@ namespace NightOwl
 		ENGINE_ASSERT(application != nullptr, "Night Owl Engine application can't be null");
 
 		// Standup necessary systems
-		WindowApi::CreateWindow("Dodge Brawl", 900, 1600);
-
+		WindowApi::CreateWindow("Animation Project 1", 900, 1600);
+		
 		#ifdef DEBUG
 		Utility::LoggerManager::Init();
 		#endif
@@ -54,10 +54,12 @@ namespace NightOwl
 		AssetManagerLocator::Provide(assetManger.get());
 		AudioSystemLocator::Provide(audioSystem.get());
 
+		assetManger->LoadEngineAssets();
+
 		application->Init();
 	}
 
-	void NightOwlEngine::Update()
+	void NightOwlEngine::Update() const
 	{
 		while (!WindowApi::GetWindow()->ShouldWindowClose())
 		{
@@ -109,13 +111,16 @@ namespace NightOwl
 		}
 	}
 
-	void NightOwlEngine::Shutdown()
+	void NightOwlEngine::Shutdown() const
 	{
 		application->Shutdown();
 
 		sceneManager->Shutdown();
 
 		audioSystem->Shutdown();
+
+		// clears engine and scene assets
+		assetManger->ClearAll();
 
 		WindowApi::GetWindow()->Shutdown();
 

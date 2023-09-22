@@ -19,14 +19,14 @@ namespace NightOwl
 		vertexArrayObject->SetVertexBuffer(vertexBuffer);
 	}
 
-	void Mesh::Bind()
+	void Mesh::Bind() const
 	{
 		ENGINE_ASSERT(isValid, "Mesh with invalid data has been bound!"); // get name to be apart of mesh for better debugging
 
 		vertexArrayObject->Bind();
 	}
 
-	void Mesh::Unbind()
+	void Mesh::Unbind() const
 	{
 		vertexArrayObject->Unbind();
 	}

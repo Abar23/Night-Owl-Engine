@@ -6,20 +6,11 @@
 
 namespace NightOwl
 {
-	OpenGlShader::OpenGlShader(const std::string& name, const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
-		:	programId(0),
-			name{ name }
+	OpenGlShader::OpenGlShader(const std::string& name)
+		: name{ name },
+		  programId(0)
 	{
-		const unsigned int vertexShaderId = CompileShaderSource(vertexShaderSource, GL_VERTEX_SHADER);
-		const unsigned int fragmentShaderId = CompileShaderSource(fragmentShaderSource, GL_FRAGMENT_SHADER);
 		programId = GL_CALL(glCreateProgram);
-		GL_CALL(glAttachShader, programId, vertexShaderId);
-		GL_CALL(glAttachShader, programId, fragmentShaderId);
-		GL_CALL(glLinkProgram, programId);
-		CHECK_PROGRAM_LINKER_ERRORS(programId);
-		glDeleteShader(vertexShaderId);
-		glDeleteShader(fragmentShaderId);
-		ProcessUniforms();
 	}
 
 	OpenGlShader::~OpenGlShader()
@@ -36,6 +27,25 @@ namespace NightOwl
 	void OpenGlShader::Unbind() const
 	{
 		GL_CALL(glUseProgram, 0);
+	}
+
+	void OpenGlShader::AddShaderStage(const std::shared_ptr<IShaderStage>& shaderStage)
+	{
+		shaderStages.push_back(shaderStage);
+	}
+
+	void OpenGlShader::AttachAndLinkShaderStages()
+	{
+		for (const auto& shaderStage : shaderStages)
+		{
+			GL_CALL(glAttachShader, programId, shaderStage->GetId());
+		}
+
+		GL_CALL(glLinkProgram, programId);
+
+		CHECK_PROGRAM_LINKER_ERRORS(programId);
+
+		ProcessUniforms();
 	}
 
 	void OpenGlShader::SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName) const
@@ -121,16 +131,6 @@ namespace NightOwl
 	const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& OpenGlShader::GetUniformDataMap() const
 	{
 		return uniformTypeToDataMap;
-	}
-
-	unsigned int OpenGlShader::CompileShaderSource(const std::string& shaderSource, GLenum shaderType)
-	{
-		const char* acceptableShaderSource = shaderSource.c_str();
-		const unsigned int shaderId = GL_CALL(glCreateShader, shaderType);
-		GL_CALL(glShaderSource, shaderId, 1, &acceptableShaderSource, NULL);
-		GL_CALL(glCompileShader, shaderId);
-		CHECK_SHADER_COMPILER_ERRORS(shaderId);
-		return shaderId;
 	}
 
 	void OpenGlShader::ProcessUniforms()

@@ -341,14 +341,13 @@ namespace NightOwl
 	{
 		if(parent == nullptr)
 		{
-			this->worldRotationOffset = newRotation;
-			this->worldRotationOffset.Normalize();
-			isWorldDirty = true;
-			return;
+			localRotation = newRotation.GetNormalize();
+			isLocalDirty = true;
 		}
 
-		localRotation = newRotation.GetNormalize();
-		isLocalDirty = true;
+		this->worldRotationOffset = newRotation;
+		this->worldRotationOffset.Normalize();
+		isWorldDirty = true;
 	}
 
 	Vec3F Transform::GetPosition()
@@ -397,23 +396,23 @@ namespace NightOwl
 		return GetRotation().GetRotationMatrix().GetColumn(1);
 	}
 
-	void Transform::Clone(const Transform& tranformToClone, Scene* currentScene /* = nullptr */)
+	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */)
 	{
-		localModelMatrix = tranformToClone.localModelMatrix;
-		worldMatrix = tranformToClone.worldMatrix;
-		parentLocalMatrix = tranformToClone.parentLocalMatrix;
-		inverseOfOriginalParentLocalModelMatrix = tranformToClone.inverseOfOriginalParentLocalModelMatrix;
-		localScale = tranformToClone.localScale;
-		localRotation = tranformToClone.localRotation;
-		localPosition = tranformToClone.localPosition;
-		worldScaleOffset = tranformToClone.worldScaleOffset;
-		worldRotationOffset = tranformToClone.worldRotationOffset;
-		worldPosition = tranformToClone.worldPosition;
-		root = tranformToClone.root;
-		parent = tranformToClone.parent;
+		localModelMatrix = transformToClone.localModelMatrix;
+		worldMatrix = transformToClone.worldMatrix;
+		parentLocalMatrix = transformToClone.parentLocalMatrix;
+		inverseOfOriginalParentLocalModelMatrix = transformToClone.inverseOfOriginalParentLocalModelMatrix;
+		localScale = transformToClone.localScale;
+		localRotation = transformToClone.localRotation;
+		localPosition = transformToClone.localPosition;
+		worldScaleOffset = transformToClone.worldScaleOffset;
+		worldRotationOffset = transformToClone.worldRotationOffset;
+		worldPosition = transformToClone.worldPosition;
+		root = transformToClone.root;
+		parent = transformToClone.parent;
 
-		isLocalDirty = tranformToClone.isLocalDirty;
-		isWorldDirty = tranformToClone.isWorldDirty;
+		isLocalDirty = transformToClone.isLocalDirty;
+		isWorldDirty = transformToClone.isWorldDirty;
 
 		// TODO: Figure out if this is needed
 		// if(parent != nullptr)
@@ -421,9 +420,9 @@ namespace NightOwl
 		// 	parent->SetChild(this);
 		// }
 
-		for (auto& transform : tranformToClone.children)
+		for (auto& transform : transformToClone.children)
 		{
-			auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr);
+			const auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr);
 			children.push_back(clonedChild->GetTransform());
 		}
 	}

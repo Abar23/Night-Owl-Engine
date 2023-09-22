@@ -3,7 +3,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "AssetManager.h"
-
 #include "AssimpModelLoader.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
@@ -11,7 +10,11 @@
 #include "NightOwl/Graphics/RenderApi.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Core/Utitlity/Utils.h"
 #include "stb/stb_image.h"
+#include <filesystem>
+
+#include "ShaderLoader.h"
 
 namespace NightOwl
 {
@@ -51,65 +54,30 @@ namespace NightOwl
 		return data;
 	}
 
-	std::string AssetManager::ReadShader(const std::string& filePath)
+	void AssetManager::ClearSceneAll()
 	{
-		std::string shaderSource;
-		try
-		{
-			std::ifstream shaderSourceFile;
-
-			shaderSourceFile.exceptions(std::ios::failbit | std::ios::badbit);
-			shaderSourceFile.open(filePath, std::ios::binary);
-
-			shaderSourceFile.seekg(0, std::ios::end);
-			const std::streamsize shaderSourceFileSize = shaderSourceFile.tellg();
-
-			if (shaderSourceFileSize > 0)
-			{
-				shaderSource.resize(shaderSourceFileSize);
-				shaderSourceFile.seekg(0, std::ios::beg);
-				shaderSourceFile.read(shaderSource.data(), shaderSourceFileSize);
-			}
-			else
-			{
-				ENGINE_LOG_ERROR("Shader source file is empty: {0}", filePath);
-				std::terminate();
-			}
-		}
-		catch (std::exception& e)
-		{
-			ENGINE_LOG_ERROR("Failed to open shader source file: {0}\n Exception raised: {1}\n, Error raised: {2}", filePath, e.what(), strerror(errno));
-			std::terminate();
-		}
-
-		return shaderSource;
+		shaderRepository.ClearSceneAssets();
+		textureRepository.ClearSceneAssets();
+		audioClipRepository.ClearSceneAssets();
+		modelRepository.ClearSceneAssets();
+		animationRepository.ClearSceneAssets();
 	}
 
 	void AssetManager::ClearAll()
 	{
-		shaderRepository.ClearAssets();
-		textureRepository.ClearAssets();
-		audioClipRepository.ClearAssets();
+		shaderRepository.ClearAllAssets();
+		textureRepository.ClearAllAssets();
+		audioClipRepository.ClearAllAssets();
+		modelRepository.ClearAllAssets();
+		animationRepository.ClearAllAssets();
 	}
 
-	IShader* AssetManager::LoadShader(const std::string& name, const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
+	void AssetManager::LoadShaders(const std::string& shaderDirectory, bool isEngineAsset /* = false */)
 	{
-		if (shaderRepository.HasAsset(name))
-		{
-			return shaderRepository.GetAsset(name);
-		}
-
-		std::string vertexShaderSource = ReadShader(vertexShaderPath);
-		std::string fragmentShaderSource = ReadShader(fragmentShaderPath);
-
-		const auto shader = RenderApi::CreateShader(name, vertexShaderSource, fragmentShaderSource);
-
-		shaderRepository.AddAsset(name, shader);
-
-		return shader.get();
+		ShaderLoader::LoadShaders(shaderDirectory, isEngineAsset);
 	}
 
-	ITexture2D* AssetManager::LoadTexture2D(const std::string& filePath)
+	ITexture2D* AssetManager::LoadTexture2D(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
 		const std::string textureName = Utility::StripFilePathToName(filePath);
 
@@ -126,14 +94,14 @@ namespace NightOwl
 
 		const auto texture = RenderApi::CreateTexture2D(data, height, width, numberOfChannels);
 
-		textureRepository.AddAsset(textureName, texture);
+		textureRepository.AddAsset(textureName, texture, isEngineAsset);
 
 		stbi_image_free(data);
 		
 		return texture.get();
 	}
 
-	AudioClip* AssetManager::LoadAudioClip(const std::string& filePath)
+	AudioClip* AssetManager::LoadAudioClip(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
 		const std::string audioClipName = Utility::StripFilePathToName(filePath);
 
@@ -146,12 +114,12 @@ namespace NightOwl
 
 		//audioClip->SetSound(sound);
 
-		audioClipRepository.AddAsset(audioClipName, audioClip);
+		audioClipRepository.AddAsset(audioClipName, audioClip, isEngineAsset);
 
 		return audioClip.get();
 	}
 
-	void AssetManager::LoadModel(const std::string& filePath)
+	void AssetManager::LoadModel(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
 		const std::string modelName = Utility::StripFilePathToNameWithoutExtension(filePath);
 		if (modelRepository.HasAsset(modelName))
@@ -159,11 +127,12 @@ namespace NightOwl
 			return;
 		}
 
+		// TODO: return back the model that has been loaded
 		// call assimp model load and add mesh to the repository
 		AssimpModelLoader::LoadModel(filePath);
 	}
 
-	void AssetManager::LoadAnimation(const std::string& filePath)
+	void AssetManager::LoadAnimation(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
 		const std::string animationName = Utility::StripFilePathToNameWithoutExtension(filePath);
 		if (modelRepository.HasAsset(animationName))
@@ -171,6 +140,24 @@ namespace NightOwl
 			return;
 		}
 
+		// TODO: return back the animation that has been loaded
 		AssimpModelLoader::LoadAnimation(filePath);
+	}
+
+	void AssetManager::LoadEngineAssets()
+	{
+		// Load all textures
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(ENGINE_TEXTURE_DIRECTORY)) {
+			if (is_regular_file(entry)) {
+				std::string filePath = entry.path().string();
+				Utility::StandardizeFilePathString(filePath);
+				LoadTexture2D(filePath, true);
+			}
+		}
+
+		// Load all shaders
+		LoadShaders(ENGINE_SHADER_DIRECTORY, true);
+
+		// TODO: add any additional engine specific
 	}
 }

@@ -79,7 +79,7 @@ namespace NightOwl
 
 		Quaternion<T>& operator=(const Quaternion<T>& quaternion);
 
-		Quaternion<T>& operator*=(const Quaternion<T>& quaterion);
+		Quaternion<T>& operator*=(const Quaternion<T>& quaternion);
 
 		Quaternion<T>& operator*=(const T scalar);
 

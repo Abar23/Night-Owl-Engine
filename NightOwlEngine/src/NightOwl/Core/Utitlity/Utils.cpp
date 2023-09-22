@@ -41,6 +41,17 @@ namespace NightOwl::Utility
 		return fileName.substr(0, delimiterPosition);
 	}
 
+	std::string StripFilePathToExtension(const std::string& filePath)
+	{
+		size_t positionOfDot = filePath.find_last_of(".");
+		if (positionOfDot != std::string::npos) 
+		{
+			return filePath.substr(positionOfDot + 1);
+		}
+
+		return ""; // Empty string if no extension found
+	}
+
 	std::string FilePathToDirectory(std::string filePath)
 	{
 		StandardizeFilePathString(filePath);

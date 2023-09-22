@@ -9,16 +9,16 @@ namespace NightOwl
 	{
 		switch (type)
 		{
-		case ShaderType::VERTEX:
+		case ShaderType::Vertex:
 			return GL_VERTEX_SHADER;
 
-		case ShaderType::TESS_CONTROL:
+		case ShaderType::TessControl:
 			return GL_TESS_CONTROL_SHADER;
 
-		case ShaderType::TESS_EVALUATION:
+		case ShaderType::TessEvaluation:
 			return GL_TESS_EVALUATION_SHADER;
 
-		case ShaderType::GEOMETRY:
+		case ShaderType::Geometry:
 			return GL_GEOMETRY_SHADER;
 
 		default:

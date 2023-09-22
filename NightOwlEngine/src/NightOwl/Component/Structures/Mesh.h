@@ -18,9 +18,9 @@ namespace NightOwl
 	public:
 		Mesh();
 
-		void Bind();
+		void Bind() const;
 
-		void Unbind();
+		void Unbind() const;
 
 		std::vector<Vec3F> GetVertices();
 

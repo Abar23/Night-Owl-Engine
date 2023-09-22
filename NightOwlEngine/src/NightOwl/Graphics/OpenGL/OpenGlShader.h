@@ -1,10 +1,6 @@
 #pragma once
 
-#include <map>
-
-#include "glad/glad.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
-#include "NightOwl/Graphics/Types/ShaderTypes.h"
 #include "NightOwl/Graphics/Types/UniformDataTypes.h"
 
 namespace NightOwl
@@ -12,13 +8,17 @@ namespace NightOwl
 	class OpenGlShader : public IShader
 	{
 	public:
-		OpenGlShader(const std::string& name, const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
+		OpenGlShader(const std::string& name);
 
 		~OpenGlShader() override;
 
 		void Bind() const override;
 
 		void Unbind() const override;
+
+		void AddShaderStage(const std::shared_ptr<IShaderStage>& shaderStage) override;
+
+		void AttachAndLinkShaderStages() override;
 
 		void SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName) const override;
 
@@ -57,13 +57,13 @@ namespace NightOwl
 		const std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)>& GetUniformDataMap() const override;
 
 	private:
-		unsigned int programId;
-
 		std::string name;
 
-		std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)> uniformTypeToDataMap;
+		std::vector<std::shared_ptr<IShaderStage>> shaderStages;
 
-		unsigned int CompileShaderSource(const std::string& shaderSource, GLenum shaderType);
+		unsigned int programId;
+
+		std::array<std::vector<std::pair<std::string, int>>, static_cast<int>(UniformDataTypes::NumberOfTypes)> uniformTypeToDataMap;
 
 		void ProcessUniforms();
 	};

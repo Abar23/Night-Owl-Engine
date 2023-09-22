@@ -18,9 +18,9 @@ namespace NightOwl
 
 		void Init();
 
-		void Update();
+		void Update() const;
 
-		void Shutdown();
+		void Shutdown() const;
 
 		void SetApplication(std::shared_ptr<IApplication> application)
 		{

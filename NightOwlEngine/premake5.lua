@@ -19,7 +19,12 @@ project "NightOwlEngine"
         "ENGINE_LOG_FILE=\"./Logs/EngineLogs.txt\"",
         "CLIENT_LOG_FILE=\"./Logs/ClientLogs.txt\"",
         "LOG_FILE_DIR=\"./Logs/\"",
-        "SERIALIZED_SCENE_DIR=\"./assets/Scenes\""
+        "SERIALIZED_SCENE_DIR=\"./assets/Scenes\"",
+        "ENGINE_TEXTURE_DIRECTORY=\"../NightOwlEngine/assets/Textures\"",
+        "ENGINE_SHADER_DIRECTORY=\"../NightOwlEngine/assets/Shaders\"",
+        "ENGINE_MODEL_DIRECTORY=\"../NightOwlEngine/assets/Models\"",
+        "ENGINE_AUDIO_DIRECTORY=\"../NightOwlEngine/assets/Audio\"",
+        "ENGINE_ANIMATION_DIRECTORY=\"../NightOwlEngine/assets/Animations\""
     }
 
     files 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IShaderStage.h"
 #include "NightOwl/Graphics/Types/UniformDataTypes.h"
 #include "NightOwl/Math/Math.h"
 
@@ -13,6 +14,10 @@ namespace NightOwl
 		virtual void Bind() const = 0;
 
 		virtual void Unbind() const = 0;
+
+		virtual void AddShaderStage(const std::shared_ptr<IShaderStage>& shaderStage) = 0;
+
+		virtual void AttachAndLinkShaderStages() = 0;
 
 		virtual void SetUniformMat4F(const Mat4F& mat4, const std::string& uniformName) const = 0;
 

@@ -12,9 +12,11 @@
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexBuffer.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlIndexBuffer.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlShaderStage.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
 #include <memory>
+
 
 namespace NightOwl
 {
@@ -26,6 +28,14 @@ namespace NightOwl
 		{
 			#ifdef OPEN_GL
 			return std::make_shared<OpenGlShader>(std::forward<Args>(args)...);
+			#endif
+		}
+
+		template<typename... Args>
+		static std::shared_ptr<IShaderStage> CreateShaderStage(Args&&... args)
+		{
+			#ifdef OPEN_GL
+			return std::make_shared<OpenGlShaderStage>(std::forward<Args>(args)...);
 			#endif
 		}
 

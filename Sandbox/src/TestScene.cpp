@@ -1,5 +1,7 @@
 #include "TestScene.h"
 
+#include "Behaviors/CameraController.h"
+#include "Behaviors/ImGuiInterface.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
@@ -17,30 +19,41 @@ void TestScene::Init()
 	auto* assetManager = NightOwl::AssetManagerLocator::GetAssetManager();
 
 	// Drunk walk scene
-	assetManager->LoadModel("./assets/Y Bot.dae");
-	assetManager->LoadAnimation("./assets/Shoved Reaction With Spin.dae");
+	assetManager->LoadModel("./assets/Bot/Y Bot.dae");
+	assetManager->LoadAnimation("./assets/Bot/Shoved Reaction With Spin.dae");
+	assetManager->LoadAnimation("./assets/Bot/Start Walking.dae");
+	assetManager->LoadAnimation("./assets/Bot/Drunk Walking Turn.dae");
+	assetManager->LoadAnimation("./assets/Bot/Running Slide.dae");
 
 	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Y Bot");
 	NightOwl::Animation* shoveAnimation = assetManager->GetAnimationRepository().GetAsset("Shoved Reaction With Spin");
-
-	auto& rootGameObject = AddGameObject("Y Bot");
-	auto* renderer = rootGameObject.AddComponent<NightOwl::MeshRenderer>();
-	rootGameObject.GetTransform()->Scale(NightOwl::Vec3F(1.5f), NightOwl::Space::World);
+	NightOwl::Animation* startWalkingAnimation = assetManager->GetAnimationRepository().GetAsset("Start Walking");
+	NightOwl::Animation* drunkWalkingTurn = assetManager->GetAnimationRepository().GetAsset("Drunk Walking Turn");
+	NightOwl::Animation* runningSlideAnimation = assetManager->GetAnimationRepository().GetAsset("Running Slide");
+	
+	auto& yBotGameObject = AddGameObject("Y Bot");
+	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
+	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(1.5f), NightOwl::Space::World);
 	// Make sure mesh gets a copy
 	renderer->CloneRenderer(model->renderer);
 	
 	NightOwl::GameObject& skeleton = AddCloneOfGameObject(model->skeleton[0]);
-	skeleton.GetTransform()->SetParent(rootGameObject.GetTransform());
+	skeleton.GetTransform()->SetParent(yBotGameObject.GetTransform());
 	
-	auto* animator = rootGameObject.AddComponent<NightOwl::Animator>();
+	auto* animator = yBotGameObject.AddComponent<NightOwl::Animator>();
 	animator->AddAnimation(shoveAnimation);
-	animator->SetCurrentAnimation("Shoved Reaction With Spin");
+	animator->AddAnimation(startWalkingAnimation);
+	animator->AddAnimation(drunkWalkingTurn);
+	animator->AddAnimation(runningSlideAnimation);
+	animator->SetCurrentAnimation("Running Slide");
 	animator->SetSkeleton(skeleton.GetTransform());
 	animator->Play();
-	
+
+	yBotGameObject.AddComponent<ImGuiInterface>();
+
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
 	mainCameraGameObject.AddComponent<NightOwl::Camera>();
-	mainCameraGameObject.GetTransform()->Translate({ 0.0f, 2, 10 }, NightOwl::Space::World);
+	mainCameraGameObject.AddComponent<CameraController>();
 
 	// backpack test
 	// assetManager->LoadModel("./assets/backpack/backpack.obj");

@@ -16,7 +16,7 @@ project "Sandbox"
 
 	defines
 	{
-		"GLFW_INCLUDE_NONE"
+		"GLFW_INCLUDE_NONE",
 	}
 
 	includedirs
@@ -39,14 +39,18 @@ project "Sandbox"
 		"NightOwlEngine"
 	}
 
-	postbuildcommands 
-    { 
-        "copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-		"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
-    }
-
 	filter "system:windows"
 		systemversion "latest"
+		
+		postbuildcommands 
+		{ 
+			"rmdir /s /q \"$(ProjectDir)$(OutDir)\\..\\NightOwlEngine\\assets\"",
+			"rmdir /s /q \"$(ProjectDir)$(OutDir)\\assets\"",
+			"copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
+			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
+			"xcopy /E /I /Y \".\\assets\" \"$(ProjectDir)$(OutDir)\\assets\"",
+			"xcopy /E /I /Y \"..\\NightOwlEngine\\assets\" \"$(ProjectDir)$(OutDir)\\..\\NightOwlEngine\\assets\""
+		}
 
 	filter "configurations:Debug"
 		defines "DEBUG" 

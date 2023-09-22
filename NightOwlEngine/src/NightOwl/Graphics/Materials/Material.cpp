@@ -1,19 +1,20 @@
 #include <NightOwlPch.h>
 
 #include "NightOwl/Graphics/Materials/Material.h"
-#include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/RenderAPI.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
-#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 
 namespace NightOwl
 {
 	Material::Material()
 	{
 		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
-		shader = assetManager->LoadShader("Standard Shader", "./assets/Shaders/Standard.vert", "./assets/Shaders/Standard.frag");
+
+		// Set default shader to the engine's standard shader
+		shader = assetManager->GetShaderRepository().GetAsset("StandardShader");
+
 		ProcessShaderUniforms();
 	}
 
@@ -183,6 +184,14 @@ namespace NightOwl
 		return shader;
 	}
 
+	void Material::SetShader(IShader* shader)
+	{
+		this->shader = shader;
+
+		ClearUniformMaps();
+		ProcessShaderUniforms();
+	}
+
 	void Material::ProcessShaderUniforms()
 	{
 		const auto& uniformMap = shader->GetUniformDataMap();
@@ -222,5 +231,14 @@ namespace NightOwl
 				}
 			}
 		}
+	}
+
+	void Material::ClearUniformMaps()
+	{
+		textureUniformMap.clear();
+		floatUniformMap.clear();
+		integerUniformMap.clear();
+		vectorUniformMap.clear();
+		matrixUniformMap.clear();
 	}
 }

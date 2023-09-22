@@ -25,15 +25,19 @@ namespace NightOwl
 
 		AssetRepository<Animation>& GetAnimationRepository();
 
-		IShader* LoadShader(const std::string& name, const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+		void LoadShaders(const std::string& shaderDirectory, bool isEngineAsset = false);
 
-		ITexture2D* LoadTexture2D(const std::string& filePath);
+		ITexture2D* LoadTexture2D(const std::string& filePath, bool isEngineAsset = false);
 
-		AudioClip* LoadAudioClip(const std::string& filePath);
+		AudioClip* LoadAudioClip(const std::string& filePath, bool isEngineAsset = false);
 
-		void LoadModel(const std::string& filePath);
+		void LoadModel(const std::string& filePath, bool isEngineAsset = false);
 
-		void LoadAnimation(const std::string& filePath);
+		void LoadAnimation(const std::string& filePath, bool isEngineAsset = false);
+
+		void LoadEngineAssets();
+
+		void ClearSceneAll();
 
 		void ClearAll();
 
@@ -49,7 +53,5 @@ namespace NightOwl
 		AssetRepository<Animation> animationRepository;
 
 		stbi_uc* ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels);
-
-		std::string ReadShader(const std::string& filePath);
 	};
 }

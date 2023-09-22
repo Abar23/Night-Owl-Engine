@@ -370,14 +370,14 @@ namespace NightOwl
 	}
 
 	template <typename T>
-	Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quaterion)
+	Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quaternion)
 	{
 		Quaternion<T> temp = *this;
 
-		this->x = temp.w * quaterion.x + temp.x * quaterion.w + temp.y * quaterion.z - temp.z * quaterion.y;
-		this->y = temp.w * quaterion.y + temp.y * quaterion.w + temp.z * quaterion.x - temp.x * quaterion.z;
-		this->z = temp.w * quaterion.z + temp.z * quaterion.w + temp.x * quaterion.y - temp.y * quaterion.x;
-		this->w = temp.w * quaterion.w - temp.x * quaterion.x - temp.y * quaterion.y - temp.z * quaterion.z;
+		this->x = temp.w * quaternion.x + temp.x * quaternion.w + temp.y * quaternion.z - temp.z * quaternion.y;
+		this->y = temp.w * quaternion.y + temp.y * quaternion.w + temp.z * quaternion.x - temp.x * quaternion.z;
+		this->z = temp.w * quaternion.z + temp.z * quaternion.w + temp.x * quaternion.y - temp.y * quaternion.x;
+		this->w = temp.w * quaternion.w - temp.x * quaternion.x - temp.y * quaternion.y - temp.z * quaternion.z;
 
 		return *this;
 	}
