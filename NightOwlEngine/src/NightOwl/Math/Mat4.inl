@@ -466,7 +466,7 @@ namespace NightOwl
 	template <typename T>
 	Mat4<T> Mat4<T>::Orthographic(const T left, const T right, const T bottom, const T top, const T near, const T far)
 	{
-				T two = static_cast<T>(2);
+		T two = static_cast<T>(2);
 		T negativeTwo = static_cast<T>(-2);
 		T negativeOne = static_cast<T>(-1);
 
@@ -484,8 +484,9 @@ namespace NightOwl
 		T one = static_cast<T>(1);
 		T negativeOne = static_cast<T>(-1);
 
-		T yScale = one / std::tan(DegreesToRad(fieldOfViewInDegrees) / two);
-		T xScale = yScale / aspectRatio;
+		T tangentHalfFov = std::tan(DegreesToRad(fieldOfViewInDegrees) / two);
+		T xScale = one / tangentHalfFov;
+		T yScale = aspectRatio / tangentHalfFov;
 		T farMinusNear = far - near;
 
 		return Mat4<T>(xScale,		0,											 0,										  0,

@@ -2,12 +2,16 @@
 
 #include "Behaviors/CameraController.h"
 #include "Behaviors/ImGuiInterface.h"
+#include "Behaviors/InfinitePlane.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Graphics/RenderAPI.h"
 #include "NightOwl/Graphics/Materials/Material.h"
+
+class InfinitePlane;
 
 TestScene::TestScene()
 	: Scene("TestScene")
@@ -19,6 +23,7 @@ void TestScene::Init()
 	auto* assetManager = NightOwl::AssetManagerLocator::GetAssetManager();
 
 	// Drunk walk scene
+	assetManager->LoadShaders("./assets/Shaders");
 	assetManager->LoadModel("./assets/Bot/Y Bot.dae");
 	assetManager->LoadAnimation("./assets/Bot/Shoved Reaction With Spin.dae");
 	assetManager->LoadAnimation("./assets/Bot/Start Walking.dae");
@@ -54,6 +59,12 @@ void TestScene::Init()
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
 	mainCameraGameObject.AddComponent<NightOwl::Camera>();
 	mainCameraGameObject.AddComponent<CameraController>();
+
+	auto& gameObject = AddGameObject("Infinite Plane");
+	gameObject.AddComponent<NightOwl::MeshRenderer>();
+	gameObject.AddComponent<InfinitePlane>();
+
+	NightOwl::RenderApi::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
 
 	// backpack test
 	// assetManager->LoadModel("./assets/backpack/backpack.obj");

@@ -1,4 +1,4 @@
-#include "/preamble.glsl"
+#include "/FragInputs.glsl"
 
 void main(void)
 {

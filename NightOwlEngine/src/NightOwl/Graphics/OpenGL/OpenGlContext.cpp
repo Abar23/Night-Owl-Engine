@@ -30,7 +30,6 @@ namespace NightOwl
 		GL_CALL(glEnable, GL_DEBUG_OUTPUT);
 		GL_CALL(glEnable, GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		GL_CALL(glDebugMessageCallback, Utility::GlDebugOutput, nullptr);
-
 		GL_CALL(glDebugMessageControl, GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, NULL, GL_FALSE);
 		#endif
 
