@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NightOwl/Behavior/OwlBehavior.h"
+#include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 
 class ImGuiInterface : public NightOwl::OwlBehavior
@@ -18,6 +19,8 @@ private:
 	bool showWindow = true;
 
 	NightOwl::Animator* characterAnimator;
+
+	NightOwl::Renderer* characterRenderer;
 
 	void InitImGui();
 

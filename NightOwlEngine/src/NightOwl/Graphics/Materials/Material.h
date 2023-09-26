@@ -11,11 +11,13 @@ namespace NightOwl
 	public:
 		Material();
 
+		Material(const std::string& shaderName);
+
 		std::shared_ptr<Material> Clone();
 
 		void Bind();
 
-		void UnBind();
+		void Unbind();
 
 		void SetMat4F(const Mat4F& matrix, const std::string& uniformName);
 

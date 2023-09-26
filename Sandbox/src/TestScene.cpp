@@ -38,7 +38,7 @@ void TestScene::Init()
 	
 	auto& yBotGameObject = AddGameObject("Y Bot");
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
-	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(1.5f), NightOwl::Space::World);
+	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(2.0f), NightOwl::Space::World);
 	// Make sure mesh gets a copy
 	renderer->CloneRenderer(model->renderer);
 	

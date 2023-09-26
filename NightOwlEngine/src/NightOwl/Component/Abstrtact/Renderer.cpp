@@ -58,7 +58,7 @@ namespace NightOwl
 
 			currentMaterial->Bind();
 			RenderApi::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
-			currentMaterial->UnBind();
+			currentMaterial->Unbind();
 
 			currentMaterial->GetShader()->Unbind();
 		}

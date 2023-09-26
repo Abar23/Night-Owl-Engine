@@ -1,6 +1,6 @@
 #include "/VertexInputs.glsl"
 
-void main(void)
+void main()
 {
     outVertexData.materialPosition = materialPosition;
     outVertexData.materialColor = materialColor;
@@ -11,7 +11,7 @@ void main(void)
     outVertexData.materialBoneIds = boneIds;
     outVertexData.materialBoneWeights = boneWeights;
 
-    vec4 totalPosition = vec4(materialPosition, 1.0);
+    vec4 totalPosition = modelMatrix * vec4(materialPosition, 1.0);
     if (hasBones)
     {    
         totalPosition = vec4(0.0);
@@ -27,5 +27,5 @@ void main(void)
         }
     }
 
-    gl_Position = viewProjectionMatrix * modelMatrix * totalPosition;
+    gl_Position = viewProjectionMatrix * totalPosition;
 } 

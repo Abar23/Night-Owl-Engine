@@ -1,11 +1,10 @@
 #include "ImGuiInterface.h"
 
-#include <ImGui/backends/imgui_impl_glfw.h>
-#include <ImGui/backends/imgui_impl_opengl3.h>
-
+#include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Window/WindowApi.h"
 #include "NightOwl/GameObject/GameObject.h"
-
+#include <ImGui/backends/imgui_impl_glfw.h>
+#include <ImGui/backends/imgui_impl_opengl3.h>
 
 ImGuiInterface::~ImGuiInterface()
 {
@@ -20,6 +19,7 @@ void ImGuiInterface::Awake()
 void ImGuiInterface::Start()
 {
 	characterAnimator = gameObject->GetComponent<NightOwl::Animator>();
+	characterRenderer = gameObject->GetComponent<NightOwl::MeshRenderer>();
 }
 
 void ImGuiInterface::Update()
@@ -35,17 +35,19 @@ void ImGuiInterface::Update()
 		return;
 	}
 
+	ImGui::SetWindowSize(ImVec2(300, 400));
+
 	if (ImGui::CollapsingHeader("Animator Controls"))
 	{
-		const char* items[] = { "Shoved Reaction With Spin", "Start Walking", "Drunk Walking Turn", "Running Slide" };
-		static int item_current = 0;
-		static int previsouItem = item_current;
-		ImGui::Combo("Animations", &item_current, items, IM_ARRAYSIZE(items));
+		const char* animations[] = { "Shoved Reaction With Spin", "Start Walking", "Drunk Walking Turn", "Running Slide" };
+		static int currentAnimations = 0;
+		static int previousItem = currentAnimations;
+		ImGui::Combo("Animations", &currentAnimations, animations, IM_ARRAYSIZE(animations));
 
-		if (previsouItem != item_current)
+		if (previousItem != currentAnimations)
 		{
-			characterAnimator->SetCurrentAnimation(items[item_current]);
-			previsouItem = item_current;
+			characterAnimator->SetCurrentAnimation(animations[currentAnimations]);
+			previousItem = currentAnimations;
 		}
 
 		if (ImGui::Button(characterAnimator->IsPlaying() ? "Pause" : "Play"))
@@ -64,6 +66,10 @@ void ImGuiInterface::Update()
 		{
 			characterAnimator->Reset();
 		}
+
+		static bool shouldRenderMesh = characterRenderer->IsVisible();
+		ImGui::Checkbox("Render Mesh", &shouldRenderMesh);
+		characterRenderer->SetVisible(shouldRenderMesh);
 	}
 
 	ImGui::End();
@@ -75,10 +81,9 @@ void ImGuiInterface::InitImGui()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-	// Removing ".ini" file extension due to the CRT Guidelines
 	io.IniFilename = NULL;
 
 	ImGui::StyleColorsDark();

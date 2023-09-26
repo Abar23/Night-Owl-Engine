@@ -32,7 +32,8 @@ namespace NightOwl::Utility
 				
 				const std::string preamble = std::format("[{0:%H:%M:%S}] {1}({2}) ", now, fileName, line);
 
-				const std::string userMessage = std::vformat(message, std::make_format_args(args...));
+				const int numberOfFormatStringInputs = sizeof...(args);
+				const std::string userMessage = numberOfFormatStringInputs == 0 ? message : std::vformat(message, std::make_format_args(args...));
 
 				const std::string severityName = SeverityToString(severity);
 

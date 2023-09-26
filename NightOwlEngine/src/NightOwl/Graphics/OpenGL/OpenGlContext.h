@@ -16,6 +16,8 @@ namespace NightOwl
 
 		void SwapBuffers() override;
 
+		void DrawArrays(DrawType drawType, int vertexCount, int startingIndex = 0) override;
+
 		void DrawIndexed(DrawType drawType, int numberOfIndices) override;
 
 		void DrawIndexedBaseVertex(DrawType drawType, int numberOfIndices, int startIndex, int baseVertex) override;

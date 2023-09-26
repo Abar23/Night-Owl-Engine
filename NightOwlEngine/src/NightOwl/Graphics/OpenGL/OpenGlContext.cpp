@@ -55,15 +55,21 @@ namespace NightOwl
 		glfwSwapBuffers(window);
 	}
 
+	void OpenGlContext::DrawArrays(DrawType drawType, int vertexCount, int startingIndex /* = 0 */)
+	{
+		const int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
+		GL_CALL(glDrawArrays, openGlDrawType, startingIndex, vertexCount);
+	}
+
 	void OpenGlContext::DrawIndexed(DrawType drawType, int numberOfIndices)
 	{
-		int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
+		const int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
 		GL_CALL(glDrawElements, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, 0);
 	}
 
 	void OpenGlContext::DrawIndexedBaseVertex(DrawType drawType, int numberOfIndices, int startIndex, int baseVertex)
 	{
-		int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
+		const int openGlDrawType = DrawTypeToOpenGlDrawType(drawType);
 		GL_CALL(glDrawElementsBaseVertex, openGlDrawType, numberOfIndices, GL_UNSIGNED_INT, reinterpret_cast<void*>(startIndex * sizeof(unsigned int)), baseVertex);
 	}
 

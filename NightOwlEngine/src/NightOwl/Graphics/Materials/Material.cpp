@@ -18,6 +18,15 @@ namespace NightOwl
 		ProcessShaderUniforms();
 	}
 
+	Material::Material(const std::string& shaderName)
+	{
+		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+
+		shader = assetManager->GetShaderRepository().GetAsset(shaderName);
+
+		ProcessShaderUniforms();
+	}
+
 	std::shared_ptr<Material> Material::Clone()
 	{
 		std::shared_ptr<Material> clone = std::make_shared<Material>();
@@ -66,7 +75,7 @@ namespace NightOwl
 		}
 	}
 
-	void Material::UnBind()
+	void Material::Unbind()
 	{
 		for (const auto& uniformIdValuePair : textureUniformMap | std::views::values)
 		{

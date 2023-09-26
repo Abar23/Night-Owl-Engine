@@ -1,6 +1,6 @@
 #include "/FragInputs.glsl"
 
-void main(void)
+void main()
 {
     vec4 outputColor = diffuseColor;
 

@@ -6,6 +6,7 @@
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
@@ -38,28 +39,25 @@ namespace NightOwl
 
 		Time::SetFixedTime(FIXED_UPDATE_TIME_STEP);
 
-		owlBehaviorManager = std::make_shared<OwlBehaviorManager>();
-		meshRendererSystem = std::make_shared<MeshRendererSystem>();
-		animatorSystem = std::make_shared<AnimatorSystem>();
-		physicsEngine2D = std::make_shared<PhysicsEngine2D>();
-		audioSystem = std::make_shared<AudioSystem>();
-		sceneManager = std::make_shared<SceneManager>();
-		assetManger = std::make_shared<AssetManager>();
+		OwlBehaviorManagerLocator::Provide(&owlBehaviorManager);
+		MeshRendererSystemLocator::Provide(&meshRendererSystem);
+		AnimatorSystemLocator::Provide(&animatorSystem);
+		PhysicsEngine2DLocator::Provide(&physicsEngine2D);
+		SceneManagerLocator::Provide(&sceneManager);
+		AssetManagerLocator::Provide(&assetManger);
+		AudioSystemLocator::Provide(&audioSystem);
+		DebugSystemLocator::Provide(&debugSystem);
 
-		OwlBehaviorManagerLocator::Provide(owlBehaviorManager.get());
-		MeshRendererSystemLocator::Provide(meshRendererSystem.get());
-		AnimatorSystemLocator::Provide(animatorSystem.get());
-		PhysicsEngine2DLocator::Provide(physicsEngine2D.get());
-		SceneManagerLocator::Provide(sceneManager.get());
-		AssetManagerLocator::Provide(assetManger.get());
-		AudioSystemLocator::Provide(audioSystem.get());
+		assetManger.LoadEngineAssets();
 
-		assetManger->LoadEngineAssets();
+		// Depends on engine assets being loaded in
+		debugSystem.Init();
 
+		// Initialize application
 		application->Init();
 	}
 
-	void NightOwlEngine::Update() const
+	void NightOwlEngine::Update()
 	{
 		while (!WindowApi::GetWindow()->ShouldWindowClose())
 		{
@@ -67,9 +65,9 @@ namespace NightOwl
 
 			application->Update();
 
-			if (sceneManager->ShouldLoadNextScene())
+			if (sceneManager.ShouldLoadNextScene())
 			{
-				sceneManager->LoadNextScene();
+				sceneManager.LoadNextScene();
 
 				Time::Reset();
 			}
@@ -78,15 +76,15 @@ namespace NightOwl
 			{
 				Time::UpdateFixedTime();
 
-				owlBehaviorManager->FixedUpdate();
+				owlBehaviorManager.FixedUpdate();
 
-				physicsEngine2D->Update();
+				physicsEngine2D.Update();
 
-				sceneManager->Update();
+				sceneManager.Update();
 
-				audioSystem->Update();
+				audioSystem.Update();
 
-				animatorSystem->FixedUpdate();
+				animatorSystem.FixedUpdate();
 			}
 
 			if (Time::ShouldRenderFrame())
@@ -94,33 +92,35 @@ namespace NightOwl
 				RenderApi::GetContext()->ClearColor();
 				RenderApi::GetContext()->ClearBuffer();
 
-				owlBehaviorManager->Update();
+				owlBehaviorManager.Update();
 
-				sceneManager->Update();
+				sceneManager.Update();
 
-				animatorSystem->Update();
+				animatorSystem.Update();
 
-				meshRendererSystem->Update();
+				meshRendererSystem.Update();
+
+				debugSystem.Update();
 
 				Input::Update();
 
 				WindowApi::GetWindow()->Update();
 			}
 
-			sceneManager->DestroyMarkedGameObjects();
+			sceneManager.DestroyMarkedGameObjects();
 		}
 	}
 
-	void NightOwlEngine::Shutdown() const
+	void NightOwlEngine::Shutdown()
 	{
 		application->Shutdown();
 
-		sceneManager->Shutdown();
+		sceneManager.Shutdown();
 
-		audioSystem->Shutdown();
+		audioSystem.Shutdown();
 
 		// clears engine and scene assets
-		assetManger->ClearAll();
+		assetManger.ClearAll();
 
 		WindowApi::GetWindow()->Shutdown();
 

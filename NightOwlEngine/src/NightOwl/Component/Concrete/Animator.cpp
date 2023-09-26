@@ -8,6 +8,8 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
 
+#include "NightOwl/Core/Locator/DebugSystemLocator.h"
+
 namespace NightOwl
 {
 	Animator::Animator()
@@ -38,6 +40,28 @@ namespace NightOwl
 
 	void Animator::Update()
 	{
+		// TODO: remove debug lines after project 1
+		// Draw debug lines for bones
+		std::stack<Transform*> skeletonTransforms;
+		DebugSystem* debugSystem = DebugSystemLocator::GetDebugSystem();
+		skeletonTransforms.push(skeleton);
+		while (skeletonTransforms.empty() == false)
+		{
+			Transform* skeletonTransform = skeletonTransforms.top();
+			skeletonTransforms.pop();
+
+			Vec3F parentStartPoint = skeletonTransform->GetPosition();
+			for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
+			{
+				Transform* childTransform = skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex);
+
+				Vec3F childStartPosition = childTransform->GetPosition();
+				debugSystem->DrawLine(parentStartPoint, childStartPosition);
+
+				skeletonTransforms.push(childTransform);
+			}
+		}
+
 		if (isPlaying == false ||
 			currentAnimation == nullptr ||
 			animationCollection.animationsMap.empty() == true)
@@ -77,7 +101,6 @@ namespace NightOwl
 			finalBoneOffsetMatrices.resize(100);
 		}
 
-		std::stack<Transform*> skeletonTransforms;
 		skeletonTransforms.push(skeleton);
 		while (skeletonTransforms.empty() == false)
 		{
