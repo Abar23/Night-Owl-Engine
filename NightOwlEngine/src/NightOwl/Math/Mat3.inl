@@ -13,6 +13,9 @@ namespace NightOwl
 	Mat3<T>::Mat3()
 		:	data{ 0 }
 	{
+		data[0][0] = 1.0f;
+		data[1][1] = 1.0f;
+		data[2][2] = 1.0f;
 	}
 
 	template<typename T>

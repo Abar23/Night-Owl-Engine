@@ -6,7 +6,6 @@
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/GameObject/GameObject.h"
 
-// NEED TO CLEAN UP LOGIC, KINDA NASTY!!!!!!!!!!
 namespace NightOwl
 {
 	Transform::Transform()
@@ -15,8 +14,6 @@ namespace NightOwl
 	      worldMatrix(1.0f),
 		  parentLocalMatrix(1.0f),
 		  inverseOfOriginalParentLocalModelMatrix(1.0f),
-		  localScale(1.0f),
-		  worldScaleOffset(1.0f),
 		  root(this),
 		  parent(nullptr),
 		  isLocalDirty(false),
@@ -34,13 +31,13 @@ namespace NightOwl
 	{
 		if (parent == nullptr || space == Space::Local)
 		{
-			localScale = scale;
+			localVecQuatMat.SetScale(scale);
 
 			SetLocalDirtyFlag();
 		}
 		else if (space == Space::World)
 		{
-			worldScaleOffset = scale;
+			worldOffsetVecQuatMat.SetScale(scale);
 
 			SetWorldDirtyFlag();
 		}
@@ -57,16 +54,18 @@ namespace NightOwl
 	{
 		if (parent == nullptr || space == Space::Local)
 		{
-			localRotation = QuatF::MakeRotationFromEulers(eulers) * localRotation;
+			localVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(eulers) * localVecQuatMat.quaternion;
 
-			localRotation.Renormalize();
+			localVecQuatMat.quaternion.Renormalize();
 
 			SetLocalDirtyFlag();
 
 		}
 		else if (space == Space::World)
 		{
-			worldRotationOffset = QuatF::MakeRotationFromEulers(eulers) * worldRotationOffset;
+			worldOffsetVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(eulers) * worldOffsetVecQuatMat.quaternion;
+
+			worldOffsetVecQuatMat.quaternion.Renormalize();
 
 			SetWorldDirtyFlag();
 		}
@@ -83,14 +82,14 @@ namespace NightOwl
 	{
 		if(parent == nullptr || space == Space::Local)
 		{
-			localPosition += translation;
+			localVecQuatMat.vector += translation;
 
 			SetLocalDirtyFlag();
 
 		}
 		else if (space == Space::World)
 		{
-			worldPosition += translation;
+			worldOffsetVecQuatMat.vector += translation;
 
 			SetWorldDirtyFlag();
 		}
@@ -98,64 +97,64 @@ namespace NightOwl
 
 	const Vec3F& Transform::GetLocalScale()
 	{
-		return localScale;
+		return localVecQuatMat.GetScale();
 	}
 
 	void Transform::SetLocalScale(float scaleX, float scaleY, float scaleZ)
 	{
-		localScale = Vec3F(scaleX, scaleY, scaleZ);
+		localVecQuatMat.SetScale({ scaleX, scaleY, scaleZ });
 
 		SetLocalDirtyFlag();
 	}
 
 	void Transform::SetLocalScale(const Vec3F& scale)
 	{
-		localScale = scale;
+		localVecQuatMat.SetScale(scale);
 
 		SetLocalDirtyFlag();
 	}
 
 	const Vec3F Transform::GetLocalEulerAngles()
 	{
-		return localRotation.GetEulerAngles();
+		return localVecQuatMat.GetRotation().GetEulerAngles();
 	}
 
 	void Transform::SetLocalRotation(const QuatF& rotation)
 	{
-		localRotation = rotation;
+		localVecQuatMat.quaternion = rotation;
 
 		SetLocalDirtyFlag();
 	}
 
 	void Transform::SetLocalEulerAngles(float angleX, float angleY, float angleZ)
 	{
-		localRotation = QuatF::MakeRotationFromEulers(Vec3F(angleX, angleY, angleZ));
+		localVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(Vec3F(angleX, angleY, angleZ));
 
 		SetLocalDirtyFlag();
 	}
 
 	void Transform::SetLocalEulerAngles(const Vec3F& eulers)
 	{
-		localRotation = QuatF::MakeRotationFromEulers(eulers);
+		localVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(eulers);
 
 		SetLocalDirtyFlag();
 	}
 
 	const Vec3F& Transform::GetLocalPosition()
 	{
-		return localPosition;
+		return localVecQuatMat.GetTranslation();
 	}
 
 	void Transform::SetLocalPosition(float positionX, float positionY, float positionZ)
 	{
-		localPosition = Vec3F(positionX, positionY, positionZ);
+		localVecQuatMat.SetTranslation({ positionX, positionY, positionZ } );
 
 		SetLocalDirtyFlag();
 	}
 
 	void Transform::SetLocalPosition(const Vec3F& position)
 	{
-		localPosition = position;
+		localVecQuatMat.vector = position;
 
 		SetLocalDirtyFlag();
 	}
@@ -212,16 +211,16 @@ namespace NightOwl
 			parent = nullptr;
 
 			// Since parent is being removed, save off the current rotation, scale, and position that as been given to the object
- 			localPosition = worldMatrix.GetTranslation();
-			localScale = worldMatrix.GetScale();
-			localRotation.SetOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
-			localRotation.Normalize();
+			localVecQuatMat.vector = worldMatrix.GetTranslation();
+			localVecQuatMat.SetScale(worldMatrix.GetScale());
+			localVecQuatMat.quaternion.SetNonOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
+			localVecQuatMat.quaternion.Normalize();
 			isLocalDirty = true;
 
 			// Reset world data since parent has been lost. In this case Local = World
-			worldPosition = Vec3F();
-			worldScaleOffset = Vec3F(1.0);
-			worldRotationOffset = QuatF();
+			worldOffsetVecQuatMat.vector = Vec3F::Zero();
+			worldOffsetVecQuatMat.SetScale(Vec3F(1.0f));
+			worldOffsetVecQuatMat.SetRotation(QuatF());
 			parentLocalMatrix = Mat4F::Identity();
 			inverseOfOriginalParentLocalModelMatrix = Mat4F::Identity();
 
@@ -245,18 +244,13 @@ namespace NightOwl
 	{
 		if (isLocalDirty || overrideDirtyFlag)
 		{
-			const Mat4F translationMatrix = Mat4F::MakeTranslation(localPosition);
-
-			const Mat4F scaleMatrix = Mat4F::MakeScale(localScale);
-
-			localModelMatrix = translationMatrix * localRotation.GetRotationMatrix() * scaleMatrix;
+			localModelMatrix = localVecQuatMat.GetMatrix();
 
 			// CLean up tomorrow
 			if(parent == nullptr)
 			{
 				worldMatrix = localModelMatrix;
 			}
-
 		}
 
 		return localModelMatrix;
@@ -266,22 +260,19 @@ namespace NightOwl
 	{
 		if (isWorldDirty || isLocalDirty)
 		{
-			const Mat4F translationMatrix = Mat4F::MakeTranslation(worldPosition);
-
-			const Mat4F scaleMatrix = Mat4F::MakeScale(worldScaleOffset);
-
 			if(parent != nullptr)
 			{
 				const Mat4F parentChildCombined = parentLocalMatrix * inverseOfOriginalParentLocalModelMatrix * GetLocalModelMatrix();
 
 				const Mat4F parentChildCombinedTranslation = Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
 
-				worldMatrix = parentChildCombinedTranslation * translationMatrix * worldRotationOffset.GetRotationMatrix() * scaleMatrix * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+				worldMatrix = parentChildCombinedTranslation * worldOffsetVecQuatMat.GetMatrix() * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
 			}
 			else
 			{
 				// Clean up tomorrow!
-				worldMatrix =  GetLocalModelMatrix() * translationMatrix * worldRotationOffset.GetRotationMatrix() * scaleMatrix;
+				finalVecQuatMat = localVecQuatMat * worldOffsetVecQuatMat;
+				worldMatrix = finalVecQuatMat.GetMatrix();
 			}
 
 			isWorldDirty = false;
@@ -332,21 +323,19 @@ namespace NightOwl
 
 	QuatF Transform::GetRotation()
 	{
-		QuatF currentWorldRotation;
-		currentWorldRotation.SetNonOrthogonalRotationMatrix(GetWorldMatrix().GetRotationMatrix());
-		return currentWorldRotation.Normalize();
+		return finalVecQuatMat.quaternion;
 	}
 
 	void Transform::SetRotation(const QuatF& newRotation)
 	{
 		if(parent == nullptr)
 		{
-			localRotation = newRotation.GetNormalize();
+			localVecQuatMat.quaternion = newRotation.GetNormalize();
 			isLocalDirty = true;
 		}
 
-		this->worldRotationOffset = newRotation;
-		this->worldRotationOffset.Normalize();
+		worldOffsetVecQuatMat.quaternion = newRotation;
+
 		isWorldDirty = true;
 	}
 
@@ -362,12 +351,13 @@ namespace NightOwl
 			// Add to the local position the world offset of the desired position coming in
 			Vec3F worldOffset = worldPosition - GetPosition();
 			// Apply rotation to the offset so that it is aligned with the local position axes
-			localPosition += GetWorldMatrix().GetRotationMatrix() * localModelMatrix.GetRotationMatrix().GetInverse() * worldOffset;
+			localVecQuatMat.vector += GetWorldMatrix().GetRotationMatrix() * localModelMatrix.GetRotationMatrix().GetInverse() * worldOffset;
 		}
 		else
 		{
-			localPosition = worldPosition;
+			localVecQuatMat.vector = worldPosition;
 		}
+
 		isLocalDirty = true;
 	}
 
@@ -402,12 +392,8 @@ namespace NightOwl
 		worldMatrix = transformToClone.worldMatrix;
 		parentLocalMatrix = transformToClone.parentLocalMatrix;
 		inverseOfOriginalParentLocalModelMatrix = transformToClone.inverseOfOriginalParentLocalModelMatrix;
-		localScale = transformToClone.localScale;
-		localRotation = transformToClone.localRotation;
-		localPosition = transformToClone.localPosition;
-		worldScaleOffset = transformToClone.worldScaleOffset;
-		worldRotationOffset = transformToClone.worldRotationOffset;
-		worldPosition = transformToClone.worldPosition;
+		localVecQuatMat = transformToClone.localVecQuatMat;
+		worldOffsetVecQuatMat = transformToClone.worldOffsetVecQuatMat;
 		root = transformToClone.root;
 		parent = transformToClone.parent;
 
@@ -428,11 +414,11 @@ namespace NightOwl
 	}
 
 	START_REFLECTION(Transform)
-	CLASS_MEMBER_REFLECTION(localScale)
-	CLASS_MEMBER_REFLECTION(localRotation)
-	CLASS_MEMBER_REFLECTION(localPosition)
-	CLASS_MEMBER_REFLECTION(worldScaleOffset)
-	CLASS_MEMBER_REFLECTION(worldRotationOffset)
-	CLASS_MEMBER_REFLECTION(worldPosition)
+	// CLASS_MEMBER_REFLECTION(localScale)
+	// CLASS_MEMBER_REFLECTION(localRotation)
+	// CLASS_MEMBER_REFLECTION(localPosition)
+	// CLASS_MEMBER_REFLECTION(worldScaleOffset)
+	// CLASS_MEMBER_REFLECTION(worldRotationOffset)
+	// CLASS_MEMBER_REFLECTION(worldPosition)
 	END_REFLECTION(Transform)
 }

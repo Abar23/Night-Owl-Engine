@@ -93,6 +93,11 @@ namespace NightOwl
 		{
 			return Quaternion<T>::TransformVector(quaternion, vector);
 		}
+
+		friend Vec3<T> operator*(const Vec3<T>& vector, const Quaternion<T>& quaternion)
+		{
+			return Quaternion<T>::TransformVector(quaternion, vector);
+		}
 	};
 
 	template <typename T>

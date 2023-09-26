@@ -98,17 +98,11 @@ namespace NightOwl
 
 		std::vector<Transform*> children;
 
-		Vec3F localScale;
+		VecQuatMatF localVecQuatMat;
 
-		QuatF localRotation;
+		VecQuatMatF worldOffsetVecQuatMat;
 
-		Vec3F localPosition;
-
-		Vec3F worldScaleOffset;
-
-		QuatF worldRotationOffset;
-
-		Vec3F worldPosition;
+		VecQuatMatF finalVecQuatMat;
 
 		Transform* root;
 

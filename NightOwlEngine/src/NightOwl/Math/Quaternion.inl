@@ -240,13 +240,19 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T> Quaternion<T>::TransformVector(const Quaternion<T>& quaternion, const Vec3<T>& vector)
 	{
-		Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
+		const Vec3<T> quatCrossVector = static_cast<T>(2) * Vec3<T>::Cross(quaternion.components.xyz, vector);
 
-		float scalar = quaternion.w;
+		Vec3<T> transformedVector = vector + quaternion.w * quatCrossVector + Vec3<T>::Cross(quaternion.components.xyz, quatCrossVector);
 
-		return static_cast<T>(2) * Vec3<T>::Dot(vectorPart, vector) * vectorPart
-			+ (scalar * scalar - Vec3<T>::Dot(vectorPart, vectorPart)) * vector
-			+ static_cast<T>(2) * scalar * Vec3<T>::Cross(vectorPart, vector);
+		return transformedVector;
+
+		// Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
+		//
+		// float scalar = quaternion.w;
+		//
+		// return static_cast<T>(2) * Vec3<T>::Dot(vectorPart, vector) * vectorPart
+		// 	+ (scalar * scalar - Vec3<T>::Dot(vectorPart, vectorPart)) * vector
+		// 	+ static_cast<T>(2) * scalar * Vec3<T>::Cross(vectorPart, vector);
 	}
 
 	template <typename T>
