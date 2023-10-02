@@ -333,10 +333,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		T clampedT = std::max(0.0f, std::m
-			in(1.0f, t));
-
-		return Lerp(leftQuaternion, rightQuaternion, clampedT).GetNormalize();
+		return Lerp(leftQuaternion, rightQuaternion, t).GetNormalize();
 	}
 
 	template <typename T>
