@@ -51,7 +51,7 @@ namespace NightOwl
 
 		Transform& GetParent();
 
-		void SetParent(Transform* parentTransform, bool shouldSetInverse = true);
+		void SetParent(Transform* parentTransform, bool shouldSetParentInverse = true);
 
 		Transform* RemoveParent();
 
@@ -92,9 +92,11 @@ namespace NightOwl
 
 		Mat4F worldMatrix;
 
-		Mat4F parentLocalMatrix;
+		VecQuatMatF worldVecQuatMat;
 
-		Mat4F inverseOfOriginalParentLocalModelMatrix;
+		VecQuatMatF parentLocalMatrix;
+
+		VecQuatMatF inverseOfOriginalParentLocalModelMatrix;
 
 		std::vector<Transform*> children;
 
@@ -120,7 +122,7 @@ namespace NightOwl
 
 		void SetFlagBasedOnSpace(Space space);
 
-		void PropagateParentLocalTransform(const Mat4F& parentLocalTransform);
+		void PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform);
 
 		void Remove() override;
 	};

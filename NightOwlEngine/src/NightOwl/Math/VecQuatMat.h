@@ -30,6 +30,8 @@ namespace NightOwl
 
 		Mat4<T> GetMatrix();
 
+		VecQuatMat<T> GetInverse();
+
 		static VecQuatMat<T> Identity();
 
 		VecQuatMat<T>& operator*=(const VecQuatMat<T>& vecQuatMat);

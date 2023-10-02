@@ -185,7 +185,9 @@ namespace NightOwl
 
 		static Vec3<T> Reject(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 
-		static Vec3<T> Lerp(const Vec3<T>& leftVector, const Vec3<T>& rightVector, const float t);
+		static Vec3<T> Lerp(const Vec3<T>& leftVector, const Vec3<T>& rightVector, const T t);
+
+		static Vec3<T> Elerp(const Vec3<T>& leftVector, const Vec3<T>& rightVector, const T t);
 
 		static Vec3<T> Zero();
 

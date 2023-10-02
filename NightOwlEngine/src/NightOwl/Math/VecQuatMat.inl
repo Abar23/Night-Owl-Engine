@@ -52,9 +52,25 @@ namespace NightOwl
 
 		result.SetTranslation(vector);
 
-		result *= quaternion.GetRotationMatrix() * scaleMatrix;
+		result = result * quaternion.GetRotationMatrix() * scaleMatrix;
 
 		return result;
+	}
+
+	template <typename T>
+	VecQuatMat<T> VecQuatMat<T>::GetInverse()
+	{
+		VecQuatMat<T> inverse;
+
+		Quaternion<T> quaternionInverse = quaternion.GetInverse();
+		Mat3<T> quaternionRotationMatrix = quaternion.GetRotationMatrix();
+		Mat3<T> quaternionInverseRotationMatrix = quaternionInverse.GetRotationMatrix();
+
+		inverse.vector = scaleMatrix.GetInverse() * (quaternionInverse * (vector * static_cast<T>(-1)));
+		inverse.scaleMatrix = quaternionRotationMatrix * (quaternionRotationMatrix * scaleMatrix * quaternionInverse.GetRotationMatrix()).GetInverse() * quaternionInverseRotationMatrix;
+		inverse.quaternion = quaternionInverse;
+
+		return inverse;
 	}
 
 	template <typename T>
@@ -68,10 +84,10 @@ namespace NightOwl
 	{
 		VecQuatMat result;
 
-		const Mat3F rotationMatrix = quaternion.GetRotationMatrix();
-		const Mat3F inverseRotationMatrix = quaternion.GetInverse().GetRotationMatrix();
+		const Mat3F rotationMatrix = vecQuatMat.quaternion.GetRotationMatrix();
+		const Mat3F inverseRotationMatrix = vecQuatMat.quaternion.GetInverse().GetRotationMatrix();
 
-		result.vector = quaternion * (scaleMatrix * vecQuatMat.vector) + vecQuatMat.vector;
+		result.vector = (quaternion * (scaleMatrix * vecQuatMat.vector)) + vector;
 		result.quaternion = quaternion * vecQuatMat.quaternion;
 		result.scaleMatrix = (inverseRotationMatrix * scaleMatrix * rotationMatrix) * (rotationMatrix * vecQuatMat.scaleMatrix * inverseRotationMatrix);
 

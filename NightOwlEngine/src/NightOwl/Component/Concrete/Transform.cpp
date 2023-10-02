@@ -169,21 +169,21 @@ namespace NightOwl
 		return *parent;
 	}
 
-	void Transform::SetParent(Transform* parentTransform, bool shouldSetInverse /* = false */)
+	void Transform::SetParent(Transform* parentTransform, bool shouldSetParentInverse /* = true */)
 	{
 		if(parentTransform != nullptr && parentTransform != parent)
 		{
 			parent = parentTransform;
 			parent->SetChild(this);
 
-			if (shouldSetInverse)
+			if (shouldSetParentInverse)
 			{
-				inverseOfOriginalParentLocalModelMatrix = parent->GetWorldMatrix().GetInverse();
+				inverseOfOriginalParentLocalModelMatrix = parent->worldVecQuatMat.GetInverse();
 			}
 
 			for (const auto& childTransform : parentTransform->children)
 			{
-				childTransform->PropagateParentLocalTransform(parent->GetLocalModelMatrix());
+				childTransform->PropagateParentLocalTransform(parent->localVecQuatMat);
 			}
 
 			if (gameObject->GetScene() != nullptr)
@@ -218,11 +218,9 @@ namespace NightOwl
 			isLocalDirty = true;
 
 			// Reset world data since parent has been lost. In this case Local = World
-			worldOffsetVecQuatMat.vector = Vec3F::Zero();
-			worldOffsetVecQuatMat.SetScale(Vec3F(1.0f));
-			worldOffsetVecQuatMat.SetRotation(QuatF());
-			parentLocalMatrix = Mat4F::Identity();
-			inverseOfOriginalParentLocalModelMatrix = Mat4F::Identity();
+			worldOffsetVecQuatMat = VecQuatMatF();
+			parentLocalMatrix = VecQuatMatF();
+			inverseOfOriginalParentLocalModelMatrix = VecQuatMatF();
 
 			gameObject->GetScene()->SetDirtyFlag();
 		}
@@ -262,15 +260,16 @@ namespace NightOwl
 		{
 			if(parent != nullptr)
 			{
-				const Mat4F parentChildCombined = parentLocalMatrix * inverseOfOriginalParentLocalModelMatrix * GetLocalModelMatrix();
+				VecQuatMatF parentChildCombined = parentLocalMatrix * inverseOfOriginalParentLocalModelMatrix * localVecQuatMat;
 
-				const Mat4F parentChildCombinedTranslation = Mat4F::MakeTranslation(parentChildCombined.GetTranslation());
+				VecQuatMatF parentChildCombinedTranslation;
+				parentChildCombinedTranslation.SetTranslation(parentChildCombined.GetTranslation());
 
-				worldMatrix = parentChildCombinedTranslation * worldOffsetVecQuatMat.GetMatrix() * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+				worldVecQuatMat = parentChildCombinedTranslation * worldOffsetVecQuatMat * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+				worldMatrix = worldVecQuatMat.GetMatrix();
 			}
 			else
 			{
-				// Clean up tomorrow!
 				finalVecQuatMat = localVecQuatMat * worldOffsetVecQuatMat;
 				worldMatrix = finalVecQuatMat.GetMatrix();
 			}
@@ -304,13 +303,13 @@ namespace NightOwl
 		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
-	void Transform::PropagateParentLocalTransform(const Mat4F& parentLocalTransform)
+	void Transform::PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform)
 	{
 		this->parentLocalMatrix = parentLocalTransform;
 
 		for (const auto& childTransform : this->children)
 		{
-			childTransform->PropagateParentLocalTransform(parentLocalTransform * this->GetLocalModelMatrix(true));
+			childTransform->PropagateParentLocalTransform(parentLocalTransform * this->localVecQuatMat);
 		}
 
 		SetWorldDirtyFlag();

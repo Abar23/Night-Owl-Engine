@@ -157,7 +157,7 @@ namespace NightOwl
 		
 		const float scaleFactor = GetScaleFactor(previousKey.timeStamp, nextKey.timeStamp, animationTime);
 
-		finalScale = Vec3F::Lerp(previousKey.scale, nextKey.scale, scaleFactor);
+		finalScale = Vec3F::Elerp(previousKey.scale, nextKey.scale, scaleFactor);
 	}
 
 	void BoneKeyFrames::InterpolateKeyRotation()

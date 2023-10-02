@@ -29,7 +29,7 @@ void TestScene::Init()
 	assetManager->LoadAnimation("./assets/Bot/Start Walking.dae");
 	assetManager->LoadAnimation("./assets/Bot/Drunk Walking Turn.dae");
 	assetManager->LoadAnimation("./assets/Bot/Running Slide.dae");
-
+	
 	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Y Bot");
 	NightOwl::Animation* shoveAnimation = assetManager->GetAnimationRepository().GetAsset("Shoved Reaction With Spin");
 	NightOwl::Animation* startWalkingAnimation = assetManager->GetAnimationRepository().GetAsset("Start Walking");
@@ -38,13 +38,14 @@ void TestScene::Init()
 	
 	auto& yBotGameObject = AddGameObject("Y Bot");
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
-	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(2.0f), NightOwl::Space::World);
 	// Make sure mesh gets a copy
 	renderer->CloneRenderer(model->renderer);
 	
 	NightOwl::GameObject& skeleton = AddCloneOfGameObject(model->skeleton[0]);
 	skeleton.GetTransform()->SetParent(yBotGameObject.GetTransform());
-	
+
+	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(2.0f), NightOwl::Space::World);
+
 	auto* animator = yBotGameObject.AddComponent<NightOwl::Animator>();
 	animator->AddAnimation(shoveAnimation);
 	animator->AddAnimation(startWalkingAnimation);
@@ -53,7 +54,7 @@ void TestScene::Init()
 	animator->SetCurrentAnimation("Running Slide");
 	animator->SetSkeleton(skeleton.GetTransform());
 	animator->Play();
-
+	
 	yBotGameObject.AddComponent<ImGuiInterface>();
 
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
@@ -63,7 +64,7 @@ void TestScene::Init()
 	auto& gameObject = AddGameObject("Infinite Plane");
 	gameObject.AddComponent<NightOwl::MeshRenderer>();
 	gameObject.AddComponent<InfinitePlane>();
-
+	
 	NightOwl::RenderApi::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
 
 	// backpack test

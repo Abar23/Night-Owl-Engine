@@ -18,11 +18,10 @@ namespace NightOwl
 		{
 			if (parent->IsActive())
 			{
-				Mat4F parentLocalModelMatrix = parent->GetTransform()->GetLocalModelMatrix();
 				for (int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
 				{
 					Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
-					childTransform->PropagateParentLocalTransform(parentLocalModelMatrix);
+					childTransform->PropagateParentLocalTransform(parent->GetTransform()->localVecQuatMat);
 				}
 			}
 		}
