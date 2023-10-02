@@ -222,13 +222,13 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T> Vec3<T>::Back()
 	{
-		return Vec3<T>(0, 0, 1);
+		return Vec3<T>(0, 0, -1);
 	}
 
 	template <typename T>
 	Vec3<T> Vec3<T>::Forward()
 	{
-		return Vec3<T>(0, 0, -1);
+		return Vec3<T>(0, 0, 1);
 	}
 
 	template <typename T>

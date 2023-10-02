@@ -35,8 +35,7 @@ namespace NightOwl
 	template <typename T>
 	Vec2<T>::Vec2(const Vec2& vector)
 		:	x(vector.x), y(vector.y)
-	{
-	}
+	{ }
 
 	template <typename T>
 	Vec2<T> Vec2<T>::Zero()

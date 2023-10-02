@@ -375,17 +375,17 @@ namespace NightOwl
 
 	Vec3F Transform::GetForward()
 	{
-		return GetRotation().GetRotationMatrix().GetColumn(2);
+		return GetRotation() * Vec3F::Forward();
 	}
 
 	Vec3F Transform::GetRight()
 	{
-		return GetRotation().GetRotationMatrix().GetColumn(0);
+		return GetRotation() * Vec3F::Right();
 	}
 
 	Vec3F Transform::GetUp()
 	{
-		return GetRotation().GetRotationMatrix().GetColumn(1);
+		return GetRotation() * Vec3F::Up();
 	}
 
 	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */)
