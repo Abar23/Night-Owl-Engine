@@ -58,11 +58,11 @@ namespace NightOwl
 	template<typename T>
 	Quaternion<T>& Quaternion<T>::Normalize()
 	{
-		T norm = Norm();
-		this->x /= norm;
-		this->y /= norm;
-		this->z /= norm;
-		this->w /= norm;
+		T inverseNorm = static_cast<T>(1) / Norm();
+		this->x *= inverseNorm;
+		this->y *= inverseNorm;
+		this->z *= inverseNorm;
+		this->w *= inverseNorm;
 		return *this;
 	}
 
@@ -247,14 +247,6 @@ namespace NightOwl
 		T scalar = quaternion.w;
 
 		return transformedVector;
-
-		// Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
-		//
-		// float scalar = quaternion.w;
-		//
-		// return static_cast<T>(2) * Vec3<T>::Dot(vectorPart, vector) * vectorPart
-		// 	+ (scalar * scalar - Vec3<T>::Dot(vectorPart, vectorPart)) * vector
-		// 	+ static_cast<T>(2) * scalar * Vec3<T>::Cross(vectorPart, vector);
 	}
 
 	template <typename T>

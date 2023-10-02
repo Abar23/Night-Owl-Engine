@@ -1,15 +1,13 @@
 #include "NightOwlPch.h"
 
 #include "Renderer.h"
-
-#include <stack>
-
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/RenderAPI.h"
 #include "NightOwl/Graphics/Materials/Material.h"
+#include <stack>
 
 namespace NightOwl
 {

@@ -211,16 +211,14 @@ namespace NightOwl
 			parent = nullptr;
 
 			// Since parent is being removed, save off the current rotation, scale, and position that as been given to the object
-			localVecQuatMat.vector = worldMatrix.GetTranslation();
-			localVecQuatMat.SetScale(worldMatrix.GetScale());
-			localVecQuatMat.quaternion.SetNonOrthogonalRotationMatrix(worldMatrix.GetRotationMatrix());
-			localVecQuatMat.quaternion.Normalize();
+			GetWorldMatrix(); // ensure worldVecQuatMat is up-to-date
+			localVecQuatMat = worldVecQuatMat;
 			isLocalDirty = true;
 
 			// Reset world data since parent has been lost. In this case Local = World
-			worldOffsetVecQuatMat = VecQuatMatF();
-			parentLocalVecQuatMat = VecQuatMatF();
-			inverseOfOriginalParentLocalVecQuatMat = VecQuatMatF();
+			worldOffsetVecQuatMat = VecQuatMatF::Identity();
+			parentLocalVecQuatMat = VecQuatMatF::Identity();
+			inverseOfOriginalParentLocalVecQuatMat = VecQuatMatF::Identity();
 
 			gameObject->GetScene()->SetDirtyFlag();
 		}
