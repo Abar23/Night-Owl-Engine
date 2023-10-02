@@ -72,20 +72,20 @@ namespace NightOwl
 				Time::Reset();
 			}
 
-			// while (Time::ShouldExecuteFixedUpdate())
-			// {
-			// 	Time::UpdateFixedTime();
-			//
-			// 	owlBehaviorManager.FixedUpdate();
-			//
-			// 	physicsEngine2D.Update();
-			//
-			// 	sceneManager.Update();
-			//
-			// 	audioSystem.Update();
-			//
-			// 	animatorSystem.FixedUpdate();
-			// }
+			while (Time::ShouldExecuteFixedUpdate())
+			{
+				Time::UpdateFixedTime();
+			
+				owlBehaviorManager.FixedUpdate();
+			
+				physicsEngine2D.Update();
+			
+				sceneManager.Update();
+			
+				audioSystem.Update();
+			
+				animatorSystem.FixedUpdate();
+			}
 
 			if (Time::ShouldRenderFrame())
 			{

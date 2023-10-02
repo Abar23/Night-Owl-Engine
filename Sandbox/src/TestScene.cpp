@@ -51,7 +51,7 @@ void TestScene::Init()
 	animator->AddAnimation(startWalkingAnimation);
 	animator->AddAnimation(drunkWalkingTurn);
 	animator->AddAnimation(runningSlideAnimation);
-	animator->SetCurrentAnimation("Running Slide");
+	animator->SetCurrentAnimation("Shoved Reaction With Spin");
 	animator->SetSkeleton(skeleton.GetTransform());
 	animator->Play();
 	
