@@ -94,17 +94,15 @@ namespace NightOwl
 
 		VecQuatMatF worldVecQuatMat;
 
-		VecQuatMatF parentLocalMatrix;
+		VecQuatMatF parentLocalVecQuatMat;
 
-		VecQuatMatF inverseOfOriginalParentLocalModelMatrix;
+		VecQuatMatF inverseOfOriginalParentLocalVecQuatMat;
 
 		std::vector<Transform*> children;
 
 		VecQuatMatF localVecQuatMat;
 
 		VecQuatMatF worldOffsetVecQuatMat;
-
-		VecQuatMatF finalVecQuatMat;
 
 		Transform* root;
 

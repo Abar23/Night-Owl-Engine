@@ -12,8 +12,8 @@ namespace NightOwl
 		: Component(ComponentType::Transform),
 		  localModelMatrix(1.0f),
 	      worldMatrix(1.0f),
-		  parentLocalMatrix(1.0f),
-		  inverseOfOriginalParentLocalModelMatrix(1.0f),
+		  parentLocalVecQuatMat(1.0f),
+		  inverseOfOriginalParentLocalVecQuatMat(1.0f),
 		  root(this),
 		  parent(nullptr),
 		  isLocalDirty(false),
@@ -178,7 +178,7 @@ namespace NightOwl
 
 			if (shouldSetParentInverse)
 			{
-				inverseOfOriginalParentLocalModelMatrix = parent->worldVecQuatMat.GetInverse();
+				inverseOfOriginalParentLocalVecQuatMat = parent->localVecQuatMat.GetInverse();
 			}
 
 			for (const auto& childTransform : parentTransform->children)
@@ -219,8 +219,8 @@ namespace NightOwl
 
 			// Reset world data since parent has been lost. In this case Local = World
 			worldOffsetVecQuatMat = VecQuatMatF();
-			parentLocalMatrix = VecQuatMatF();
-			inverseOfOriginalParentLocalModelMatrix = VecQuatMatF();
+			parentLocalVecQuatMat = VecQuatMatF();
+			inverseOfOriginalParentLocalVecQuatMat = VecQuatMatF();
 
 			gameObject->GetScene()->SetDirtyFlag();
 		}
@@ -260,18 +260,19 @@ namespace NightOwl
 		{
 			if(parent != nullptr)
 			{
-				VecQuatMatF parentChildCombined = parentLocalMatrix * inverseOfOriginalParentLocalModelMatrix * localVecQuatMat;
+				VecQuatMatF parentChildCombined = parentLocalVecQuatMat * inverseOfOriginalParentLocalVecQuatMat * localVecQuatMat;
 
 				VecQuatMatF parentChildCombinedTranslation;
 				parentChildCombinedTranslation.SetTranslation(parentChildCombined.GetTranslation());
 
 				worldVecQuatMat = parentChildCombinedTranslation * worldOffsetVecQuatMat * parentChildCombinedTranslation.GetInverse() * parentChildCombined;
+
 				worldMatrix = worldVecQuatMat.GetMatrix();
 			}
 			else
 			{
-				finalVecQuatMat = localVecQuatMat * worldOffsetVecQuatMat;
-				worldMatrix = finalVecQuatMat.GetMatrix();
+				worldVecQuatMat = localVecQuatMat * worldOffsetVecQuatMat;
+				worldMatrix = worldVecQuatMat.GetMatrix();
 			}
 
 			isWorldDirty = false;
@@ -305,7 +306,7 @@ namespace NightOwl
 
 	void Transform::PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform)
 	{
-		this->parentLocalMatrix = parentLocalTransform;
+		this->parentLocalVecQuatMat = parentLocalTransform;
 
 		for (const auto& childTransform : this->children)
 		{
@@ -322,7 +323,8 @@ namespace NightOwl
 
 	QuatF Transform::GetRotation()
 	{
-		return finalVecQuatMat.quaternion;
+		GetWorldMatrix();
+		return worldVecQuatMat.quaternion;
 	}
 
 	void Transform::SetRotation(const QuatF& newRotation)
@@ -340,7 +342,8 @@ namespace NightOwl
 
 	Vec3F Transform::GetPosition()
 	{
-		return GetWorldMatrix().GetTranslation();
+		GetWorldMatrix();
+		return worldVecQuatMat.GetTranslation();
 	}
 
 	void Transform::SetPosition(const Vec3F& worldPosition)
@@ -350,7 +353,7 @@ namespace NightOwl
 			// Add to the local position the world offset of the desired position coming in
 			Vec3F worldOffset = worldPosition - GetPosition();
 			// Apply rotation to the offset so that it is aligned with the local position axes
-			localVecQuatMat.vector += GetWorldMatrix().GetRotationMatrix() * localModelMatrix.GetRotationMatrix().GetInverse() * worldOffset;
+			localVecQuatMat.vector += GetWorldMatrix().GetRotationMatrix() * localVecQuatMat.quaternion.GetRotationMatrix().GetInverse() * worldOffset;
 		}
 		else
 		{
@@ -389,8 +392,8 @@ namespace NightOwl
 	{
 		localModelMatrix = transformToClone.localModelMatrix;
 		worldMatrix = transformToClone.worldMatrix;
-		parentLocalMatrix = transformToClone.parentLocalMatrix;
-		inverseOfOriginalParentLocalModelMatrix = transformToClone.inverseOfOriginalParentLocalModelMatrix;
+		parentLocalVecQuatMat = transformToClone.parentLocalVecQuatMat;
+		inverseOfOriginalParentLocalVecQuatMat = transformToClone.inverseOfOriginalParentLocalVecQuatMat;
 		localVecQuatMat = transformToClone.localVecQuatMat;
 		worldOffsetVecQuatMat = transformToClone.worldOffsetVecQuatMat;
 		root = transformToClone.root;

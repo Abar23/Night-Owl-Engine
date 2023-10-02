@@ -2,6 +2,9 @@
 
 #include "Renderer.h"
 
+#include <stack>
+
+#include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/GameObject/GameObject.h"
@@ -24,8 +27,44 @@ namespace NightOwl
 		}
 
 		Transform* transform = gameObject->GetTransform();
-		Mat4F modelMatrix = transform->GetWorldMatrix();
-		Mat4F viewProjectionMatrix = Camera::GetMainCamera()->GetViewProjectionMatrix();
+		const Mat4F modelMatrix = transform->GetWorldMatrix();
+		const Mat4F viewProjectionMatrix = Camera::GetMainCamera()->GetViewProjectionMatrix();
+
+		// Calculating final bones here since the scene graph has propagated all of the parent local changes made in the animator component
+		// Should be moved to skinned mesh renderer since these components are tightly coupled
+		if (gameObject->HasComponent<Animator>())
+		{
+			if (finalBoneMatrices.empty() == true)
+			{
+				finalBoneMatrices.resize(100);
+			}
+
+			const Animator* animator = gameObject->GetComponent<Animator>();
+
+			auto& boneInfoMap = mesh->GetBoneInfoMap();
+
+			std::stack<Transform*> skeletonTransforms;
+			skeletonTransforms.push(animator->GetSkeleton());
+			while (skeletonTransforms.empty() == false)
+			{
+				Transform* skeletonTransform = skeletonTransforms.top();
+				skeletonTransforms.pop();
+
+				for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
+				{
+					skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
+				}
+
+				const BoneKeyFrames* boneKeyFrames = animator->GetCurrentAnimation()->GetBoneKeyFrames(skeletonTransform->GetGameObject().GetName());
+				if (boneKeyFrames != nullptr)
+				{
+					const auto& boneName = skeletonTransform->GetGameObject().GetName();
+					BoneInfo boneInfo = boneInfoMap.at(boneName);
+					const Mat4F finalBoneOffsetMatrix = skeletonTransform->GetWorldMatrix() * boneInfo.offsetMatrix;
+					finalBoneMatrices[boneInfo.id] = finalBoneOffsetMatrix;
+				}
+			}
+		}
 
 		mesh->Bind();
 		for (const auto& subMesh : mesh->GetSubMeshes())
@@ -41,13 +80,13 @@ namespace NightOwl
 
 			if (finalBoneMatrices.empty() == false)
 			{
-				for (int i = 0; i < finalBoneMatrices.size(); ++i)
+				for (int boneIndex = 0; boneIndex < finalBoneMatrices.size(); ++boneIndex)
 				{
-					if (i == 0)
+					if (boneIndex == 0)
 					{
 						currentMaterial->SetMat4F(finalBoneMatrices[0], "finalBonesMatrices[0]");
 					}
-					currentMaterial->GetShader()->SetUniformMat4F(finalBoneMatrices[i], "finalBonesMatrices[" + std::to_string(i) + "]");
+					currentMaterial->GetShader()->SetUniformMat4F(finalBoneMatrices[boneIndex], "finalBonesMatrices[" + std::to_string(boneIndex) + "]");
 				}
 				currentMaterial->SetInteger(1, "hasBones");
 			}

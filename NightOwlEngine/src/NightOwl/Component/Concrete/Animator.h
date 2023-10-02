@@ -36,6 +36,10 @@ namespace NightOwl
 
 		void SetSkeleton(Transform* skeleton);
 
+		Transform* GetSkeleton() const;
+
+		Animation* GetCurrentAnimation() const;
+
 	private:
 		AnimatorUpdateMode updateMode;
 

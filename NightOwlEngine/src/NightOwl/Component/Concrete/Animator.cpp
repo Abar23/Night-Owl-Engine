@@ -91,15 +91,6 @@ namespace NightOwl
 		{
 			return;
 		}
-		
-		auto& bonInfoMap = renderer->GetMesh()->GetBoneInfoMap();
-
-		// TODO: Do this in a buffer
-		std::vector<Mat4F>& finalBoneOffsetMatrices = renderer->GetFinalBoneMatrices();
-		if (finalBoneOffsetMatrices.empty() == true)
-		{
-			finalBoneOffsetMatrices.resize(100);
-		}
 
 		skeletonTransforms.push(skeleton);
 		while (skeletonTransforms.empty() == false)
@@ -120,11 +111,6 @@ namespace NightOwl
 				skeletonTransform->SetLocalPosition(boneKeyFrames->GetFinalPosition());
 				skeletonTransform->SetLocalRotation(boneKeyFrames->GetFinalRotation());
 				skeletonTransform->SetLocalScale(boneKeyFrames->GetFinalScale());
-
-				const auto& boneName = skeletonTransform->GetGameObject().GetName();
-				BoneInfo boneInfo = bonInfoMap.at(boneName);
-				const Mat4F finalBoneOffsetMatrix = skeletonTransform->GetWorldMatrix() * boneInfo.offsetMatrix;
-				finalBoneOffsetMatrices[boneInfo.id] = finalBoneOffsetMatrix;
 			}
 		}
 	}
@@ -188,6 +174,16 @@ namespace NightOwl
 	void Animator::SetSkeleton(Transform* skeleton)
 	{
 		this->skeleton = skeleton;
+	}
+
+	Transform* Animator::GetSkeleton() const
+	{
+		return skeleton;
+	}
+
+	Animation* Animator::GetCurrentAnimation() const
+	{
+		return currentAnimation;
 	}
 
 	void Animator::Remove()

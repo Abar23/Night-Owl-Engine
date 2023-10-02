@@ -42,8 +42,6 @@ namespace NightOwl
 
 		//std::shared_ptr<ArchetypeSystem> archetypeSystem;
 
-		//std::shared_ptr<Animation::AnimatorSystem> animatorSystem;
-
 		PhysicsEngine2D physicsEngine2D;
 
 		AudioSystem audioSystem;
