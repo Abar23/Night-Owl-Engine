@@ -67,7 +67,7 @@ namespace NightOwl
 
 		static Quaternion<T> MakeRotationAxisAngle(const Vec3<T>& unitVector, const T angleInDegrees);
 
-		static Quaternion<T> MakeRotationFromEulers(float xAngleInDegrees, float yAngleInDegrees, float zAngleInDegrees);
+		static Quaternion<T> MakeRotationFromEulers(const T xAngleInDegrees, const T yAngleInDegrees, const T zAngleInDegrees);
 
 		static Quaternion<T> MakeRotationFromEulers(Vec3<T> anglesInDegrees);
 

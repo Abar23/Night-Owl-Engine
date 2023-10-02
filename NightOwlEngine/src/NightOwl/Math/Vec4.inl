@@ -139,7 +139,29 @@ namespace NightOwl
 	template <typename T>
 	Vec4<T> Vec4<T>::Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t)
 	{
-		return leftVector * (static_cast<T>(1) - t) + rightVector * t;
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		return leftVector * (static_cast<T>(1) - clampedT) + rightVector * clampedT;
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Elerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t)
+	{
+		Vec4<T> interpolatedVector;
+
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		T leftVectorX = std::max(EPSILON, std::abs(leftVector.x)) * std::copysign(static_cast<T>(1), leftVector.x);
+		T leftVectorY = std::max(EPSILON, std::abs(leftVector.y)) * std::copysign(static_cast<T>(1), leftVector.y);
+		T leftVectorZ = std::max(EPSILON, std::abs(leftVector.z)) * std::copysign(static_cast<T>(1), leftVector.z);
+		T leftVectorW = std::max(EPSILON, std::abs(leftVector.w)) * std::copysign(static_cast<T>(1), leftVector.w);
+
+		interpolatedVector.x = leftVectorX * std::pow(rightVector.x / leftVectorX, clampedT);
+		interpolatedVector.y = leftVectorX * std::pow(rightVector.y / leftVectorY, clampedT);
+		interpolatedVector.z = leftVectorX * std::pow(rightVector.z / leftVectorZ, clampedT);
+		interpolatedVector.w = leftVectorX * std::pow(rightVector.w / leftVectorW, clampedT);
+
+		return interpolatedVector;
 	}
 
 	template <typename T>

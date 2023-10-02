@@ -100,6 +100,8 @@ namespace NightOwl
 
 		static Vec2<T> Lerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t);
 
+		static Vec2<T> Elerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t);
+
 		static Vec2<T> Zero();
 
 		static Vec2<T> XAxis();

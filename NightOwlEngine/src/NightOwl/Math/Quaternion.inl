@@ -187,7 +187,7 @@ namespace NightOwl
 		T m11 = matrix(1, 1);
 		T m22 = matrix(2, 2);
 
-		float absQ2 = std::pow(matrix.Determinant(), static_cast<T>(1) / static_cast<T>(3));
+		T absQ2 = std::pow(matrix.Determinant(), static_cast<T>(1) / static_cast<T>(3));
 
 		w = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 + m11 + m22)) / static_cast<T>(2);
 		x = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 - m11 - m22)) / static_cast<T>(2);
@@ -242,7 +242,7 @@ namespace NightOwl
 	{
 		Vec3<T> vectorPart(quaternion.x, quaternion.y, quaternion.z);
 
-		float scalar = quaternion.w;
+		T scalar = quaternion.w;
 
 		return static_cast<T>(2) * Vec3<T>::Dot(vectorPart, vector) * vectorPart
 			+ (scalar * scalar - Vec3<T>::Dot(vectorPart, vectorPart)) * vector
@@ -275,7 +275,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::MakeRotationZ(const T angleInDegrees)
 	{
-		float halfAngle = DegreesToRad(angleInDegrees) / static_cast<T>(2);
+		T halfAngle = DegreesToRad(angleInDegrees) / static_cast<T>(2);
 		return Quaternion<T>(static_cast<T>(0), static_cast<T>(0), std::sin(halfAngle), std::cos(halfAngle));
 	}
 
@@ -286,7 +286,7 @@ namespace NightOwl
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(float xAngleInDegrees, float yAngleInDegrees, float zAngleInDegrees)
+	Quaternion<T> Quaternion<T>::MakeRotationFromEulers(T xAngleInDegrees, T yAngleInDegrees, T zAngleInDegrees)
 	{
 		T two = static_cast<T>(2);
 
@@ -325,19 +325,26 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Lerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		return leftQuaternion * (static_cast<T>(1) - t) + rightQuaternion * t;
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		return leftQuaternion * (static_cast<T>(1) - clampedT) + rightQuaternion * clampedT;
 	}
 
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		return Lerp(leftQuaternion, rightQuaternion, t).GetNormalize();
+		T clampedT = std::max(0.0f, std::m
+			in(1.0f, t));
+
+		return Lerp(leftQuaternion, rightQuaternion, clampedT).GetNormalize();
 	}
 
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		T dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
 		Quaternion<T> newRightQuaternion = rightQuaternion;
 		if (dot < static_cast<T>(0))
@@ -352,7 +359,7 @@ namespace NightOwl
 		}
 		
 		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));
-		T theta = std::acos(dot) * t; // Angle between leftQuaternion and new quaternion at t
+		T theta = std::acos(dot) * clampedT; // Angle between leftQuaternion and new quaternion at t
 		Quaternion<T> newQuaternion = rightQuaternion - leftQuaternion * dot;
 		newQuaternion.Normalize();
 		

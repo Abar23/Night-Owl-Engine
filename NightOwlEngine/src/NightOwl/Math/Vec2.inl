@@ -185,7 +185,25 @@ namespace NightOwl
 	template <typename T>
 	Vec2<T> Vec2<T>::Lerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t)
 	{
-		return (leftVector * (static_cast<T>(1) - t)) + (rightVector * t);
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		return (leftVector * (static_cast<T>(1) - clampedT)) + (rightVector * clampedT);
+	}
+
+	template <typename T>
+	Vec2<T> Vec2<T>::Elerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t)
+	{
+		Vec2<T> interpolatedVector;
+
+		T clampedT = std::max(0.0f, std::min(1.0f, t));
+
+		T leftVectorX = std::max(EPSILON, std::abs(leftVector.x)) * std::copysign(static_cast<T>(1), leftVector.x);
+		T leftVectorY = std::max(EPSILON, std::abs(leftVector.y)) * std::copysign(static_cast<T>(1), leftVector.y);
+
+		interpolatedVector.x = leftVectorX * std::pow(rightVector.x / leftVectorX, clampedT);
+		interpolatedVector.y = leftVectorX * std::pow(rightVector.y / leftVectorY, clampedT);
+
+		return interpolatedVector;
 	}
 
 	template <typename T>

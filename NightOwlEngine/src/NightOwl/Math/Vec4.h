@@ -399,6 +399,8 @@ namespace NightOwl
 
 		static Vec4<T> Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t);
 
+		static Vec4<T> Elerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t);
+
 		static Vec4<T> Zero();
 
 		Vec4<T>& operator=(const Vec4<T>& vector);
