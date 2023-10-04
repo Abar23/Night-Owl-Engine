@@ -86,12 +86,6 @@ namespace NightOwl
 			elapsedTime = 0.0f;
 		}
 
-		auto* renderer = gameObject->GetComponent<MeshRenderer>();
-		if (renderer == nullptr)
-		{
-			return;
-		}
-
 		skeletonTransforms.push(skeleton);
 		while (skeletonTransforms.empty() == false)
 		{
