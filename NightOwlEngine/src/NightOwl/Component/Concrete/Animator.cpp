@@ -103,7 +103,7 @@ namespace NightOwl
 				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
 			}
 
-			BoneKeyFrames* boneKeyFrames = currentAnimation->GetBoneKeyFrames(skeletonTransform->GetGameObject().GetName());
+			BoneKeyFrames* boneKeyFrames = currentAnimation->GetBoneKeyFramesMap(skeletonTransform->GetGameObject().GetName());
 			if (boneKeyFrames != nullptr)
 			{
 				boneKeyFrames->Update(elapsedTime);

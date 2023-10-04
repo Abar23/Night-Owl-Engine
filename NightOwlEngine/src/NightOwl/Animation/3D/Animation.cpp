@@ -40,7 +40,7 @@ namespace NightOwl
 		this->name = name;
 	}
 
-	BoneKeyFrames* Animation::GetBoneKeyFrames(const std::string& boneName)
+	BoneKeyFrames* Animation::GetBoneKeyFramesMap(const std::string& boneName)
 	{
 		if (boneKeyFramesMap.contains(boneName) == false)
 		{

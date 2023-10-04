@@ -53,7 +53,7 @@ namespace NightOwl
 					skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
 				}
 
-				const BoneKeyFrames* boneKeyFrames = animator->GetCurrentAnimation()->GetBoneKeyFrames(skeletonTransform->GetGameObject().GetName());
+				const BoneKeyFrames* boneKeyFrames = animator->GetCurrentAnimation()->GetBoneKeyFramesMap(skeletonTransform->GetGameObject().GetName());
 				if (boneKeyFrames != nullptr)
 				{
 					const auto& boneName = skeletonTransform->GetGameObject().GetName();

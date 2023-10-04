@@ -1,4 +1,5 @@
 #pragma once
+
 namespace NightOwl
 {
 	template <typename T> class Vec3;

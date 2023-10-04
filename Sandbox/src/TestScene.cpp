@@ -66,14 +66,6 @@ void TestScene::Init()
 	gameObject.AddComponent<InfinitePlane>();
 	
 	NightOwl::RenderApi::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
-
-	// backpack test
-	// assetManager->LoadModel("./assets/backpack/backpack.obj");
-	//
-	// const NightOwl::Model* backpackModel = assetManager->GetModelRepository().GetAsset("backpack");
-	// NightOwl::GameObject& backpack = AddGameObject("backpack");
-	// NightOwl::MeshRenderer* backpackRenderer = backpack.AddComponent<NightOwl::MeshRenderer>();
-	// backpackRenderer->CloneRenderer(backpackModel->renderer);
 }
 
 void TestScene::Reset()

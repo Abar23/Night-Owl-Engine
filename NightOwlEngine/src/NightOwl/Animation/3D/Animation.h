@@ -24,7 +24,7 @@ namespace NightOwl
 
 		void SetName(const std::string& name);
 
-		BoneKeyFrames* GetBoneKeyFrames(const std::string& boneName);
+		BoneKeyFrames* GetBoneKeyFramesMap(const std::string& boneName);
 
 		std::map<std::string, BoneKeyFrames>& GetBoneKeyFramesMap();
 
