@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Core/Application/SceneManager.h"
-
 namespace NightOwl
 {
+	class SceneManager;
+
 	class SceneManagerLocator
 	{
 	public:

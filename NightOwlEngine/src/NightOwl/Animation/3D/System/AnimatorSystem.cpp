@@ -1,7 +1,9 @@
 #include "NightOwlPch.h"
 
-#include "NightOwl/GameObject/GameObject.h"
 #include "AnimatorSystem.h"
+#include "NightOwl/Animation/Types/AnimatorUpdateMode.h"
+#include "NightOwl/GameObject/GameObject.h"
+#include "NightOwl/Component/Concrete/Animator.h"
 
 namespace NightOwl
 {

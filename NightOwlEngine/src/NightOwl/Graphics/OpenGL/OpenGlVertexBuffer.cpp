@@ -1,8 +1,8 @@
 #include <NightOwlPch.h>
 
 #include "OpenGlVertexBuffer.h"
-#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 
 namespace NightOwl
 {

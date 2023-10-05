@@ -1,10 +1,10 @@
 #include "NightOwlPch.h"
 
 #include "ColliderRendererSystem.h"
-
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Physics/2D/Collider/Collider2D.h"
 
 namespace NightOwl
 {

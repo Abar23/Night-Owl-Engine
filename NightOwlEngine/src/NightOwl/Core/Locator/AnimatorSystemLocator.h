@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Animation/3D/System/AnimatorSystem.h"
-
 namespace NightOwl
 {
+	class AnimatorSystem;
+
 	class AnimatorSystemLocator
 	{
 	public:

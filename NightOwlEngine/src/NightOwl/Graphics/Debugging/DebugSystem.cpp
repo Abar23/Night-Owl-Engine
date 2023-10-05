@@ -1,11 +1,11 @@
 #include "NightOwlPch.h"
 
 #include "DebugSystem.h"
-
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 
 namespace NightOwl
 {

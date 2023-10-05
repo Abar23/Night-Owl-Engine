@@ -1,11 +1,12 @@
 #pragma once
 
-#include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include <vector>
 
 namespace NightOwl
 {
+	class Renderer;
+
 	class Model
 	{
 	public:

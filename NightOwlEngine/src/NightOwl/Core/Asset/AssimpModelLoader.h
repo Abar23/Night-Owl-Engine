@@ -1,13 +1,15 @@
 #pragma once
 
-#include "NightOwl/Component/Structures/Mesh.h"
 #include "ModelLoadingInfo.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
+#include "NightOwl/Component/Structures/Mesh.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
 #include <string>
 
 namespace NightOwl
 {
+	class Material;
+
 	class Mesh;
 
 	class AssimpModelLoader

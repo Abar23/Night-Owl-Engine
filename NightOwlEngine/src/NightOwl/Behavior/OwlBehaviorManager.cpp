@@ -3,8 +3,8 @@
 #include "OwlBehaviorManager.h"
 #include "OwlBehaviorState.h"
 #include "OwlBehavior.h"
-
 #include "NightOwl/GameObject/GameObject.h"
+
 
 namespace NightOwl
 {

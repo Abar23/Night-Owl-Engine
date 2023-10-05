@@ -1,11 +1,11 @@
 #pragma once
 
-#include "NightOwl/Physics/2D/Collider/Collider2D.h"
 #include <vector>
-#include <set>
 
 namespace NightOwl
 {
+	class Collider2D;
+
 	class ColliderRendererSystem
 	{
 	public:

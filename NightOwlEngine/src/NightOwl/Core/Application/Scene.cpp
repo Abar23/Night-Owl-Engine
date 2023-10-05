@@ -1,7 +1,10 @@
 #include <NightOwlPch.h>
 
 #include "Scene.h"
+#include "NightOwl/Component/Concrete/Transform.h"
+#include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl
 {

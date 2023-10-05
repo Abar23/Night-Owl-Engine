@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Graphics/Debugging/DebugSystem.h"
-
 namespace NightOwl
 {
+	class DebugSystem;
+
 	class DebugSystemLocator
 	{
 	public:

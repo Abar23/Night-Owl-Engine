@@ -1,13 +1,13 @@
 #pragma once
 
-#include "NightOwl/Math/Math.h"
+#include "SubMeshData.h"
+#include "NightOwl/Animation/3D/Structures/BoneWeight.h"
+#include "NightOwl/Animation/3D/Structures/BoneInfo.h"
+#include "NightOwl/Core/Reflection/Reflection.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
-#include "NightOwl/Core/Reflection/Reflection.h"
-#include "NightOwl/Animation/3D/Structures/BoneWeight.h"
-#include "NightOwl/Animation/3D/Structures/BoneInfo.h"
-#include "SubMeshData.h"
+#include "NightOwl/Math/Math.h"
 #include <map>
 #include <vector>
 

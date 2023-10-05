@@ -1,10 +1,9 @@
 #include <NightOwlPch.h>
 
 #include "GameObject.h"
-#include <limits>
-#include <stack>
-
+#include "NightOwl/Behavior/OwlBehaviorManager.h"
 #include "NightOwl/Core/Application/Scene.h"
+#include <limits>
 
 namespace NightOwl
 {

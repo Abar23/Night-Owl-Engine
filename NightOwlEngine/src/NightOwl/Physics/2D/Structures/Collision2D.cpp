@@ -2,6 +2,7 @@
 
 #include "Collision2D.h"
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
+#include "NightOwl/Physics/2D/Collider/Collider2D.h"
 
 namespace NightOwl
 {

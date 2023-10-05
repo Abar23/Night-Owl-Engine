@@ -1,8 +1,8 @@
 #pragma once
 
 #include <chrono>
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 namespace NightOwl
 {

@@ -1,6 +1,8 @@
 #include "InfinitePlane.h"
 
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
+#include "NightOwl/Component/Structures/Mesh.h"
+#include "NightOwl/Component/Structures/SubMeshData.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/GameObject/GameObject.h"

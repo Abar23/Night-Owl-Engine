@@ -1,8 +1,9 @@
 #include <NightOwlPch.h>
 
+#include "OwlBehaviorManager.h"
 #include "OwlBehavior.h"
-#include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl
 {

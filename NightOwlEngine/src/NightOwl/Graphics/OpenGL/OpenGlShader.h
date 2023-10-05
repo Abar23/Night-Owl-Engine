@@ -2,6 +2,7 @@
 
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Types/UniformDataTypes.h"
+#include "NightOwl/Math/Math.h"
 
 namespace NightOwl
 {

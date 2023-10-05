@@ -1,9 +1,11 @@
 #pragma once
 
-#include <cstring>
+#include "MathFunctions.h"
+#include "Mat3.h"
+#include "Vec3.h"
 #include <cmath>
 #include <cstdint>
-#include "MathFunctions.h"
+#include <cstring>
 
 namespace NightOwl
 {

@@ -1,7 +1,9 @@
 #include "NightOwlPch.h"
 
 #include "SceneManager.h"
+#include "NightOwl/Behavior/OwlBehaviorManager.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
 
 namespace NightOwl
 {

@@ -4,7 +4,8 @@
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
-#include "glad/glad.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace NightOwl
 {

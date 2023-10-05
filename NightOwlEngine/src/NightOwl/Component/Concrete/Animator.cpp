@@ -1,14 +1,15 @@
 #include "NightOwlPch.h"
 
 #include "Animator.h"
-#include "MeshRenderer.h"
-#include "NightOwl/Graphics/Materials/Material.h"
+#include "NightOwl/Animation/3D/Animation.h"
+#include "NightOwl/Animation/3D/Structures/BoneKeyFrames.h"
+#include "NightOwl/Animation/3D/System/AnimatorSystem.h"
+#include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Time/Time.h"
+#include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
-
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
 
 namespace NightOwl
 {

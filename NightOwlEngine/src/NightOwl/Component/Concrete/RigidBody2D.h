@@ -1,17 +1,18 @@
 #pragma once
 
 #include "NightOwl/Component/Component.h"
-#include "NightOwl/Math/Vec2.h"
-#include "NightOwl/Physics/2D/Collider/Collider2D.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
+#include "NightOwl/Math/Vec2.h"
 #include <memory>
 #include <set>
 
 namespace NightOwl
 {
-	class PhysicsEngine2D;
+	class Collider2D;
 
 	class Collision2D;
+
+	class PhysicsEngine2D;
 
 	class RigidBody2D : public Component
 	{

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
-#include <string>
 
 namespace NightOwl
 {

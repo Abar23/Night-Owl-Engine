@@ -2,9 +2,9 @@
 
 #include "AudioClipLoadType.h"
 #include "AudioSampleType.h"
-#include <string>
 #include <libsndfile/sndfile.hh>
 #include <libsndfile/sndfile.h>
+#include <string>
 
 namespace NightOwl
 {

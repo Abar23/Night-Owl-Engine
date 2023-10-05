@@ -25,7 +25,7 @@ namespace NightOwl
 
 		unsigned GetVertexArrayObjectId() override;
 
-		void SetupVertexBufferAttributes();
+		void SetupVertexBufferAttributes() override;
 
 	private:
 		unsigned int vertexArrayObjectId;

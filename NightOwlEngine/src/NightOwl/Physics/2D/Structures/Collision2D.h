@@ -1,10 +1,12 @@
 #pragma once
 
-#include "NightOwl/Physics/2D/Collider/Collider2D.h"
-
 namespace NightOwl
 {
+	class Collider2D;
+
 	class GameObject;
+
+	class RigidBody2D;
 
 	class Collision2D
 	{

@@ -1,12 +1,10 @@
 #pragma once
 
 #include "KeyPosition.h"
-#include "KeyScale.h"
 #include "KeyRotation.h"
-#include "NightOwl/Math/Mat4.h"
-#include <vector>
+#include "KeyScale.h"
 #include <assimp/anim.h>
-
+#include <vector>
 
 namespace NightOwl
 {

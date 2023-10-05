@@ -2,8 +2,8 @@
 
 #include "NightOwl/Component/Component.h"
 #include "NightOwl/Component/Structures/ClippingPlanes.h"
-#include "NightOwl/Math/Math.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
+#include "NightOwl/Math/Math.h"
 
 namespace NightOwl
 {

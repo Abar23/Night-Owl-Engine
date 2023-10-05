@@ -1,9 +1,10 @@
 #include "Application.h"
-#include <NightOwl/Window/WindowApi.h>
-#include <NightOwl/Core/Locator/SceneManagerLocator.h>
-#include <NightOwl/Input/Input.h>
 
 #include "TestScene.h"
+#include "NightOwl/Core/Application/SceneManager.h"
+#include "NightOwl/Core/Locator/SceneManagerLocator.h"
+#include "NightOwl/Input/Input.h"
+#include "NightOwl/Window/WindowApi.h"
 
 namespace Sandbox
 {

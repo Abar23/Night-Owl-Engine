@@ -1,7 +1,6 @@
 #include "NightOwlPch.h"
 
 #include "OBBBoxCollider2D.h"
-
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/GameObject/GameObject.h"
 

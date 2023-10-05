@@ -1,6 +1,5 @@
 #pragma once
 
-#include "IApplication.h"
 #include "SceneManager.h"
 #include "NightOwl/Animation/3D/System/AnimatorSystem.h"
 #include "NightOwl/Audio/AudioSystem.h"
@@ -12,6 +11,8 @@
 
 namespace NightOwl
 {
+	class IApplication;
+
 	class NightOwlEngine
 	{
 	public:

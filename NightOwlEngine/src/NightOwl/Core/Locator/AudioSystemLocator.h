@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Audio/AudioSystem.h"
-
 namespace NightOwl
 {
+	class AudioSystem;
+
 	class AudioSystemLocator
 	{
 	public:

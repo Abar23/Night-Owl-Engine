@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NightOwl/Graphics/Types/DrawType.h"
-#include "NightOwl/Math/Math.h"
+#include "NightOwl/Math/Vec4.h"
 
 namespace NightOwl
 {

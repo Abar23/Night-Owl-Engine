@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
-
 namespace NightOwl
 {
+	class VertexBufferLayout;
+
 	class IVertexBuffer
 	{
 	public:

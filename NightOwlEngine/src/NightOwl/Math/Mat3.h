@@ -2,10 +2,10 @@
 
 #include <initializer_list>
 
-#include "Vec3.h"
-
 namespace NightOwl
 {
+	template <typename T> class Vec3;
+
 	template <typename T> class Mat4;
 
 	template <typename T>

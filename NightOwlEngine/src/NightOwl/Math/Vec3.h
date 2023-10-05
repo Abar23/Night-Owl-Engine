@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Vec2.h"
+#include "Swizzle.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
 
 namespace NightOwl
 {
+	template <typename T> class Vec2;
+
 	template <typename T> class Vec4;
 
 	template <typename T>

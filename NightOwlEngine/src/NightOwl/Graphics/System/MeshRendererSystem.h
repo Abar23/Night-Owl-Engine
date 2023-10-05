@@ -1,10 +1,11 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include <vector>
 
 namespace NightOwl
 {
+	class MeshRenderer;
+
 	class MeshRendererSystem
 	{
 	public:

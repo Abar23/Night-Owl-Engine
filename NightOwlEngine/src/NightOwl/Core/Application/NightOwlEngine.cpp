@@ -1,6 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "NightOwlEngine.h"
+#include "IApplication.h"
 #include "NightOwlEngineConstants.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"

@@ -1,7 +1,6 @@
 #include <NightOwlPch.h>
 
 #include "GamePadState.h"
-
 #include "GamePadAxis.h"
 #include "NightOwl/Math/MathFunctions.h"
 

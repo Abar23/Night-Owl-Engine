@@ -2,10 +2,9 @@
 
 #include "AudioClip.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/Core/Utitlity/AlErrorCheck.h"
 #include <AL/al.h>
 #include <AL/alext.h>
-
-#include "NightOwl/Core/Utitlity/AlErrorCheck.h"
 
 namespace NightOwl
 {

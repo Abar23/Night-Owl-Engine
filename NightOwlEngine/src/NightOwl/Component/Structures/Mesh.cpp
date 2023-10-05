@@ -1,9 +1,9 @@
 #include <NightOwlPch.h>
 
 #include "Mesh.h"
+#include "NightOwl/Graphics/RenderAPI.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
-#include "NightOwl/Graphics/RenderAPI.h"
 
 namespace NightOwl
 {

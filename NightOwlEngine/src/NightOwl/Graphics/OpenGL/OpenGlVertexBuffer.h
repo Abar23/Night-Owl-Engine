@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
+#include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 
 namespace NightOwl
 {

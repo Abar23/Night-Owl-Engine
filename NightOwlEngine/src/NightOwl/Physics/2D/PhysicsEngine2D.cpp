@@ -2,6 +2,7 @@
 
 #include "PhysicsEngine2D.h"
 #include "CollisionTest.h"
+#include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/Physics/Integrator/RungeKuttaIntegrator.h"
 #include "NightOwl/GameObject/GameObject.h"
 

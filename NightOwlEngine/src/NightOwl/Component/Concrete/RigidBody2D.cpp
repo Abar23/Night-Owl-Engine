@@ -3,6 +3,8 @@
 #include "RigidBody2D.h"
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
 #include "NightOwl/GameObject/GameObject.h"
+#include "NightOwl/Physics/2D/PhysicsEngine2D.h"
+#include "NightOwl/Physics/2D/Collider/Collider2D.h"
 
 namespace NightOwl
 {

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/Animator.h"
+#include <vector>
 
 namespace NightOwl
 {
+	class Animator;
+
 	class AnimatorSystem
 	{
 	public:

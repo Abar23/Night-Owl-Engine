@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Physics/2D/PhysicsEngine2D.h"
-
 namespace NightOwl
 {
+	class PhysicsEngine2D;
+
 	class PhysicsEngine2DLocator
 	{
 	public:

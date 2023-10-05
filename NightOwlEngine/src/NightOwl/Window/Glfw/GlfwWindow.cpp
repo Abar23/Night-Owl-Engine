@@ -1,10 +1,12 @@
 #include <NightOwlPch.h>
 
 #include "GlfwWindow.h"
-#include "GLFW/glfw3.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 #include "NightOwl/Graphics/RenderApi.h"
+#include "NightOwl/Window/Structures/MonitorProperties.h"
+#include "NightOwl/Window/Structures/WindowProperties.h"
+#include <GLFW/glfw3.h>
 
 namespace NightOwl
 {

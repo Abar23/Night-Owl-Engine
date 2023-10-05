@@ -1,17 +1,21 @@
 #pragma once
 
 #include "AssetRepository.h"
-#include "NightOwl/Animation/3D/Animation.h"
-#include "NightOwl/Animation/3D/Structures/Model.h"
-#include "NightOwl/Graphics/Interfaces/IShader.h"
-#include "NightOwl/Graphics/Interfaces/ITexture2D.h"
-#include "NightOwl/Component/Structures/Mesh.h"
-#include "NightOwl/Audio/AudioClip.h"
 
 typedef unsigned char stbi_uc;
 
 namespace NightOwl
 {
+	class Animation;
+
+	class AudioClip;
+
+	class ITexture2D;
+
+	class IShader;
+
+	class Model;
+
 	class AssetManager
 	{
 	public:

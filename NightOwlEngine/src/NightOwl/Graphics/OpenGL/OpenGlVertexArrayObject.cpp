@@ -2,6 +2,10 @@
 
 #include "OpenGlVertexArrayObject.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
+#include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
+#include "NightOwl/Graphics/Structures/VertexBufferData.h"
+#include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 
 namespace NightOwl
 {

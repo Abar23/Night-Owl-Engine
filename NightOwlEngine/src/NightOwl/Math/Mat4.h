@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Vec4.h"
-#include "Vec3.h"
-#include "Mat3.h"
 #include <initializer_list>
 
 namespace NightOwl
 {
+	template <typename T> class Vec3;
+
+	template <typename T> class Mat3;
+
 	template <typename T>
 	class Mat4
 	{

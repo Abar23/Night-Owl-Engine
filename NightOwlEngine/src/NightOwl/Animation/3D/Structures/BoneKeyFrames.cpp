@@ -1,9 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "BoneKeyFrames.h"
-
 #include "NightOwl/Core/Utitlity/Utils.h"
-#include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 
 namespace NightOwl
 {

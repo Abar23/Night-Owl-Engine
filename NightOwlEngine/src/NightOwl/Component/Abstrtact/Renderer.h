@@ -1,11 +1,13 @@
 #pragma once
 
-#include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Component/Component.h"
+#include "NightOwl/Math/Mat4.h"
 #include <memory>
+#include <vector>
 
 namespace NightOwl
 {
+	class Mesh;
 	class Material;
 
 	class Renderer : public Component

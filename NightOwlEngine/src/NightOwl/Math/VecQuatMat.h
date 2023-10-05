@@ -3,8 +3,11 @@
 namespace NightOwl
 {
 	template <typename T> class Vec3;
+
 	template <typename T> class Mat3;
+
 	template <typename T> class Mat4;
+
 	template <typename T> class Quaternion;
 
 	template <typename T>

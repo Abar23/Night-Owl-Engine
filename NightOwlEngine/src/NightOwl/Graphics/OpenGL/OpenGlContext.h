@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NightOwl/Graphics/Interfaces/IContext.h"
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 namespace NightOwl
 {

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
+#include "NightOwl/GameObject/GameObject.h"
 #include <string>
-#include <assimp/scene.h>
+
+struct aiScene;
 
 namespace NightOwl
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Graphics/System/MeshRendererSystem.h"
-
 namespace NightOwl
 {
+	class MeshRendererSystem;
+
 	class MeshRendererSystemLocator
 	{
 	public:

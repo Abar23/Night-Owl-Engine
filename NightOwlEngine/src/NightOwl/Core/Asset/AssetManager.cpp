@@ -4,17 +4,18 @@
 
 #include "AssetManager.h"
 #include "AssimpModelLoader.h"
-#include "NightOwl/Core/Utitlity/Utils.h"
+#include "ShaderLoader.h"
+#include "NightOwl/Animation/3D/Animation.h"
+#include "NightOwl/Animation/3D/Structures/Model.h"
+#include "NightOwl/Audio/AudioClip.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
-#include "NightOwl/Graphics/RenderApi.h"
-#include "NightOwl/Core/Locator/AudioSystemLocator.h"
-#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
-#include "stb/stb_image.h"
+#include "NightOwl/Graphics/Interfaces/IShader.h"
+#include "NightOwl/Graphics/Interfaces/ITexture2D.h"
+#include "NightOwl/Graphics/RenderApi.h"
 #include <filesystem>
-
-#include "ShaderLoader.h"
+#include <stb/stb_image.h>
 
 namespace NightOwl
 {

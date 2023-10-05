@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NightOwl/Graphics/Interfaces/IShaderStage.h"
+#include <string>
 
 namespace NightOwl
 {

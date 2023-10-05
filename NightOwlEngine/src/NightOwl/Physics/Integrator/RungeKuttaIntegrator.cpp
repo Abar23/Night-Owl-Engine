@@ -1,6 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "RungeKuttaIntegrator.h"
+#include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 

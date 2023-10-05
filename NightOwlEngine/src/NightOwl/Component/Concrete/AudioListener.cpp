@@ -1,6 +1,7 @@
 #include "NightOwlPch.h"
 
 #include "AudioListener.h"
+#include "NightOwl/Audio/AudioSystem.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
 #include <algorithm>
 

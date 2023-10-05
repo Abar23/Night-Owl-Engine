@@ -1,11 +1,13 @@
 #pragma once
 
-#include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
-#include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
 #include <memory>
 
 namespace NightOwl
 {
+	class IIndexBuffer;
+
+	class IVertexBuffer;
+
 	class IVertexArrayObject
 	{
 	public:

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Behavior/OwlBehaviorManager.h"
-
 namespace NightOwl
 {
+	class OwlBehaviorManager;
+
 	class OwlBehaviorManagerLocator
 	{
 	public:

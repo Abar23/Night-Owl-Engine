@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace NightOwl
 {
 	constexpr float EPSILON = 1.0e-5f;

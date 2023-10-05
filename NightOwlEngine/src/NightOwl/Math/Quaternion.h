@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Vec4.h"
-#include "Mat3.h"
-
 namespace NightOwl
 {
+	template <typename T> class Vec4;
+
+	template <typename T> class Mat3;
+
 	template <typename T>
 	class Quaternion
 	{

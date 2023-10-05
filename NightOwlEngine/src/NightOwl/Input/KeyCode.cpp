@@ -1,7 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "NightOwl/Input/KeyCode.h"
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 namespace NightOwl
 {

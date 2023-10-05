@@ -1,14 +1,14 @@
 #pragma once
 
-#include "NightOwl/Math/Vec2.h"
-#include "KeyCode.h"
-#include "InputAction.h"
-#include "MouseButton.h"
-#include "GamePadState.h"
-#include "GamePadId.h"
 #include "GamePadAxis.h"
-#include <mutex>
+#include "GamePadId.h"
+#include "GamePadState.h"
+#include "InputAction.h"
+#include "KeyCode.h"
+#include "MouseButton.h"
+#include "NightOwl/Math/Vec2.h"
 #include <memory>
+#include <mutex>
 
 namespace NightOwl
 {

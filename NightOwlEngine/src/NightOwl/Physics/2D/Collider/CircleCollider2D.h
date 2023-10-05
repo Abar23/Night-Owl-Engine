@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Collider2D.h"
-#include "NightOwl/Math/Vec2.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
+#include "NightOwl/Math/Vec2.h"
 
 namespace NightOwl
 {

@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-#include "Vec2.h"
 
 namespace NightOwl
 {

@@ -1,15 +1,19 @@
 #pragma once
 
-#include "NightOwl/Window/Structures/WindowProperties.h"
-#include "NightOwl/Window/Structures/MonitorProperties.h"
-#include "NightOwl/Window/Structures/WindowSnapshot.h"
-#include "NightOwl/Window/Interfaces/IWindow.h"
 #include "NightOwl/Input/GamePadState.h"
-#include "GLFW/glfw3.h"
+#include "NightOwl/Window/Interfaces/IWindow.h"
+#include "NightOwl/Window/Structures/MonitorProperties.h"
+#include "NightOwl/Window/Structures/WindowProperties.h"
 #include <functional>
+#include <GLFW/glfw3.h>
+
 
 namespace NightOwl
 {
+	class MonitorProperties;
+
+	class WindowProperties;
+
 	class GlfwWindow : public IWindow
 	{
 	public:

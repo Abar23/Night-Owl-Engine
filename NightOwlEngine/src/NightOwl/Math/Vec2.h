@@ -1,14 +1,15 @@
 #pragma once
 
-#include "Swizzle.h"
 #include "MathFunctions.h"
-#include <ostream>
-#include <initializer_list>
+#include "Swizzle.h"
 #include <array>
+#include <initializer_list>
+#include <ostream>
 
 namespace NightOwl
 {
 	template <typename T> class Vec3;
+
 	template <typename T> class Vec4;
 
 	template <typename T>

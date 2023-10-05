@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 
-
 namespace NightOwl
 {
 	class Animation

@@ -1,10 +1,11 @@
 #pragma once
 
-#include "NightOwl/Audio/AudioClip.h"
 #include "NightOwl/Component/Component.h"
 
 namespace NightOwl
 {
+	class AudioClip;
+
 	class AudioSource : public Component
 	{
 	public:

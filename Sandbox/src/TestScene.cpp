@@ -3,13 +3,15 @@
 #include "Behaviors/CameraController.h"
 #include "Behaviors/ImGuiInterface.h"
 #include "Behaviors/InfinitePlane.h"
+#include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
+#include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/RenderAPI.h"
-#include "NightOwl/Graphics/Materials/Material.h"
 
 class InfinitePlane;
 

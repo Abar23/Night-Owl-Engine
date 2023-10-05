@@ -3,6 +3,7 @@
 #include "MeshRenderer.h"
 #include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
+#include "NightOwl/Graphics/System/MeshRendererSystem.h"
 
 namespace NightOwl
 {

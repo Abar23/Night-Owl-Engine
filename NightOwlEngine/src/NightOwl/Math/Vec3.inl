@@ -1,10 +1,9 @@
 #pragma once
 
+#include "MathFunctions.h"
 #include <cassert>
 #include <cmath>
 #include <string>
-#include "MathFunctions.h"
-#include "Vec3.h"
 
 namespace NightOwl
 {

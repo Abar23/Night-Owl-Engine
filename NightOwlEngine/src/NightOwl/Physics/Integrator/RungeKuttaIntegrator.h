@@ -1,9 +1,11 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/RigidBody2D.h"
+#include "NightOwl/Math/Vec2.h"
 
 namespace NightOwl
 {
+	class RigidBody2D;
+
 	class RungeKuttaIntegrator
 	{
 	public:

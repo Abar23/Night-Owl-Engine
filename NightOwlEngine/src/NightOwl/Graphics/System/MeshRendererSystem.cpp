@@ -2,6 +2,7 @@
 
 #include "MeshRendererSystem.h"
 #include "NightOwl/Component/Concrete/Camera.h"
+#include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl

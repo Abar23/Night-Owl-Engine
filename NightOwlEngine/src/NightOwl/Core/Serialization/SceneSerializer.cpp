@@ -1,12 +1,14 @@
 #include "NightOwlPch.h"
 
 #include "SceneSerializer.h"
-#include "rapidjson/filewritestream.h"
-#include "rapidjson/prettywriter.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
+#include "NightOwl/GameObject/GameObject.h"
 #include <cstdio>
+#include <rapidjson/filewritestream.h>
+#include <rapidjson/prettywriter.h>
+
 
 namespace NightOwl
 {

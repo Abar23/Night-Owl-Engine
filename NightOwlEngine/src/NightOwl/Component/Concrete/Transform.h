@@ -1,9 +1,9 @@
 #pragma once
 
-#include "NightOwl/Math/Math.h"
 #include "NightOwl/Component/Component.h"
 #include "NightOwl/Component/Types/Space.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
+#include "NightOwl/Math/Math.h"
 #include <vector>
 
 namespace NightOwl

@@ -1,8 +1,9 @@
 #include "NightOwlPch.h"
 
 #include "ShaderLoader.h"
-#include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
+#include "AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 #include "NightOwl/Graphics/RenderAPI.h"
 #include <filesystem>
 

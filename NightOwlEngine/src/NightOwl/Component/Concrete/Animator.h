@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Transform.h"
 #include "NightOwl/Animation/3D/Structures/AnimationCollection.h"
 #include "NightOwl/Animation/Types/AnimatorUpdateMode.h"
 #include "NightOwl/Component/Component.h"
 
 namespace NightOwl
 {
+	class Transform;
+
 	class Animator : public Component
 	{
 	public:

@@ -1,11 +1,12 @@
 #pragma once
 
-#include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include <vector>
 #include <set>
 
 namespace NightOwl
 {
+	class RigidBody2D;
+
 	class PhysicsEngine2D
 	{
 	public:

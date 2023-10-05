@@ -1,17 +1,19 @@
 #pragma once
 
-#include "NightOwl/GameObject/GameObject.h"
 #include <map>
+#include <memory>
 #include <vector>
 #include <string>
 
 namespace NightOwl
 {
+	class GameObject;
+
+	class SceneManager;
+
 	class SceneSerializer;
 
 	class Transform;
-
-	class SceneManager;
 
 	class Scene
 	{

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "MathFunctions.h"
+#include "Mat3.h"
+#include "Vec4.h"
 #include <cmath>
 #include <algorithm>
-#include "MathFunctions.h"
-#include "Quaternion.h"
 
 namespace NightOwl
 {
@@ -33,8 +34,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T>::Quaternion(const Quaternion<T>& quaternion)
 		: x(quaternion.x), y(quaternion.y), z(quaternion.z), w(quaternion.w)
-	{
-	}
+	{ }
 
 	template <typename T>
 	T Quaternion<T>::Norm() const

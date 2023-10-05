@@ -1,12 +1,10 @@
 #pragma once
 
-#include <vector>
-
-#include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Math/Vec3.h"
+#include <vector>
 
 namespace NightOwl
 {
