@@ -49,7 +49,7 @@ namespace NightOwl
 		
 		glfwSetMonitorUserPointer(monitorHandle, &monitorProperties);
 		
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		glfwSetWindowSizeCallback(windowHandle, ScreenResizeCallback);
 		glfwSetFramebufferSizeCallback(windowHandle, FramebufferResizeCallback);

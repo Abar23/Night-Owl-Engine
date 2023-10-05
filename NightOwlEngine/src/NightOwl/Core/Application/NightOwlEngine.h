@@ -6,7 +6,7 @@
 #include "NightOwl/Audio/AudioSystem.h"
 #include "NightOwl/Behavior/OwlBehaviorManager.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Debug/DebugSystem.h"
+#include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/Graphics/System/MeshRendererSystem.h"
 #include "NightOwl/Physics/2D/PhysicsEngine2D.h"
 

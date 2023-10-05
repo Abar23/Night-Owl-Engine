@@ -9,9 +9,8 @@
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/GameObject/GameObject.h"
-#include <stack>
-
 #include "NightOwl/Graphics/Materials/Material.h"
+#include <stack>
 
 namespace NightOwl
 {
@@ -369,7 +368,6 @@ namespace NightOwl
 			armatureNodes.pop();
 
 			armatureNodePair.first->SetName(armatureNodePair.second->mName.data);
-			ENGINE_LOG_INFO("Armature name: {0}", armatureNodePair.second->mName.data);
 
 			aiVector3D scale;
 			aiVector3D position;

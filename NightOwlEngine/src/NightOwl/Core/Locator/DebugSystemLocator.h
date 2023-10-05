@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NightOwl/Core/Debug/DebugSystem.h"
+#include "NightOwl/Graphics/Debugging/DebugSystem.h"
 
 namespace NightOwl
 {
