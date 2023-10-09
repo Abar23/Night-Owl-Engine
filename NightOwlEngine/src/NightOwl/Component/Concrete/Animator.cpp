@@ -11,6 +11,8 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
 
+#include "NightOwl/Core/Application/Scene.h"
+
 namespace NightOwl
 {
 	Animator::Animator()
@@ -32,9 +34,10 @@ namespace NightOwl
 		clone->animationCollection = animationCollection;
 		clone->elapsedTime = elapsedTime;
 		clone->isPlaying = isPlaying;
-		// TODO: skeleton will need to be cloned otherwise it will effect the same transforms of original
-		clone->skeleton = skeleton;
 		clone->currentAnimation = currentAnimation;
+
+		// Since skeleton is hierarchy of child gameobjects, they will be cloned when via base gameobject clone.
+		clone->skeleton = nullptr;
 
 		return clone;
 	}
