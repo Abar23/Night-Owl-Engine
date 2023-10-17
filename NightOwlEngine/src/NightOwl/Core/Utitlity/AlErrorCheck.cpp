@@ -12,7 +12,7 @@ bool checkOpenAlError(const std::string& filename, const std::uint32_t line)
 	{
 		std::string errorMessage;
 
-		const std::string fileNameStripped = NightOwl::Utility::StripFilePathToName(filename);
+		const std::string fileNameStripped = NightOwl::Utility::StripFilePathToNameWithExtension(filename);
 
 		switch (error)
 		{
@@ -54,7 +54,7 @@ bool checkOpenAlContextError(const std::string& filename, const std::uint32_t li
 	{
 		std::string errorMessage;
 
-		const std::string fileNameStripped = NightOwl::Utility::StripFilePathToName(filename);
+		const std::string fileNameStripped = NightOwl::Utility::StripFilePathToNameWithExtension(filename);
 
 		switch (error)
 		{

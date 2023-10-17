@@ -308,7 +308,7 @@ namespace NightOwl
 			std::string textureFilePath(str.C_Str());
 			Utility::StandardizeFilePathString(textureFilePath);
 			textureFilePath = modelLoadingInfo.directory + '/' + textureFilePath;
-			std::string assetName = Utility::StripFilePathToName(textureFilePath);
+			std::string assetName = Utility::StripFilePathToNameWithExtension(textureFilePath);
 
 			ITexture2D* loadedTexture;
 			if (assetManager->GetTextureRepository().HasAsset(assetName))

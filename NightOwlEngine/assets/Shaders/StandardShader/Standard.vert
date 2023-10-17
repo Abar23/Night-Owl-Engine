@@ -1,4 +1,4 @@
-#include "/VertexInputs.glsl"
+#include "VertexInputs.glsl"
 
 void main()
 {

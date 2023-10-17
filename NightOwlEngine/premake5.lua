@@ -45,7 +45,9 @@ project "NightOwlEngine"
         vendorDir .. "/nlohmann/single_include",
         vendorDir .. "/OpenAL/include",
         vendorDir .. "/libsndfile/include",
-        vendorDir .. "/Assimp/include"
+        vendorDir .. "/Assimp/include",
+        vendorDir .. "/shaderc/include",
+        vendorDir .. "/SPIRV-Cross/include"
     }
 
     links
@@ -56,7 +58,9 @@ project "NightOwlEngine"
         "opengl32.lib",
         "OpenAL32.lib",
         "sndfile.lib",
-        "assimp-vc143-mt.lib"
+        "assimp-vc143-mt.lib",
+        "shaderc.lib",
+        "shaderc_combined.lib",
     }
 
     filter "system:windows"
@@ -71,7 +75,18 @@ project "NightOwlEngine"
         {
             vendorDir .. "/OpenAL/libs/Win64",
             vendorDir .. "/libsndfile/Debug",
-            vendorDir .. "/Assimp/lib/x64"
+            vendorDir .. "/Assimp/lib/x64",
+            vendorDir .. "/shaderc/lib/Debug",
+            vendorDir .. "/SPIRV-Cross/lib/Debug"
+        }
+
+        links
+        {
+            "spirv-cross-cored.lib",
+            "spirv-cross-cppd.lib",
+            "spirv-cross-glsld.lib",
+            "spirv-cross-reflectd.lib",
+            "spirv-cross-utild.lib"
         }
     
     filter "configurations:Release"  
@@ -83,5 +98,17 @@ project "NightOwlEngine"
         {
             vendorDir .. "/OpenAL/libs/Win64",
             vendorDir .. "/libsndfile/Release",
-            vendorDir .. "/Assimp/lib/x64"
+            vendorDir .. "/Assimp/lib/x64",
+            vendorDir .. "/shaderc/lib/Release",
+            vendorDir .. "/SPIRV-Cross/lib/Release"
         }
+
+        links
+        {
+            "spirv-cross-core.lib",
+            "spirv-cross-cpp.lib",
+            "spirv-cross-glsl.lib",
+            "spirv-cross-reflect.lib",
+            "spirv-cross-util.lib"
+        }
+    

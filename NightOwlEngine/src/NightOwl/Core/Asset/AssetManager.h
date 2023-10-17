@@ -29,6 +29,8 @@ namespace NightOwl
 
 		AssetRepository<Animation>& GetAnimationRepository();
 
+		AssetRepository<std::string>& GetShaderIncludeRepository();
+
 		void LoadShaders(const std::string& shaderDirectory, bool isEngineAsset = false);
 
 		ITexture2D* LoadTexture2D(const std::string& filePath, bool isEngineAsset = false);
@@ -55,6 +57,8 @@ namespace NightOwl
 		AssetRepository<Model> modelRepository;
 
 		AssetRepository<Animation> animationRepository;
+
+		AssetRepository<std::string> shaderIncludeRepository;
 
 		stbi_uc* ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels);
 	};

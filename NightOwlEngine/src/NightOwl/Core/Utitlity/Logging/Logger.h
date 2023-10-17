@@ -28,7 +28,7 @@ namespace NightOwl::Utility
 			{
 				auto now = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 				
-				std::string fileName = StripFilePathToName(file);
+				std::string fileName = StripFilePathToNameWithExtension(file);
 				
 				const std::string preamble = std::format("[{0:%H:%M:%S}] {1}({2}) ", now, fileName, line);
 

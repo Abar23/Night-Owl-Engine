@@ -2,7 +2,7 @@
 
 #include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/GameObject/GameObject.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 

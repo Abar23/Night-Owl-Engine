@@ -4,7 +4,7 @@
 #include "AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include <filesystem>
 
 
@@ -12,15 +12,59 @@ namespace NightOwl
 {
 	void ShaderLoader::LoadShaders(const std::string& shaderDirectory, bool isEngineAsset /* = false */)
 	{
+		ProcessSharedShaders(shaderDirectory, isEngineAsset);
+
+		ProcessShaders(shaderDirectory, isEngineAsset);
+	}
+
+	void ShaderLoader::ProcessSharedShaders(const std::string& shaderDirectory, bool isEngineAsset)
+	{
+		const std::string& sharedShaderDirectory = shaderDirectory + "/Shared/";
+		if (Utility::IsValidDirectory(sharedShaderDirectory) == false)
+		{
+			return;
+		}
+
 		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
 
-		const std::string& sharedShaderDirectory = shaderDirectory + "/Shared/";
+		auto& shaderIncludeRepo = assetManager->GetShaderIncludeRepository();
 
-		ProcessSharedShaders(sharedShaderDirectory);
-
-		for (const auto& shaderProgramDirectory : std::filesystem::directory_iterator(shaderDirectory)) 
+		for (const auto& entry : std::filesystem::directory_iterator(sharedShaderDirectory)) 
 		{
-			if (is_directory(shaderProgramDirectory) && 
+			if (is_regular_file(entry) == false) 
+			{
+				continue;
+			}
+
+			std::string filePath = entry.path().string();
+
+			const std::string includeShaderName = Utility::StripFilePathToNameWithExtension(filePath);
+
+			if (shaderIncludeRepo.HasAsset(includeShaderName))
+			{
+				continue;
+			}
+
+			Utility::StandardizeFilePathString(filePath);
+			std::string shaderSource = ReadShader(filePath);
+			const std::shared_ptr<std::string> shaderSourceAsset = std::make_shared<std::string>(shaderSource);
+
+			shaderIncludeRepo.AddAsset(includeShaderName, shaderSourceAsset, isEngineAsset);
+		}
+	}
+
+	void ShaderLoader::ProcessShaders(const std::string& shaderDirectory, bool isEngineAsset)
+	{
+		if (Utility::IsValidDirectory(shaderDirectory) == false)
+		{
+			return;
+		}
+
+		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+
+		for (const auto& shaderProgramDirectory : std::filesystem::directory_iterator(shaderDirectory))
+		{
+			if (is_directory(shaderProgramDirectory) &&
 				shaderProgramDirectory.path().filename() == "Shared")
 			{
 				continue;
@@ -32,7 +76,7 @@ namespace NightOwl
 				continue;
 			}
 
-			const std::shared_ptr<IShader> shader = RenderApi::CreateShader(shaderName);
+			std::shared_ptr<IShader> shader = Graphics::CreateShader(shaderName);
 
 			for (const auto& shaderStageFile : std::filesystem::directory_iterator(shaderProgramDirectory.path()))
 			{
@@ -47,7 +91,7 @@ namespace NightOwl
 				const std::string& shaderStageSource = shaderHeader + ReadShader(shaderStageFilePath);
 				const std::string shaderStageExtension = Utility::StripFilePathToExtension(shaderStageFilePath);
 
-				std::shared_ptr<IShaderStage> shaderStage = RenderApi::CreateShaderStage(shaderStageSource, ExtensionToShaderType(shaderStageExtension));
+				std::shared_ptr<IShaderStage> shaderStage = Graphics::CreateShaderStage(shaderStageSource, ExtensionToShaderType(shaderStageExtension));
 
 				shader->AddShaderStage(shaderStage);
 			}
@@ -55,23 +99,6 @@ namespace NightOwl
 			shader->AttachAndLinkShaderStages();
 
 			assetManager->GetShaderRepository().AddAsset(shaderName, shader, isEngineAsset);
-		}
-	}
-
-	void ShaderLoader::ProcessSharedShaders(const std::string& sharedShaderDirectory)
-	{
-		for (const auto& entry : std::filesystem::directory_iterator(sharedShaderDirectory)) 
-		{
-			if (is_regular_file(entry) == false) 
-			{
-				continue;
-			}
-
-			std::string filePath = entry.path().string();
-			Utility::StandardizeFilePathString(filePath);
-			const std::string& shaderSource = ReadShader(filePath);
-
-			RenderApi::GetContext()->AddShaderInclude("/" + Utility::StripFilePathToName(filePath), shaderSource);
 		}
 	}
 
@@ -100,9 +127,9 @@ namespace NightOwl
 				std::terminate();
 			}
 		}
-		catch (std::exception& e)
+		catch (std::exception& exception)
 		{
-			ENGINE_LOG_ERROR("Failed to open shader source file: {0}\n Exception raised: {1}\n, Error raised: {2}", filePath, e.what(), strerror(errno));
+			ENGINE_LOG_ERROR("Failed to open shader source file: {0}\n Exception raised: {1}\n, Error raised: {2}", filePath, exception.what(), strerror(errno));
 			std::terminate();
 		}
 

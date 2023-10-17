@@ -9,13 +9,15 @@
 
 namespace NightOwl::Utility
 {
-	std::string StripFilePathToName(const std::string& filePath);
+	std::string StripFilePathToNameWithExtension(const std::string& filePath);
 
 	std::string StripFilePathToNameWithoutExtension(const std::string& filePath);
 
 	std::string StripFilePathToExtension(const std::string& filePath);
 
 	std::string FilePathToDirectory(std::string filePath);
+
+	bool IsValidDirectory(const std::string& directory);
 
 	void StandardizeFilePathString(std::string& filePath);
 

@@ -1,9 +1,7 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <string>
-
-#include "ShaderTypes.h"
-#include "glad/glad.h"
 
 namespace NightOwl
 {

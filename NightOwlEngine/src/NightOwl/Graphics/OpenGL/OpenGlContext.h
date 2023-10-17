@@ -32,10 +32,6 @@ namespace NightOwl
 
 		void SetClearColor(const Vec4F& color) override;
 
-		void AddShaderInclude(const std::string& name, const std::string& shaderIncludeSource) override;
-
-		void DeleteShaderInclude(const std::string& name) override;
-
 	private:
 		GLFWwindow* window;
 

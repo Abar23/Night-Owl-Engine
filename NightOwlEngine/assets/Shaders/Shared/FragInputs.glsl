@@ -1,20 +1,20 @@
 out vec4 FragColor;
 
-uniform vec4 diffuseColor;
-uniform vec4 specularColor;
-uniform vec4 emissiveColor;
-uniform vec4 transparentColor;
-uniform vec4 reflectiveColor;
-uniform vec4 ambientColor;
+layout (location = 900) uniform vec4 diffuseColor;
+layout (location = 910) uniform vec4 specularColor;
+layout (location = 920) uniform vec4 emissiveColor;
+layout (location = 930) uniform vec4 transparentColor;
+layout (location = 940) uniform vec4 reflectiveColor;
+layout (location = 950) uniform vec4 ambientColor;
+ 
+layout (location = 960) uniform sampler2D diffuseTexture;
+layout (location = 970) uniform sampler2D specularTexture;
+layout (location = 980) uniform sampler2D ambientOcclusionsTexture;
+layout (location = 990) uniform sampler2D normalsTexture;
+layout (location = 1000) uniform sampler2D roughnessTexture;
 
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
-uniform sampler2D ambientOcclusionsTexture;
-uniform sampler2D normalsTexture;
-uniform sampler2D roughnessTexture;
-
-uniform float shininess;
-uniform float shininessStrength;
+layout (location = 1010) uniform float shininess;
+layout (location = 1020) uniform float shininessStrength;
 
 in vertexData
 {

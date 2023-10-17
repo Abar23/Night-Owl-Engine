@@ -11,7 +11,7 @@
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/GameObject/GameObject.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 
 class InfinitePlane;
 
@@ -67,7 +67,7 @@ void TestScene::Init()
 	gameObject.AddComponent<NightOwl::MeshRenderer>();
 	gameObject.AddComponent<InfinitePlane>();
 	
-	NightOwl::RenderApi::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
+	NightOwl::Graphics::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
 }
 
 void TestScene::Reset()

@@ -4,7 +4,7 @@
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 
 namespace NightOwl
@@ -19,7 +19,7 @@ namespace NightOwl
 		debugMaterial->SetShader(debugShader);
 
 		// Define data to line segments vertex buffer
-		vertexBuffer = RenderApi::CreateVertexBuffer();
+		vertexBuffer = Graphics::CreateVertexBuffer();
 
 		VertexBufferData lineVertexData("Line Vertices", VertexDataType::VectorFloat3, 0);
 
@@ -29,7 +29,7 @@ namespace NightOwl
 		vertexBuffer->SetVertexBufferLayout(vertexDataLayout);
 
 		// Setup inputs to shader, in this case it is line vertices only
-		vertexArrayObject = RenderApi::CreateVertexArrayObject();
+		vertexArrayObject = Graphics::CreateVertexArrayObject();
 		vertexArrayObject->SetVertexBuffer(vertexBuffer);
 		vertexArrayObject->SetupVertexBufferAttributes();
 	}
@@ -41,7 +41,7 @@ namespace NightOwl
 			return;
 		}
 
-		IContext* renderContext = RenderApi::GetContext().get();
+		IContext* renderContext = Graphics::GetContext().get();
 
 		// Populate vertex buffer with lines
 		const VertexBufferLayout vertexBufferLayout = vertexBuffer->GetVertexBufferLayout();

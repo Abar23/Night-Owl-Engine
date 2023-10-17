@@ -1,7 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "Mesh.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
 
@@ -10,11 +10,11 @@ namespace NightOwl
 	Mesh::Mesh()
 		: isValid(false)
 	{
-		vertexBuffer = RenderApi::CreateVertexBuffer();
+		vertexBuffer = Graphics::CreateVertexBuffer();
 
-		indexBuffer = RenderApi::CreateIndexBuffer();
+		indexBuffer = Graphics::CreateIndexBuffer();
 
-		vertexArrayObject = RenderApi::CreateVertexArrayObject();
+		vertexArrayObject = Graphics::CreateVertexArrayObject();
 		vertexArrayObject->SetIndexBuffer(indexBuffer);
 		vertexArrayObject->SetVertexBuffer(vertexBuffer);
 	}

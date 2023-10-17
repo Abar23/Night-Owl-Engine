@@ -1,4 +1,4 @@
-#include "/VertexInputs.glsl"
+#include "VertexInputs.glsl"
 
 out vec3 nearPoint;
 out vec3 farPoint;

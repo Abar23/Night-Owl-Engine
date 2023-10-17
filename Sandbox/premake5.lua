@@ -31,6 +31,8 @@ project "Sandbox"
 		"%{wks.location}/NightOwlEngine/vendor/OpenAL/include",
 		"%{wks.location}/NightOwlEngine/vendor/libsndfile/include",
 		"%{wks.location}/NightOwlEngine/vendor/Assimp/include",
+		"%{wks.location}/NightOwlEngine/vendor/shaderc/include",
+		"%{wks.location}/NightOwlEngine/vendor/SPIRV-Cross/include",
 		"%{wks.location}/NightOwlEngine/src"
 	}
 

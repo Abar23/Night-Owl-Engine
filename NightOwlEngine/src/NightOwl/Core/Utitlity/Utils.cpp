@@ -6,7 +6,7 @@
 
 namespace NightOwl::Utility
 {
-	std::string StripFilePathToName(const std::string& filePath)
+	std::string StripFilePathToNameWithExtension(const std::string& filePath)
 	{
 		std::size_t delimiterPosition = filePath.rfind('/', filePath.length());
 		if(delimiterPosition == std::string::npos)
@@ -25,7 +25,7 @@ namespace NightOwl::Utility
 
 	std::string StripFilePathToNameWithoutExtension(const std::string& filePath)
 	{
-		std::string fileName = StripFilePathToName(filePath);
+		std::string fileName = StripFilePathToNameWithExtension(filePath);
 
 		if(fileName.empty())
 		{
@@ -59,6 +59,16 @@ namespace NightOwl::Utility
 		return filePath.substr(0, filePath.find_last_of('/'));
 	}
 
+	bool IsValidDirectory(const std::string& directory)
+	{
+		if (std::filesystem::exists(directory) && std::filesystem::is_directory(directory))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	void StandardizeFilePathString(std::string& filePath)
 	{
 		std::ranges::replace(filePath, '\\', '/');
@@ -69,7 +79,7 @@ namespace NightOwl::Utility
 		std::ifstream jsonFile(path);
 		if (!jsonFile)
 		{
-			ENGINE_LOG_ERROR("Error to open JSON File : {0}", path);
+			ENGINE_LOG_ERROR("Error to open JSON File : {0}", path); 
 			std::terminate();
 		}
 

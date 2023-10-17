@@ -13,7 +13,7 @@
 #include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
 #include "NightOwl/Core/Locator/SceneManagerLocator.h"
 #include "NightOwl/Core/Time/Time.h"
-#include "NightOwl/Graphics/RenderApi.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Input/Input.h"
 #include "NightOwl/Window/WindowApi.h"
 
@@ -90,8 +90,8 @@ namespace NightOwl
 
 			if (Time::ShouldRenderFrame())
 			{
-				RenderApi::GetContext()->ClearColor();
-				RenderApi::GetContext()->ClearBuffer();
+				Graphics::GetContext()->ClearColor();
+				Graphics::GetContext()->ClearBuffer();
 
 				owlBehaviorManager.Update();
 

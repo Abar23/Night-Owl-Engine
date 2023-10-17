@@ -3,7 +3,7 @@
 #include "ColliderRendererSystem.h"
 #include "NightOwl/Component/Concrete/RigidBody2D.h"
 #include "NightOwl/GameObject/GameObject.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Physics/2D/Collider/Collider2D.h"
 
 namespace NightOwl
@@ -12,7 +12,7 @@ namespace NightOwl
 	{
 		for (auto& collider : colliders)
 		{
-			RenderApi::GetContext()->EnableWireFrame(true);
+			Graphics::GetContext()->EnableWireFrame(true);
 
 			if (collider->GetRigidBody()->GetGameObject().IsActive())
 			{
@@ -21,7 +21,7 @@ namespace NightOwl
 				//draw velocity and acceleration lines.
 			}
 
-			RenderApi::GetContext()->EnableWireFrame(false);
+			Graphics::GetContext()->EnableWireFrame(false);
 		}
 	}
 

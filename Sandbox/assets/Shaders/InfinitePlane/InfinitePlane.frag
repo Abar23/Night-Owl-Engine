@@ -1,4 +1,4 @@
-#include "/FragInputs.glsl"
+#include "FragInputs.glsl"
 
 in vec3 nearPoint;
 in vec3 farPoint;
@@ -54,7 +54,8 @@ void main() {
     float t = -nearPoint.y / (farPoint.y - nearPoint.y);
     vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
 
-    gl_FragDepth = ((gl_DepthRange.diff * CalculateDepth(fragPos3D)) + gl_DepthRange.near + gl_DepthRange.far) / 2.0;
+    // gl_DepthRange held values 0 for near, 1 for far, and far - near in the diff. O and 1 because that is the depth range in opengl
+    gl_FragDepth = ((CalculateDepth(fragPos3D)) + 1.0) / 2.0;
 
     float linearDepth = CalculateLinearDepth(fragPos3D);
     float fading = max(0, (0.5 - linearDepth));

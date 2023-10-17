@@ -12,7 +12,7 @@ namespace NightOwl::Utility
 		{
 			std::string errorMessage;
 
-			const std::string fileNameStripped = StripFilePathToName(filename);
+			const std::string fileNameStripped = StripFilePathToNameWithExtension(filename);
 
 			switch (glErrorCode)
 			{
@@ -195,7 +195,9 @@ User Params: {4})",
 		std::vector<char> errorBuffer(maxErrorBufferLength);
 		GL_CALL(glGetProgramInfoLog, shaderId, maxErrorBufferLength, NULL, errorBuffer.data());
 
-		ENGINE_LOG_ERROR(errorBuffer.data());
+		if (errorBuffer.empty() == false)
+		{
+			ENGINE_LOG_ERROR(errorBuffer.data());
+		}
 	}
-
 }

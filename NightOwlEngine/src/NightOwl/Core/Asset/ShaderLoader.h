@@ -9,17 +9,15 @@ namespace NightOwl
 	public:
 		static void LoadShaders(const std::string& shaderDirectory, bool isEngineAsset = false);
 
-		static void ProcessSharedShaders(const std::string& sharedShaderDirectory);
+		static void ProcessSharedShaders(const std::string& sharedShaderDirectory, bool isEngineAsset);
+
+		static void ProcessShaders(const std::string& shaderDirectory, bool isEngineAsset);
 
 	private:
 		static std::string ReadShader(const std::string& filePath);
 
 		inline static const std::string shaderHeader = R"(
-			#version 460 core
-
-			#extension GL_ARB_bindless_texture : require
-			#extension GL_ARB_shading_language_include : require
-
+			#version 450 core
 		)";
 	};
 }

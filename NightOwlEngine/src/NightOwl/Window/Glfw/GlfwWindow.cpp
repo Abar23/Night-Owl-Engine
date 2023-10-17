@@ -3,7 +3,7 @@
 #include "GlfwWindow.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
-#include "NightOwl/Graphics/RenderApi.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Window/Structures/MonitorProperties.h"
 #include "NightOwl/Window/Structures/WindowProperties.h"
 #include <GLFW/glfw3.h>
@@ -28,7 +28,7 @@ namespace NightOwl
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
 		
-		RenderApi::CreateContext(this);//Create context
+		Graphics::CreateContext(this);//Create context
 
 		glfwGetFramebufferSize(windowHandle, &windowProperties.pixelWidth, &windowProperties.pixelHeight);
 
@@ -278,7 +278,7 @@ namespace NightOwl
 
 		glfwPollEvents();
 
-		RenderApi::GetContext()->SwapBuffers();
+		Graphics::GetContext()->SwapBuffers();
 	}
 
 	void GlfwWindow::ErrorCallback(int errorCode, const char* errorMessage)
@@ -303,7 +303,7 @@ namespace NightOwl
 		properties->pixelHeight = height;
 		properties->pixelWidth = width;
 
-		RenderApi::GetContext()->SetViewport(0, 0, width, height);
+		Graphics::GetContext()->SetViewport(0, 0, width, height);
 	}
 
 	void GlfwWindow::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

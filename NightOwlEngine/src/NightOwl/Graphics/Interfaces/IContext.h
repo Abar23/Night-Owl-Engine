@@ -31,9 +31,5 @@ namespace NightOwl
 		virtual void EnableWireFrame(bool enabled) = 0;
 
 		virtual void SetClearColor(const Vec4F& color) = 0;
-
-		virtual void AddShaderInclude(const std::string& name, const std::string& shaderIncludeSource) = 0;
-
-		virtual void DeleteShaderInclude(const std::string& name) = 0;
 	};
 }

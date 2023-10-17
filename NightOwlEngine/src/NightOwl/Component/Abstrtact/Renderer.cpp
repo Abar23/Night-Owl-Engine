@@ -9,7 +9,7 @@
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Materials/Material.h"
-#include "NightOwl/Graphics/RenderAPI.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include <stack>
 
 namespace NightOwl
@@ -97,7 +97,7 @@ namespace NightOwl
 			}
 
 			currentMaterial->Bind();
-			RenderApi::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
+			Graphics::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
 			currentMaterial->Unbind();
 
 			currentMaterial->GetShader()->Unbind();

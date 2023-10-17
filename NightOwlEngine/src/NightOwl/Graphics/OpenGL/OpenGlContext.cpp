@@ -100,14 +100,4 @@ namespace NightOwl
 	{
 		clearColor = color;
 	}
-
-	void OpenGlContext::AddShaderInclude(const std::string& name, const std::string& shaderIncludeSource)
-	{
-		GL_CALL(glNamedStringARB, GL_SHADER_INCLUDE_ARB, name.size(), name.c_str(), shaderIncludeSource.size(), shaderIncludeSource.c_str());
-	}
-
-	void OpenGlContext::DeleteShaderInclude(const std::string& name)
-	{
-		glDeleteNamedStringARB(name.size(), name.c_str());
-	}
 }

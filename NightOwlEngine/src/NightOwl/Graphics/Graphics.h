@@ -20,7 +20,7 @@
 
 namespace NightOwl
 {
-	class RenderApi
+	class Graphics
 	{
 	public:
 		template<typename... Args>

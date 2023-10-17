@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <string>
 #include <unordered_map>
+#include <shaderc/shaderc.h>
 
 namespace NightOwl
 {
@@ -105,6 +106,30 @@ namespace NightOwl
 
 		default:
 			return GL_VERTEX_SHADER;
+		}
+	}
+
+	inline shaderc_shader_kind ShaderTypeToShaderCType(ShaderType type)
+	{
+		switch (type)
+		{
+		case ShaderType::Vertex:
+			return shaderc_vertex_shader;
+
+		case ShaderType::TessControl:
+			return shaderc_glsl_tess_control_shader;
+
+		case ShaderType::TessEvaluation:
+			return shaderc_glsl_tess_evaluation_shader;
+
+		case ShaderType::Geometry:
+			return shaderc_geometry_shader;
+
+		case ShaderType::Fragment:
+			return shaderc_fragment_shader;
+
+		default:
+			return shaderc_vertex_shader;
 		}
 	}
 }

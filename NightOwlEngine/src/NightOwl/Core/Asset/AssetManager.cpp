@@ -13,7 +13,7 @@
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
-#include "NightOwl/Graphics/RenderApi.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include <filesystem>
 #include <stb/stb_image.h>
 
@@ -42,6 +42,11 @@ namespace NightOwl
 	AssetRepository<Animation>& AssetManager::GetAnimationRepository()
 	{
 		return animationRepository;
+	}
+
+	AssetRepository<std::string>& AssetManager::GetShaderIncludeRepository()
+	{
+		return shaderIncludeRepository;
 	}
 
 	stbi_uc* AssetManager::ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels)
@@ -80,7 +85,7 @@ namespace NightOwl
 
 	ITexture2D* AssetManager::LoadTexture2D(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
-		const std::string textureName = Utility::StripFilePathToName(filePath);
+		const std::string textureName = Utility::StripFilePathToNameWithExtension(filePath);
 
 		if (textureRepository.HasAsset(textureName))
 		{
@@ -93,7 +98,7 @@ namespace NightOwl
 
 		stbi_uc* data = ReadTexture2D(filePath, width, height, numberOfChannels);
 
-		const auto texture = RenderApi::CreateTexture2D(data, height, width, numberOfChannels);
+		std::shared_ptr<ITexture2D> texture = Graphics::CreateTexture2D(data, height, width, numberOfChannels);
 
 		textureRepository.AddAsset(textureName, texture, isEngineAsset);
 
@@ -104,14 +109,14 @@ namespace NightOwl
 
 	AudioClip* AssetManager::LoadAudioClip(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
-		const std::string audioClipName = Utility::StripFilePathToName(filePath);
+		const std::string audioClipName = Utility::StripFilePathToNameWithExtension(filePath);
 
 		if (audioClipRepository.HasAsset(audioClipName))
 		{
 			return audioClipRepository.GetAsset(audioClipName);
 		}
 
-		const auto audioClip = std::make_shared<AudioClip>();
+		std::shared_ptr<AudioClip> audioClip = std::make_shared<AudioClip>();
 
 		//audioClip->SetSound(sound);
 
