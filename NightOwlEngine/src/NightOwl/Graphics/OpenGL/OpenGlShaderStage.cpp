@@ -70,7 +70,6 @@ namespace NightOwl
 		}
 
 		std::string glslPreprocessShader(preprocessResult.begin(), preprocessResult.end());
-		ENGINE_LOG_INFO(glslPreprocessShader);
 
 		shaderc::SpvCompilationResult compilationResult = glslCompiler.CompileGlslToSpv(glslPreprocessShader, ShaderTypeToShaderCType(shaderType), "test", glslOptions);
 		
@@ -80,8 +79,6 @@ namespace NightOwl
 		}
 
 		std::vector<unsigned int> glslShaderData(compilationResult.begin(), compilationResult.end());
-
-		// GLSL SPIRV
 
 		GL_CALL(glShaderBinary, 1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, glslShaderData.data(), glslShaderData.size() * sizeof(unsigned int));
 		GL_CALL(glSpecializeShader, shaderId, "main", 0, nullptr, nullptr);

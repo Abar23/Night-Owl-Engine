@@ -28,6 +28,8 @@ workspace "NightOwlEngine"
         include "NightOwlEngine/vendor/Glad"
         include "NightOwlEngine/vendor/GLFW"
         include "NightOwlEngine/vendor/ImGui"
+        include "NightOwlEngine/vendor/SPIRV-Cross"
+        include "NightOwlEngine/vendor/shaderc"
     group ""
 
     group "NightOwlEngine"

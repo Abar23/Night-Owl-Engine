@@ -1,0 +1,6 @@
+[submodule "NightOwlEngine/vendor/SPIRV-Cross/SPIRV-Cross-main"]
+	path = NightOwlEngine/vendor/SPIRV-Cross/SPIRV-Cross-main
+	url = https://github.com/KhronosGroup/SPIRV-Cross.git
+[submodule "NightOwlEngine/vendor/shaderc/shaderc-main"]
+	path = NightOwlEngine/vendor/shaderc/shaderc-main
+	url = https://github.com/google/shaderc.git
