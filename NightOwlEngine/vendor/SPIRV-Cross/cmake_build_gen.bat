@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 :: Specify the path to the CMake executable (replace with your actual path)
 set CMAKE_EXECUTABLE=..\..\cmake\Windows\bin\cmake.exe
@@ -18,7 +18,7 @@ set CUSTOM_OPTIONS= ^
     -DSPIRV_CROSS_ENABLE_GLSL=1 ^
     -DSPIRV_CROSS_ENABLE_REFLECT=1 ^
     -DSPIRV_CROSS_ENABLE_UTIL=1 ^
-    -DSPIRV_CROSS_STATIC=1
+    -DSPIRV_CROSS_STATIC=1 ^
     -DSPIRV_CROSS_CLI=0 ^
     -DSPIRV_CROSS_ENABLE_C_API=0 ^
     -DSPIRV_CROSS_ENABLE_HLSL=0 ^
@@ -34,7 +34,7 @@ set CUSTOM_OPTIONS= ^
     -DSPIRV_CROSS_SANITIZE_THREADS=0 ^
     -DSPIRV_CROSS_SANITIZE_UNDEFINED=0 ^
     -DSPIRV_CROSS_SHARED=0 ^
-    -DSPIRV_CROSS_SKIP_INSTALL=0 ^
+    -DSPIRV_CROSS_SKIP_INSTALL=1 ^
     -DSPIRV_CROSS_WERROR=0
 
 :: Create the build directory if it doesn't exist
