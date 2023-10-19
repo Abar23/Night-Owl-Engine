@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 :: Specify the path to the CMake executable (replace with your actual path)
 set CMAKE_EXECUTABLE=..\..\cmake\Windows\bin\cmake.exe
