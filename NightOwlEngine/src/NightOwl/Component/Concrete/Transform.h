@@ -15,6 +15,8 @@ namespace NightOwl
 	public:
 		Transform();
 
+		void LookAt(const Vec3F& targetPoint);
+
 		void Scale(float scaleX, float scaleY, float scaleZ, Space space);
 
 		void Scale(const Vec3F& scale, Space space);

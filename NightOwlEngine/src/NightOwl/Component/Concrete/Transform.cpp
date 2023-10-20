@@ -1,7 +1,6 @@
 #include <NightOwlPch.h>
 
 #include "Transform.h"
-
 #include "NightOwl/Core/Application/Scene.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/GameObject/GameObject.h"
@@ -19,6 +18,15 @@ namespace NightOwl
 		  isLocalDirty(false),
 		  isWorldDirty(false)
 	{ }
+
+	void Transform::LookAt(const Vec3F& targetPoint)
+	{
+		const Vec3F& targetDirection = targetPoint - GetPosition();
+
+		const QuatF lookAtQuaternion = QuatF::LookAt(targetDirection.GetNormalize());
+
+		SetRotation(lookAtQuaternion);
+	}
 
 	void Transform::Scale(float scaleX, float scaleY, float scaleZ, Space space)
 	{
@@ -331,9 +339,10 @@ namespace NightOwl
 		{
 			localVecQuatMat.quaternion = newRotation.GetNormalize();
 			isLocalDirty = true;
+			return;
 		}
 
-		worldOffsetVecQuatMat.quaternion = newRotation;
+		worldOffsetVecQuatMat.quaternion = newRotation.GetNormalize();
 
 		isWorldDirty = true;
 	}

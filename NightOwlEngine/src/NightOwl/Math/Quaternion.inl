@@ -259,6 +259,32 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Quaternion<T> Quaternion<T>::LookAt(const Vec3<T>& direction)
+	{
+		const float dot = Vec3<T>::Dot(Vec3<T>::Forward(), direction);
+
+		if (std::abs(dot + static_cast<T>(1)) < SMALL_EPSILON)
+		{
+			// vector a and b point exactly in the opposite direction, 
+			// so it is a 180 degrees turn around the up-axis
+			return Quaternion<T>(Vec3<T>::Up(), static_cast<T>(180));
+		}
+
+		if (std::abs(dot - static_cast<T>(1)) < SMALL_EPSILON)
+		{
+			// vector a and b point exactly in the same direction
+			// so we return the identity quaternion
+			return Quaternion<T>();
+		}
+
+		T rotationAngle = RadToDegrees(std::acos(dot));
+
+		Vec3<T> rotationAxis = Vec3<T>::Cross(Vec3<T>::Forward(), direction);
+
+		return Quaternion<T>(rotationAxis.Normalize(), rotationAngle);
+	}
+
+	template <typename T>
 	Quaternion<T> Quaternion<T>::MakeRotationX(const T angleInDegrees)
 	{
 		T halfAngle = DegreesToRad(angleInDegrees) / static_cast<T>(2);

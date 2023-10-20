@@ -3,9 +3,11 @@
 #include "Behaviors/CameraController.h"
 #include "Behaviors/ImGuiInterface.h"
 #include "Behaviors/InfinitePlane.h"
+#include "Behaviors/SplineDebugger.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
+#include "NightOwl/Component/Concrete/CatmullRomSpline.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
@@ -39,6 +41,22 @@ void TestScene::Init()
 	NightOwl::Animation* runningSlideAnimation = assetManager->GetAnimationRepository().GetAsset("Running Slide");
 	
 	auto& yBotGameObject = AddGameObject("Y Bot");
+
+	yBotGameObject.AddComponent<SplineDebugger>();
+	NightOwl::CatmullRomSpline* splineComponent = yBotGameObject.AddComponent<NightOwl::CatmullRomSpline>();
+
+	splineComponent->AddControlPoint({  0, 0,  0 });
+	splineComponent->AddControlPoint({ -4, 0,  1 });
+	splineComponent->AddControlPoint({  4, 0,  2 });
+	splineComponent->AddControlPoint({ -4, 0,  3 });
+	splineComponent->AddControlPoint({  4, 0,  4 });
+	splineComponent->AddControlPoint({ -4, 0,  5 });
+	splineComponent->AddControlPoint({  4, 0,  6 });
+	splineComponent->AddControlPoint({ -4, 0,  7 });
+	splineComponent->AddControlPoint({  4, 0,  8 });
+	splineComponent->AddControlPoint({  0, 0,  9 });
+
+
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
 	// Make sure mesh gets a copy
 	renderer->CloneRenderer(model->renderer);
@@ -63,10 +81,10 @@ void TestScene::Init()
 	mainCameraGameObject.AddComponent<NightOwl::Camera>();
 	mainCameraGameObject.AddComponent<CameraController>();
 
-	auto& gameObject = AddGameObject("Infinite Plane");
-	gameObject.AddComponent<NightOwl::MeshRenderer>();
-	gameObject.AddComponent<InfinitePlane>();
-	
+	auto& infinitePlane = AddGameObject("Infinite Plane");
+	infinitePlane.AddComponent<NightOwl::MeshRenderer>();
+	infinitePlane.AddComponent<InfinitePlane>();
+
 	NightOwl::Graphics::GetContext()->SetClearColor(NightOwl::Vec4F(0.2f, 0.2f, 0.2f, 1.0f));
 }
 

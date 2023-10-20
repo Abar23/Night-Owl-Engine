@@ -20,7 +20,7 @@ namespace NightOwl
 			return GL_LINES;
 
 		case DrawType::Points:
-			return GL_POINT;
+			return GL_POINTS;
 
 		case DrawType::Triangles:
 			return GL_TRIANGLES;

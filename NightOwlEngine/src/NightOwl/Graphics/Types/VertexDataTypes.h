@@ -9,7 +9,7 @@ namespace NightOwl
 		VectorInt2,
 		VectorInt4,
 		VectorFloat3,
-		VectorFloat4,
+		VectorFloat4
 	};
 
 	inline unsigned int VertexDataTypeToNumberOfComponents(VertexDataType type)
