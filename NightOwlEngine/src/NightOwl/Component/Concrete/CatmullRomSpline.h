@@ -13,7 +13,11 @@ namespace NightOwl
 
 		Vec3F EvaluateUsingParameter(float u);
 
+		Vec3F EvaluateTangentUsingParameter(float u);
+
 		Vec3F EvaluateUsingArcLength(float s);
+
+		Vec3F EvaluateTangentUsingArcLength(float s);
 
 		void AddControlPoint(const Vec3F& controlPoint);
 
@@ -36,7 +40,13 @@ namespace NightOwl
 
 		std::vector<Vec3F> controlPoints;
 
+		void GetCurveIndexForArclength(float nonNormalizedS, float& arcLengthOfPreviousSegments, int& curveIndex);
+
+		float GetUWithBisection(float nonNormalizedS, float arcLengthOfPreviousSegments, int curveIndex);
+
 		Vec3F GetPointOnCatmullRomSpline(float u, int curveIndex);
+
+		Vec3F GetTangentOfCatmullRomSpline(float u, int curveIndex);
 
 		void UpdateStartAndEndPoint();
 

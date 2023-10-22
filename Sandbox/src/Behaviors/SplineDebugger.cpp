@@ -21,7 +21,7 @@ void SplineDebugger::Update()
 
 	// Draw path
 	float u = 0.0f;
-	float numberOfSegments = static_cast<float>(splineComponent->GetNumberOfCurveSegments());
+	const float numberOfSegments = static_cast<float>(splineComponent->GetNumberOfCurveSegments());
 	const float step = 0.01f;
 	while (u < numberOfSegments)
 	{
@@ -40,18 +40,17 @@ void SplineDebugger::Update()
 
 	transform->SetLocalPosition(splineComponent->EvaluateUsingArcLength(arcLength));
 
-	NightOwl::Vec3F targetPoint = splineComponent->EvaluateUsingArcLength(arcLength + 0.01f);
+	NightOwl::Vec3F tangent = splineComponent->EvaluateTangentUsingArcLength(arcLength);
 
-	transform->LookAt(targetPoint);
+	debug->DrawLine(transform->GetPosition(), transform->GetPosition() + tangent);
 
-	t += NightOwl::Time::GetDeltaTime() * 0.01f;
+	transform->LookAt(transform->GetPosition() + tangent);
 
-	arcLength = -(std::cosf(NightOwl::F_PI * t) - 1.0f) / 2.0f;
-	//arcLength = t < 0.5 ? 16.0f * t * t * t * t * t : 1.0f - std::pow(-2.0f * t + 2.0f, 5.0f) / 2.0f;
-
+	t += NightOwl::Time::GetDeltaTime() * 0.025f;
 	if (t > 1.0f)
 	{
-		arcLength = 0.0f;
 		t = 0.0f;
 	}
+
+	arcLength = -(std::cosf(NightOwl::F_PI * t) - 1.0f) / 2.0f;
 }
