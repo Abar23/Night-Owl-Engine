@@ -12,6 +12,6 @@ void main()
 {
     outVertexData.materialColor = color;
 
-    gl_PointSize = 5.0;
+    gl_PointSize = 10.0;
     gl_Position = viewProjectionMatrix * vec4(position, 1.0);
 }

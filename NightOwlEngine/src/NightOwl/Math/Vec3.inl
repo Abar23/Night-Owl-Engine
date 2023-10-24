@@ -159,9 +159,9 @@ namespace NightOwl
 
 		T clampedT = std::max(0.0f, std::min(1.0f, t));
 
-		T leftVectorX = std::max(SMALL_EPSILON, std::abs(leftVector.x)) * std::copysign(static_cast<T>(1), leftVector.x);
-		T leftVectorY = std::max(SMALL_EPSILON, std::abs(leftVector.y)) * std::copysign(static_cast<T>(1), leftVector.y);
-		T leftVectorZ = std::max(SMALL_EPSILON, std::abs(leftVector.z)) * std::copysign(static_cast<T>(1), leftVector.z);
+		T leftVectorX = std::max(EPSILON, std::abs(leftVector.x)) * std::copysign(static_cast<T>(1), leftVector.x);
+		T leftVectorY = std::max(EPSILON, std::abs(leftVector.y)) * std::copysign(static_cast<T>(1), leftVector.y);
+		T leftVectorZ = std::max(EPSILON, std::abs(leftVector.z)) * std::copysign(static_cast<T>(1), leftVector.z);
 
 		interpolatedVector.x = leftVectorX * std::pow(rightVector.x / leftVectorX, clampedT);
 		interpolatedVector.y = leftVectorX * std::pow(rightVector.y / leftVectorY, clampedT);

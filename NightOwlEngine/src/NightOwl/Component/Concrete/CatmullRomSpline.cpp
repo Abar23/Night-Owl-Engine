@@ -7,7 +7,9 @@
 namespace NightOwl
 {
 	CatmullRomSpline::CatmullRomSpline()
-		: Component(ComponentType::CatmullRomSpline)
+		: Component(ComponentType::CatmullRomSpline),
+		  tension(DEFAULT_TENSION),
+		  shouldLoop(false)
 	{ }
 
 	Vec3F CatmullRomSpline::EvaluateUsingParameter(float u)
@@ -88,7 +90,7 @@ namespace NightOwl
 
 		float arcLengthOfPreviousSegments;
 		int curveIndex;
-		GetCurveIndexForArclength(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
+		GetCurveIndexForArcLength(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
 
 		const float u = GetUWithBisection(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
 
@@ -103,10 +105,10 @@ namespace NightOwl
 			return Vec3F::Forward();
 		}
 
-		s = std::clamp(s, 0.0f, 1.0f);
+		const float clampedS = std::clamp(s, 0.0f, 1.0f);
 
 		const float totalArcLength = GetArcLength();
-		const float nonNormalizedS = s * GetArcLength();
+		const float nonNormalizedS = clampedS * GetArcLength();
 		if (nonNormalizedS > totalArcLength ||
 			NearEquals(totalArcLength, nonNormalizedS))
 		{
@@ -115,7 +117,7 @@ namespace NightOwl
 
 		float arcLengthOfPreviousSegments;
 		int curveIndex;
-		GetCurveIndexForArclength(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
+		GetCurveIndexForArcLength(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
 
 		const float u = GetUWithBisection(nonNormalizedS, arcLengthOfPreviousSegments, curveIndex);
 
@@ -152,7 +154,7 @@ namespace NightOwl
 		UpdateStartAndEndPoint();
 	}
 
-	float CatmullRomSpline::GetArcLength()
+	float CatmullRomSpline::GetArcLength() const
 	{
 		if (controlPoints.empty() ||
 			controlPoints.size() == 1)
@@ -169,23 +171,55 @@ namespace NightOwl
 		return arcLengthApproximation;
 	}
 
-	int CatmullRomSpline::GetNumberOfCurveSegments()
+	int CatmullRomSpline::GetNumberOfCurveSegments() const
 	{
 		return controlPoints.size() - 1;
 	}
 
-	int CatmullRomSpline::GetNumberOfControlPoints()
+	int CatmullRomSpline::GetNumberOfControlPoints() const
 	{
 		return controlPoints.size();
 	}
 
-	void CatmullRomSpline::GetCurveIndexForArclength(float nonNormalizedS, float& arcLengthOfPreviousSegments, int& curveIndex)
+	bool CatmullRomSpline::IsLooped() const
+	{
+		return shouldLoop;
+	}
+
+	void CatmullRomSpline::ShouldLoop(bool enable)
+	{
+		if (enable == shouldLoop)
+		{
+			return;
+		}
+
+		shouldLoop = enable;
+
+		UpdateStartAndEndPoint();
+	}
+
+	float CatmullRomSpline::GetTension() const
+	{
+		return tension;
+	}
+
+	void CatmullRomSpline::SetTension(float tension)
+	{
+		this->tension = tension;
+	}
+
+	void CatmullRomSpline::ResetTensionToDefault()
+	{
+		tension = DEFAULT_TENSION;
+	}
+
+	void CatmullRomSpline::GetCurveIndexForArcLength(float nonNormalizedS, float& arcLengthOfPreviousSegments, int& curveIndex) const
 	{
 		arcLengthOfPreviousSegments = 0.0f;
 		curveIndex = 0;
 
 		float arcLength = 0.0f;
-		for (; curveIndex < GetNumberOfCurveSegments(); ++curveIndex)
+		while (curveIndex < GetNumberOfCurveSegments())
 		{
 			arcLengthOfPreviousSegments = arcLength;
 			arcLength += GaussianQuadrature(1.0f, curveIndex);
@@ -194,35 +228,37 @@ namespace NightOwl
 			{
 				break;
 			}
+
+			++curveIndex;
 		}
 	}
 
-	float CatmullRomSpline::GetUWithBisection(float nonNormalizedS, float arcLengthOfPreviousSegments, int curveIndex)
+	float CatmullRomSpline::GetUWithBisection(float nonNormalizedS, float arcLengthOfPreviousSegments, int curveIndex) const
 	{
 		// bisect algorithm
-		float ua = 0.0f;
-		float ub = 1.0f;
-		float um = 0.5f;
+		float uLow = 0.0f;
+		float uHigh = 1.0f;
+		float uMiddle = 0.5f;
 
-		float sm = GaussianQuadrature(um, curveIndex);
+		float sOfUMiddle = GaussianQuadrature(uMiddle, curveIndex);
 
-		while (std::abs(arcLengthOfPreviousSegments + sm - nonNormalizedS) > BIG_EPSILON)
+		while (std::abs(arcLengthOfPreviousSegments + sOfUMiddle - nonNormalizedS) > EPSILON)
 		{
-			if (arcLengthOfPreviousSegments + sm < nonNormalizedS)
+			if (arcLengthOfPreviousSegments + sOfUMiddle < nonNormalizedS)
 			{
-				ua = um;
+				uLow = uMiddle;
 			}
 			else
 			{
-				ub = um;
+				uHigh = uMiddle;
 			}
 
-			um = (ua + ub) / 2.0f;
+			uMiddle = (uLow + uHigh) / 2.0f;
 
-			sm = GaussianQuadrature(um, curveIndex);
+			sOfUMiddle = GaussianQuadrature(uMiddle, curveIndex);
 		}
 
-		return um;
+		return uMiddle;
 	}
 
 	Vec3F CatmullRomSpline::GetPointOnCatmullRomSpline(float u, int curveIndex)
@@ -250,7 +286,7 @@ namespace NightOwl
 		const float muCoefficientThree = u + 4.0f * uSquared - 3.0f * uCubed;
 		const float muCoefficientFour = -uSquared + uCubed;
 
-		Vec3F point = 0.5f * (muCoefficientOne * pIMinus2 + muCoefficientTwo * pIMinus1 + muCoefficientThree * pI + muCoefficientFour * pIPlus1);
+		Vec3F point = tension * (muCoefficientOne * pIMinus2 + muCoefficientTwo * pIMinus1 + muCoefficientThree * pI + muCoefficientFour * pIPlus1);
 
 		return point;
 	}
@@ -274,7 +310,7 @@ namespace NightOwl
 		const float muCoefficientThree = 1.0f + 8.0f * u - 9.0f * uSquared;
 		const float muCoefficientFour = -2.0f * u + 3.0f * uSquared;
 
-		Vec3F point = 0.5f * (muCoefficientOne * pIMinus2 + muCoefficientTwo * pIMinus1 + muCoefficientThree * pI + muCoefficientFour * pIPlus1);
+		Vec3F point = tension * (muCoefficientOne * pIMinus2 + muCoefficientTwo * pIMinus1 + muCoefficientThree * pI + muCoefficientFour * pIPlus1);
 
 		return point;
 	}
@@ -283,6 +319,14 @@ namespace NightOwl
 	{
 		if (controlPoints.size() <= 1)
 		{
+			return;
+		}
+
+		if (shouldLoop)
+		{
+			startPoint = controlPoints[controlPoints.size() - 2];
+			endPoint = controlPoints[1];
+
 			return;
 		}
 
@@ -295,21 +339,15 @@ namespace NightOwl
 		endPoint = lastPoint + (lastPoint - secondToLastPoint);
 	}
 
-	float CatmullRomSpline::GaussianQuadrature(float u, int curveIndex)
+	float CatmullRomSpline::GaussianQuadrature(float u, int curveIndex) const
 	{
-		std::vector<double> nodes, weights;
+		// 3-point quadrature weights and nodes:
+		static float nodes[3] = { -0.7745967f, 0.0f, 0.7745967f }; // sqrt(3.0 / 5.0)
+		static float weights[3] = { 0.5555556f, 0.8888889f,0.5555556f }; // 5.0 / 9.0, 8.0 / 9.0
 
-		// 2-point quadrature weights and nodes:
-		nodes.push_back(-0.7745966692); // sqrt(3.0 / 5.0)
-		nodes.push_back(0.0);
-		nodes.push_back(0.7745966692); // sqrt(3.0 / 5.0)
-		weights.push_back(0.5555555556); // 5.0 / 9.0
-		weights.push_back(0.8888888889); // 8.0 / 9.0
-		weights.push_back(0.5555555556); // 5.0 / 9.0
+		float integral = 0.0;
 
-		double integral = 0.0;
-
-		for (int nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex) 
+		for (int nodeIndex = 0; nodeIndex < 3; ++nodeIndex) 
 		{
 			const double node = 0.5f * (u * nodes[nodeIndex] + u);
 			integral += weights[nodeIndex] * ArcLengthDistanceFunction(node, curveIndex);
@@ -320,15 +358,15 @@ namespace NightOwl
 		return integral;
 	}
 
-	float CatmullRomSpline::ArcLengthDistanceFunction(float u, int curveIndex)
+	float CatmullRomSpline::ArcLengthDistanceFunction(float u, int curveIndex) const
 	{
 		// get the four points of the curve
 		Vec3F p0, p1, p2, p3;
 		GetControlPointForCurveIndex(curveIndex, p0, p1, p2, p3);
 
-		const Vec3F a = 1.5f * (-1.0f * p0 + 3.0f * p1 - 3.0f * p2 + p3);
-		const Vec3F b = 2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3;
-		const Vec3F c = 0.5f * (-1.0f * p0 + p2);
+		const Vec3F a = tension * (-3.0f * p0 + 9.0f * p1 - 9.0f * p2 + 3.0f * p3);
+		const Vec3F b = tension * (4.0f * p0 - 10.0f * p1 + 8.0f * p2 - 2.0f * p3);
+		const Vec3F c = tension * (-1.0f * p0 + p2);
 
 		const float A = Vec3F::Dot(a, a);
 		const float B = 2.0f * Vec3F::Dot(a, b);
@@ -343,7 +381,7 @@ namespace NightOwl
 		return std::sqrtf(A * uFourthed + B * uCubed + C * uSquared + D * u + E);
 	}
 
-	void CatmullRomSpline::GetControlPointForCurveIndex(int curveIndex, Vec3F& pIMinus2, Vec3F& pIMinus1, Vec3F& pI, Vec3F& pIPlus1)
+	void CatmullRomSpline::GetControlPointForCurveIndex(int curveIndex, Vec3F& pIMinus2, Vec3F& pIMinus1, Vec3F& pI, Vec3F& pIPlus1) const
 	{
 		pIMinus2 = (curveIndex - 1 < 0) ? startPoint : controlPoints[curveIndex - 1];
 		pIMinus1 = controlPoints[curveIndex];

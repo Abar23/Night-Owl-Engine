@@ -27,22 +27,38 @@ namespace NightOwl
 
 		void SetControlPointAtIndex(unsigned int index, const Vec3F& controlPoint);
 
-		float GetArcLength();
+		float GetArcLength() const;
 
-		int GetNumberOfCurveSegments();
+		int GetNumberOfCurveSegments() const;
 
-		int GetNumberOfControlPoints();
+		int GetNumberOfControlPoints() const;
+
+		bool IsLooped() const;
+
+		void ShouldLoop(bool enable);
+
+		float GetTension() const;
+
+		void SetTension(float tension);
+
+		void ResetTensionToDefault();
 
 	private:
 		Vec3F startPoint;
 
 		Vec3F endPoint;
 
+		float tension;
+
+		static inline float constexpr DEFAULT_TENSION = 0.5f;
+
+		bool shouldLoop;
+
 		std::vector<Vec3F> controlPoints;
 
-		void GetCurveIndexForArclength(float nonNormalizedS, float& arcLengthOfPreviousSegments, int& curveIndex);
+		void GetCurveIndexForArcLength(float nonNormalizedS, float& arcLengthOfPreviousSegments, int& curveIndex) const;
 
-		float GetUWithBisection(float nonNormalizedS, float arcLengthOfPreviousSegments, int curveIndex);
+		float GetUWithBisection(float nonNormalizedS, float arcLengthOfPreviousSegments, int curveIndex) const;
 
 		Vec3F GetPointOnCatmullRomSpline(float u, int curveIndex);
 
@@ -50,11 +66,11 @@ namespace NightOwl
 
 		void UpdateStartAndEndPoint();
 
-		float GaussianQuadrature(float u, int curveIndex);
+		float GaussianQuadrature(float u, int curveIndex) const;
 
-		float ArcLengthDistanceFunction(float u, int curveIndex);
+		float ArcLengthDistanceFunction(float u, int curveIndex) const;
 
-		void GetControlPointForCurveIndex(int curveIndex, Vec3F& pIMinus2, Vec3F& pIMinus1, Vec3F& pI, Vec3F& pIPlus1);
+		void GetControlPointForCurveIndex(int curveIndex, Vec3F& pIMinus2, Vec3F& pIMinus1, Vec3F& pI, Vec3F& pIPlus1) const;
 
 		void Remove() override;
 	};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MathConstants.h"
+#include <algorithm>
 
 namespace NightOwl
 {
@@ -8,7 +9,7 @@ namespace NightOwl
 	bool NearEquals(const T floatOne, const T floatTwo)
 	{
 		T absDiff = std::abs(floatOne - floatTwo);
-		if (absDiff <= SMALL_EPSILON)
+		if (absDiff <= EPSILON)
 		{
 			return true;
 		}
@@ -46,10 +47,11 @@ namespace NightOwl
 
 	inline float SinEaseInEaseOutWithConstantVelocity(float time, float totalTime, float timeOne, float timeTwo)
 	{
+		const float clampedTime = std::clamp(time, 0.0f, totalTime);
 		const float inverseTotalTime = 1.0f / totalTime;
 		const float normalizedTimeOne = timeOne * inverseTotalTime;
 		const float normalizedTimeTwo = timeTwo * inverseTotalTime;
-		const float normalizedTime = time * inverseTotalTime;
+		const float normalizedTime = clampedTime * inverseTotalTime;
 
 		const float inverseL = 1.0f / ((F_PI / 2.0f - 1.0f) * (normalizedTimeTwo - normalizedTimeOne) + 1.0f);
 

@@ -4,9 +4,7 @@
 
 namespace NightOwl
 {
-	constexpr float SMALL_EPSILON = 1.0e-5f;
-
-	constexpr float BIG_EPSILON = 1.0e-3f;
+	constexpr float EPSILON = 1.0e-5f;
 
 	constexpr float F_PI = static_cast<float>(M_PI);
 

@@ -263,14 +263,14 @@ namespace NightOwl
 	{
 		const float dot = Vec3<T>::Dot(Vec3<T>::Forward(), direction);
 
-		if (std::abs(dot + static_cast<T>(1)) < SMALL_EPSILON)
+		if (std::abs(dot + static_cast<T>(1)) < EPSILON)
 		{
 			// vector a and b point exactly in the opposite direction, 
 			// so it is a 180 degrees turn around the up-axis
 			return Quaternion<T>(Vec3<T>::Up(), static_cast<T>(180));
 		}
 
-		if (std::abs(dot - static_cast<T>(1)) < SMALL_EPSILON)
+		if (std::abs(dot - static_cast<T>(1)) < EPSILON)
 		{
 			// vector a and b point exactly in the same direction
 			// so we return the identity quaternion

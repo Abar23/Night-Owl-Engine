@@ -20,6 +20,7 @@ void ImGuiInterface::Start()
 {
 	characterAnimator = gameObject->GetComponent<NightOwl::Animator>();
 	characterRenderer = gameObject->GetComponent<NightOwl::MeshRenderer>();
+	splineAnimator = gameObject->GetComponent<SplineAnimator>();
 }
 
 void ImGuiInterface::Update()
@@ -39,32 +40,34 @@ void ImGuiInterface::Update()
 
 	if (ImGui::CollapsingHeader("Animator Controls"))
 	{
-		const char* animations[] = { "Shoved Reaction With Spin", "Start Walking", "Drunk Walking Turn", "Running Slide" };
-		static int currentAnimations = 0;
-		static int previousItem = currentAnimations;
-		ImGui::Combo("Animations", &currentAnimations, animations, IM_ARRAYSIZE(animations));
-
-		if (previousItem != currentAnimations)
-		{
-			characterAnimator->SetCurrentMotion(animations[currentAnimations]);
-			previousItem = currentAnimations;
-		}
+		// const char* animations[] = { "Shoved Reaction With Spin", "Start Walking", "Drunk Walking Turn", "Running Slide" };
+		// static int currentAnimations = 0;
+		// static int previousItem = currentAnimations;
+		// ImGui::Combo("Animations", &currentAnimations, animations, IM_ARRAYSIZE(animations));
+		//
+		// if (previousItem != currentAnimations)
+		// {
+		// 	characterAnimator->SetCurrentMotion(animations[currentAnimations]);
+		// 	previousItem = currentAnimations;
+		// }
 
 		if (ImGui::Button(characterAnimator->IsPlaying() ? "Pause" : "Play"))
 		{
 			if (characterAnimator->IsPlaying())
 			{
 				characterAnimator->Pause();
+				splineAnimator->Pause();
 			}
 			else
 			{
 				characterAnimator->Play();
+				splineAnimator->Play();
 			}
 		}
 
 		if (ImGui::Button("Reset"))
 		{
-			characterAnimator->Reset();
+			splineAnimator->Reset();
 		}
 
 		static bool shouldRenderMesh = characterRenderer->IsVisible();

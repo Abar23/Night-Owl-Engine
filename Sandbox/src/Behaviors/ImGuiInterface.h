@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SplineAnimator.h"
 #include "NightOwl/Behavior/OwlBehavior.h"
 #include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Component/Concrete/Animator.h"
@@ -21,6 +22,8 @@ private:
 	NightOwl::Animator* characterAnimator;
 
 	NightOwl::Renderer* characterRenderer;
+
+	SplineAnimator* splineAnimator;
 
 	void InitImGui();
 

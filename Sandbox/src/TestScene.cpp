@@ -3,9 +3,9 @@
 #include "Behaviors/CameraController.h"
 #include "Behaviors/ImGuiInterface.h"
 #include "Behaviors/InfinitePlane.h"
+#include "Behaviors/SplineAnimator.h"
 #include "Behaviors/SplineDebugger.h"
 #include "NightOwl/Animation/3D/Animation.h"
-#include "NightOwl/Animation/3D/BlendTree.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
@@ -28,7 +28,7 @@ void TestScene::Init()
 {
 	auto* assetManager = NightOwl::AssetManagerLocator::GetAssetManager();
 
-	// Drunk walk scene
+	// Load assets for the scene
 	assetManager->LoadShaders("./assets/Shaders");
 	assetManager->LoadModel("./assets/Bot/Y Bot.dae");
 	assetManager->LoadAnimation("./assets/Bot/Shoved Reaction With Spin.dae");
@@ -39,7 +39,7 @@ void TestScene::Init()
 	assetManager->LoadAnimation("./assets/Bot/Standard Idle.dae");
 	assetManager->LoadAnimation("./assets/Bot/Standard Run.dae");
 
-
+	// Get loaded assets
 	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Y Bot");
 	NightOwl::Animation* shoveAnimation = assetManager->GetAnimationRepository().GetAsset("Shoved Reaction With Spin");
 	NightOwl::Animation* startWalkingAnimation = assetManager->GetAnimationRepository().GetAsset("Start Walking");
@@ -52,17 +52,9 @@ void TestScene::Init()
 
 	auto& yBotGameObject = AddGameObject("Y Bot");
 
+	yBotGameObject.AddComponent<NightOwl::CatmullRomSpline>();
+	yBotGameObject.AddComponent<SplineAnimator>();
 	yBotGameObject.AddComponent<SplineDebugger>();
-	NightOwl::CatmullRomSpline* splineComponent = yBotGameObject.AddComponent<NightOwl::CatmullRomSpline>();
-
-	const int numPoints = 10;
-	for (int i = 0; i <= numPoints; ++i) {
-		float angleDegrees = i * (360.0f / numPoints);
-		float angleRadians = angleDegrees * M_PI / 180.0f;
-		float x = std::cos(angleRadians);
-		float z = std::sin(angleRadians);
-		splineComponent->AddControlPoint(NightOwl::Vec3F(x, 0, z) * 10.f); // (1, 0) - 0 degrees
-	}
 
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
 	// Make sure mesh gets a copy
@@ -74,22 +66,21 @@ void TestScene::Init()
 	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(2.0f), NightOwl::Space::World);
 
 	// Setup Blend tree
-
-	NightOwl::BlendTree* blend = new NightOwl::BlendTree();
-	blend->SetName("blend");
-	blend->AddBlendTreeNode({ idle,  0.0f, 1.0f });
-	blend->AddBlendTreeNode({ walk,   0.10f, 1.0f });
-	blend->AddBlendTreeNode({ run, 1.0f, 1.0f });
-	blend->SetBlendParameterXName("test");
+	simple1DBlendTree = std::make_shared<NightOwl::BlendTree>();
+	simple1DBlendTree->SetName("simple1DBlendTree");
+	simple1DBlendTree->AddBlendTreeNode({ idle,  0.0f, 1.0f });
+	simple1DBlendTree->AddBlendTreeNode({ walk,   0.15f, 1.0f });
+	simple1DBlendTree->AddBlendTreeNode({ run, 1.0f, 1.0f });
+	simple1DBlendTree->SetBlendParameterXName("velocity");
 
 	auto* animator = yBotGameObject.AddComponent<NightOwl::Animator>();
 	animator->AddMotion(shoveAnimation);
 	animator->AddMotion(startWalkingAnimation);
 	animator->AddMotion(drunkWalkingTurn);
 	animator->AddMotion(runningSlideAnimation);
-	animator->AddMotion(blend);
-	animator->SetCurrentMotion("blend");
-	animator->SetFloat(blend->GetBlendParameterXName(), 0.0f);
+	animator->AddMotion(simple1DBlendTree.get());
+	animator->SetCurrentMotion("simple1DBlendTree");
+	animator->SetFloat(simple1DBlendTree->GetBlendParameterXName(), 0.0f);
 	animator->SetSkeleton(skeleton.GetTransform());
 	animator->Play();
 	
@@ -116,4 +107,5 @@ void TestScene::Load()
 
 void TestScene::Shutdown()
 {
+	
 }
