@@ -397,13 +397,13 @@ namespace NightOwl
 		const std::shared_ptr<Animation> animation = std::make_shared<Animation>();
 
 		animation->SetName(animationName);
-		animation->SetDuration(assimpAnimation->mDuration);
-		animation->SetTicksPerSecond(assimpAnimation->mTicksPerSecond);
+		animation->SetDuration(static_cast<float>(assimpAnimation->mDuration));
+		animation->SetTicksPerSecond(static_cast<float>(assimpAnimation->mTicksPerSecond));
 
 		for (unsigned int channelIndex = 0; channelIndex < assimpAnimation->mNumChannels; ++channelIndex)
 		{
 			aiNodeAnim* animationChannel = assimpAnimation->mChannels[channelIndex];
-			animation->GetBoneKeyFramesMap().emplace(animationChannel->mNodeName.data, BoneKeyFrames(animationChannel));
+			animation->GetKeyFrames().emplace(animationChannel->mNodeName.data, KeyFrames(animationChannel));
 		}
 
 		AssetManagerLocator::GetAssetManager()->GetAnimationRepository().AddAsset(animationName, animation);

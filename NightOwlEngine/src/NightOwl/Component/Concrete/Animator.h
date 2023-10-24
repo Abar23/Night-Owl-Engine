@@ -27,9 +27,9 @@ namespace NightOwl
 
 		bool IsPlaying();
 
-		void AddAnimation(Animation* animation);
+		void AddMotion(Motion* motion);
 
-		void SetCurrentAnimation(const std::string& animationName);
+		void SetCurrentMotion(const std::string& motionName);
 
 		AnimatorUpdateMode GetUpdateMode();
 
@@ -39,21 +39,31 @@ namespace NightOwl
 
 		Transform* GetSkeleton() const;
 
-		Animation* GetCurrentAnimation() const;
+		Motion* GetCurrentMotion() const;
+
+		float GetFloat(const std::string& parameterName);
+
+		void SetFloat(const std::string& parameterName, float value);
 
 	private:
-		AnimatorUpdateMode updateMode;
-
-		float elapsedTime;
-
 		bool isPlaying;
 
-		Animation* currentAnimation;
+		float deltaTime;
+
+		AnimatorUpdateMode updateMode;
+
+		Motion* currentMotion;
 
 		Transform* skeleton;
 
 		AnimationCollection animationCollection;
 
+		std::map<std::string, float> floatParameterMap;
+
 		void Remove() override;
+
+		friend class Animation;
+
+		friend class BlendTree;
 	};
 }

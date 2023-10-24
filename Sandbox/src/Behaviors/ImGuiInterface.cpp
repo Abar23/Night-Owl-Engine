@@ -46,7 +46,7 @@ void ImGuiInterface::Update()
 
 		if (previousItem != currentAnimations)
 		{
-			characterAnimator->SetCurrentAnimation(animations[currentAnimations]);
+			characterAnimator->SetCurrentMotion(animations[currentAnimations]);
 			previousItem = currentAnimations;
 		}
 

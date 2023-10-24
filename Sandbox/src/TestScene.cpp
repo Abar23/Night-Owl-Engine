@@ -4,6 +4,8 @@
 #include "Behaviors/ImGuiInterface.h"
 #include "Behaviors/InfinitePlane.h"
 #include "Behaviors/SplineDebugger.h"
+#include "NightOwl/Animation/3D/Animation.h"
+#include "NightOwl/Animation/3D/BlendTree.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
@@ -33,29 +35,34 @@ void TestScene::Init()
 	assetManager->LoadAnimation("./assets/Bot/Start Walking.dae");
 	assetManager->LoadAnimation("./assets/Bot/Drunk Walking Turn.dae");
 	assetManager->LoadAnimation("./assets/Bot/Running Slide.dae");
-	
+	assetManager->LoadAnimation("./assets/Bot/Standard Walk.dae");
+	assetManager->LoadAnimation("./assets/Bot/Standard Idle.dae");
+	assetManager->LoadAnimation("./assets/Bot/Standard Run.dae");
+
+
 	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Y Bot");
 	NightOwl::Animation* shoveAnimation = assetManager->GetAnimationRepository().GetAsset("Shoved Reaction With Spin");
 	NightOwl::Animation* startWalkingAnimation = assetManager->GetAnimationRepository().GetAsset("Start Walking");
 	NightOwl::Animation* drunkWalkingTurn = assetManager->GetAnimationRepository().GetAsset("Drunk Walking Turn");
 	NightOwl::Animation* runningSlideAnimation = assetManager->GetAnimationRepository().GetAsset("Running Slide");
-	
+	NightOwl::Animation* idle = assetManager->GetAnimationRepository().GetAsset("Standard Idle");
+	NightOwl::Animation* walk = assetManager->GetAnimationRepository().GetAsset("Standard Walk");
+	NightOwl::Animation* run = assetManager->GetAnimationRepository().GetAsset("Standard Run");
+
+
 	auto& yBotGameObject = AddGameObject("Y Bot");
 
 	yBotGameObject.AddComponent<SplineDebugger>();
 	NightOwl::CatmullRomSpline* splineComponent = yBotGameObject.AddComponent<NightOwl::CatmullRomSpline>();
 
-	splineComponent->AddControlPoint({  0, 0,  0 });
-	splineComponent->AddControlPoint({ -4, 0,  1 });
-	splineComponent->AddControlPoint({  4, 0,  2 });
-	splineComponent->AddControlPoint({ -4, 0,  3 });
-	splineComponent->AddControlPoint({  4, 0,  4 });
-	splineComponent->AddControlPoint({ -4, 0,  5 });
-	splineComponent->AddControlPoint({  4, 0,  6 });
-	splineComponent->AddControlPoint({ -4, 0,  7 });
-	splineComponent->AddControlPoint({  4, 0,  8 });
-	splineComponent->AddControlPoint({  0, 0,  9 });
-
+	const int numPoints = 10;
+	for (int i = 0; i <= numPoints; ++i) {
+		float angleDegrees = i * (360.0f / numPoints);
+		float angleRadians = angleDegrees * M_PI / 180.0f;
+		float x = std::cos(angleRadians);
+		float z = std::sin(angleRadians);
+		splineComponent->AddControlPoint(NightOwl::Vec3F(x, 0, z) * 10.f); // (1, 0) - 0 degrees
+	}
 
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
 	// Make sure mesh gets a copy
@@ -66,12 +73,23 @@ void TestScene::Init()
 
 	yBotGameObject.GetTransform()->Scale(NightOwl::Vec3F(2.0f), NightOwl::Space::World);
 
+	// Setup Blend tree
+
+	NightOwl::BlendTree* blend = new NightOwl::BlendTree();
+	blend->SetName("blend");
+	blend->AddBlendTreeNode({ idle,  0.0f, 1.0f });
+	blend->AddBlendTreeNode({ walk,   0.10f, 1.0f });
+	blend->AddBlendTreeNode({ run, 1.0f, 1.0f });
+	blend->SetBlendParameterXName("test");
+
 	auto* animator = yBotGameObject.AddComponent<NightOwl::Animator>();
-	animator->AddAnimation(shoveAnimation);
-	animator->AddAnimation(startWalkingAnimation);
-	animator->AddAnimation(drunkWalkingTurn);
-	animator->AddAnimation(runningSlideAnimation);
-	animator->SetCurrentAnimation("Shoved Reaction With Spin");
+	animator->AddMotion(shoveAnimation);
+	animator->AddMotion(startWalkingAnimation);
+	animator->AddMotion(drunkWalkingTurn);
+	animator->AddMotion(runningSlideAnimation);
+	animator->AddMotion(blend);
+	animator->SetCurrentMotion("blend");
+	animator->SetFloat(blend->GetBlendParameterXName(), 0.0f);
 	animator->SetSkeleton(skeleton.GetTransform());
 	animator->Play();
 	

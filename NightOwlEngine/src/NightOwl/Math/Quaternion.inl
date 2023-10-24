@@ -365,7 +365,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		T clampedT = std::max(0.0f, std::min(1.0f, t));
+		T clampedT = std::clamp(t, static_cast<T>(0), static_cast<T>(1));
 
 		T dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
@@ -383,7 +383,7 @@ namespace NightOwl
 		
 		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));
 		T theta = std::acos(dot) * clampedT; // Angle between leftQuaternion and new quaternion at t
-		Quaternion<T> newQuaternion = rightQuaternion - leftQuaternion * dot;
+		Quaternion<T> newQuaternion = newRightQuaternion - leftQuaternion * dot;
 		newQuaternion.Normalize();
 		
 		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);

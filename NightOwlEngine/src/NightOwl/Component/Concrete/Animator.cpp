@@ -2,7 +2,7 @@
 
 #include "Animator.h"
 #include "NightOwl/Animation/3D/Animation.h"
-#include "NightOwl/Animation/3D/Structures/BoneKeyFrames.h"
+#include "NightOwl/Animation/3D/Structures/KeyFrames.h"
 #include "NightOwl/Animation/3D/System/AnimatorSystem.h"
 #include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
@@ -18,9 +18,8 @@ namespace NightOwl
 	Animator::Animator()
 		: Component(ComponentType::Animator),
 		  updateMode(AnimatorUpdateMode::Normal),
-		  elapsedTime(0.0f),
 		  isPlaying(false),
-		  currentAnimation(nullptr),
+		  currentMotion(nullptr),
 		  skeleton(nullptr)
 	{
 		AnimatorSystemLocator::GetAnimatorSystem()->AddAnimator(this);
@@ -30,11 +29,10 @@ namespace NightOwl
 	{
 		std::shared_ptr<Animator> clone = std::make_shared<Animator>();
 
-		clone->currentAnimation = currentAnimation;
+		clone->currentMotion = currentMotion;
 		clone->animationCollection = animationCollection;
-		clone->elapsedTime = elapsedTime;
 		clone->isPlaying = isPlaying;
-		clone->currentAnimation = currentAnimation;
+		clone->currentMotion = currentMotion;
 
 		// Since skeleton is hierarchy of child gameobjects, they will be cloned when via base gameobject clone.
 		clone->skeleton = nullptr;
@@ -67,13 +65,13 @@ namespace NightOwl
 		}
 
 		if (isPlaying == false ||
-			currentAnimation == nullptr ||
-			animationCollection.animationsMap.empty() == true)
+			currentMotion == nullptr ||
+			animationCollection.motionsMap.empty() == true)
 		{
 			return;
 		}
 
-		float deltaTime = Time::GetDeltaTime();
+		deltaTime = Time::GetDeltaTime();
 		if (updateMode == AnimatorUpdateMode::AnimatePhysics)
 		{
 			deltaTime = Time::GetFixedDeltaTime();
@@ -83,34 +81,7 @@ namespace NightOwl
 			deltaTime = Time::GetUnscaledDeltaTime();
 		}
 
-		elapsedTime += deltaTime * currentAnimation->GetTicksPerSecond();
-
-		if (elapsedTime > currentAnimation->GetDuration())
-		{
-			elapsedTime = 0.0f;
-		}
-
-		skeletonTransforms.push(skeleton);
-		while (skeletonTransforms.empty() == false)
-		{
-			Transform* skeletonTransform = skeletonTransforms.top();
-			skeletonTransforms.pop();
-
-			for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
-			{
-				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
-			}
-
-			BoneKeyFrames* boneKeyFrames = currentAnimation->GetBoneKeyFramesMap(skeletonTransform->GetGameObject().GetName());
-			if (boneKeyFrames != nullptr)
-			{
-				boneKeyFrames->Update(elapsedTime);
-
-				skeletonTransform->SetLocalPosition(boneKeyFrames->GetFinalPosition());
-				skeletonTransform->SetLocalRotation(boneKeyFrames->GetFinalRotation());
-				skeletonTransform->SetLocalScale(boneKeyFrames->GetFinalScale());
-			}
-		}
+		currentMotion->Update(this);
 	}
 
 	void Animator::Play()
@@ -126,12 +97,12 @@ namespace NightOwl
 	void Animator::Stop()
 	{
 		isPlaying = false;
-		elapsedTime = 0.0f;
+		currentMotion->Reset();
 	}
 
 	void Animator::Reset()
 	{
-		elapsedTime = 0.0f;
+		currentMotion->Reset();
 	}
 
 	bool Animator::IsPlaying()
@@ -139,24 +110,24 @@ namespace NightOwl
 		return isPlaying;
 	}
 
-	void Animator::AddAnimation(Animation* animation)
+	void Animator::AddMotion(Motion* motion)
 	{
-		if (animationCollection.animationsMap.contains(animation->GetName()))
+		if (animationCollection.motionsMap.contains(motion->GetName()))
 		{
 			return;
 		}
 
-		animationCollection.animationsMap.emplace(animation->GetName(), animation);
+		animationCollection.motionsMap.emplace(motion->GetName(), motion);
 	}
 
-	void Animator::SetCurrentAnimation(const std::string& animationName)
+	void Animator::SetCurrentMotion(const std::string& motionName)
 	{
-		if (animationCollection.animationsMap.contains(animationName) == false)
+		if (animationCollection.motionsMap.contains(motionName) == false)
 		{
-			currentAnimation = nullptr;
+			currentMotion = nullptr;
 		}
 
-		currentAnimation = animationCollection.animationsMap[animationName];
+		currentMotion = animationCollection.motionsMap[motionName];
 	}
 
 	AnimatorUpdateMode Animator::GetUpdateMode()
@@ -179,9 +150,21 @@ namespace NightOwl
 		return skeleton;
 	}
 
-	Animation* Animator::GetCurrentAnimation() const
+	Motion* Animator::GetCurrentMotion() const
 	{
-		return currentAnimation;
+		return currentMotion;
+	}
+
+	float Animator::GetFloat(const std::string& parameterName)
+	{
+		ENGINE_ASSERT(floatParameterMap.contains(parameterName), "Tried to retrieve float parameter that does not exist in the animator!");
+
+		return floatParameterMap[parameterName];
+	}
+
+	void Animator::SetFloat(const std::string& parameterName, float value)
+	{
+		floatParameterMap[parameterName] = value;
 	}
 
 	void Animator::Remove()

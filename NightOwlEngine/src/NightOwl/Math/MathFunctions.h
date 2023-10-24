@@ -3,18 +3,21 @@
 namespace NightOwl
 {
 	template <typename T>
-	inline bool NearEquals(const T floatOne, const T floatTwo);
+	bool NearEquals(const T floatOne, const T floatTwo);
 
 	template <typename T>
-	inline T DegreesToRad(const T angleInDegrees);
+	T DegreesToRad(const T angleInDegrees);
 
 	template <typename T>
-	inline T RadToDegrees(const T angleInDegrees);
-	template <typename T>
-	inline T FastInverseSquareRootAroundOne(const T value);
+	T RadToDegrees(const T angleInDegrees);
 
 	template <typename T>
-	inline T MapValueInRange(const T value, const T inputStart, const T inputEnd, const T outputStart, const T outputEnd);
+	T FastInverseSquareRootAroundOne(const T value);
+
+	template <typename T>
+	T MapValueInRange(const T value, const T inputStart, const T inputEnd, const T outputStart, const T outputEnd);
+
+	float SinEaseInEaseOutWithConstantVelocity(float time, float totalTime, float timeOne, float timeTwo);
 }
 
 #include "MathFunctions.inl"

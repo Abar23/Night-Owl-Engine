@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 #include "NightOwl/Animation/3D/Animation.h"
-#include "NightOwl/Animation/3D/Structures/BoneKeyFrames.h"
+#include "NightOwl/Animation/3D/Structures/KeyFrames.h"
 #include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/Transform.h"
@@ -56,10 +56,9 @@ namespace NightOwl
 					skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
 				}
 
-				const BoneKeyFrames* boneKeyFrames = animator->GetCurrentAnimation()->GetBoneKeyFramesMap(skeletonTransform->GetGameObject().GetName());
-				if (boneKeyFrames != nullptr)
+				const auto& boneName = skeletonTransform->GetGameObject().GetName();
+				if (boneInfoMap.contains(boneName))
 				{
-					const auto& boneName = skeletonTransform->GetGameObject().GetName();
 					BoneInfo boneInfo = boneInfoMap.at(boneName);
 					const Mat4F finalBoneOffsetMatrix = skeletonTransform->GetWorldMatrix() * boneInfo.offsetMatrix;
 					finalBoneMatrices[boneInfo.id] = finalBoneOffsetMatrix;

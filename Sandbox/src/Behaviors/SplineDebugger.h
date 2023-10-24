@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NightOwl/Behavior/OwlBehavior.h"
+#include "NightOwl/Component/Concrete/Animator.h"
 #include "NightOwl/Component/Concrete/CatmullRomSpline.h"
 #include "NightOwl/Component/Concrete/Transform.h"
 
@@ -16,8 +17,12 @@ private:
 
 	float t;
 
+	float previousT;
+
 	NightOwl::Transform* transform;
 
 	NightOwl::CatmullRomSpline* splineComponent;
+
+	NightOwl::Animator* animator;
 };
 

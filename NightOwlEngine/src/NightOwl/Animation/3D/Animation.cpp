@@ -1,13 +1,52 @@
 #include "NightOwlPch.h"
 
 #include "Animation.h"
+#include "NightOwl/Component/Concrete/Animator.h"
+#include "NightOwl/Component/Concrete/Transform.h"
+#include "NightOwl/Core/Time/Time.h"
+#include "NightOwl/GameObject/GameObject.h"
+#include <stack>
 
 namespace NightOwl
 {
 	Animation::Animation()
-		: duration(0),
-		  ticksPerSecond(0)
+		: Motion(MotionType::Animation),
+		  ticksPerSecond(0),
+		  duration(0)
+	{ }
+
+	void Animation::Update(Animator* animator)
 	{
+		elapsedTime += Time::GetDeltaTime() * ticksPerSecond;
+
+		if (elapsedTime > duration)
+		{
+			elapsedTime = 0.0f;
+		}
+
+		std::stack<Transform*> skeletonTransforms;
+		skeletonTransforms.push(animator->skeleton);
+
+		while (skeletonTransforms.empty() == false)
+		{
+			Transform* skeletonTransform = skeletonTransforms.top();
+			skeletonTransforms.pop();
+
+			for (int skeletonTransformChildIndex = 0; skeletonTransformChildIndex < skeletonTransform->GetNumberOfChildren(); ++skeletonTransformChildIndex)
+			{
+				skeletonTransforms.push(skeletonTransform->GetChildAtIndex(skeletonTransformChildIndex));
+			}
+
+			KeyFrames* keyFrames = GetKeyFrames(skeletonTransform->GetGameObject().GetName());
+			if (keyFrames != nullptr)
+			{
+				keyFrames->Update(elapsedTime);
+
+				skeletonTransform->SetLocalPosition(keyFrames->GetFinalPosition());
+				skeletonTransform->SetLocalRotation(keyFrames->GetFinalRotation());
+				skeletonTransform->SetLocalScale(keyFrames->GetFinalScale());
+			}
+		}
 	}
 
 	float Animation::GetDuration() const
@@ -20,38 +59,28 @@ namespace NightOwl
 		this->duration = duration;
 	}
 
-	int Animation::GetTicksPerSecond() const
+	float Animation::GetTicksPerSecond() const
 	{
 		return ticksPerSecond;
 	}
 
-	void Animation::SetTicksPerSecond(int ticksPerSecond)
+	void Animation::SetTicksPerSecond(float ticksPerSecond)
 	{
 		this->ticksPerSecond = ticksPerSecond;
 	}
 
-	std::string Animation::GetName() const
+	KeyFrames* Animation::GetKeyFrames(const std::string& gameObjectName)
 	{
-		return name;
-	}
-
-	void Animation::SetName(const std::string& name)
-	{
-		this->name = name;
-	}
-
-	BoneKeyFrames* Animation::GetBoneKeyFramesMap(const std::string& boneName)
-	{
-		if (boneKeyFramesMap.contains(boneName) == false)
+		if (keyFramesMap.contains(gameObjectName) == false)
 		{
 			return nullptr;
 		}
 
-		return &boneKeyFramesMap.at(boneName);
+		return &keyFramesMap.at(gameObjectName);
 	}
 
-	std::map<std::string, BoneKeyFrames>& Animation::GetBoneKeyFramesMap()
+	std::map<std::string, KeyFrames>& Animation::GetKeyFrames()
 	{
-		return boneKeyFramesMap;
+		return keyFramesMap;
 	}
 }

@@ -1,39 +1,38 @@
 #pragma once
 
-#include "Structures/BoneKeyFrames.h"
+#include "Motion.h"
+#include "Structures/KeyFrames.h"
 #include <map>
 #include <string>
 
+#include "NightOwl/Component/Concrete/Transform.h"
+
 namespace NightOwl
 {
-	class Animation
+	class Animation : public Motion
 	{
 	public:
 		Animation();
+
+		void Update(Animator* animator) override;
 
 		float GetDuration() const;
 
 		void SetDuration(float duration);
 
-		int GetTicksPerSecond() const;
+		float GetTicksPerSecond() const;
 
-		void SetTicksPerSecond(int ticksPerSecond);
+		void SetTicksPerSecond(float ticksPerSecond);
 
-		std::string GetName() const;
+		KeyFrames* GetKeyFrames(const std::string& gameObjectName);
 
-		void SetName(const std::string& name);
-
-		BoneKeyFrames* GetBoneKeyFramesMap(const std::string& boneName);
-
-		std::map<std::string, BoneKeyFrames>& GetBoneKeyFramesMap();
+		std::map<std::string, KeyFrames>& GetKeyFrames();
 
 	private:
+		float ticksPerSecond;
+
 		float duration;
 
-		int ticksPerSecond;
-
-		std::string name;
-
-		std::map<std::string, BoneKeyFrames> boneKeyFramesMap;
+		std::map<std::string, KeyFrames> keyFramesMap;
 	};
 }
