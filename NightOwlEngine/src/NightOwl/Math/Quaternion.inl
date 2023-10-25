@@ -259,6 +259,32 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Quaternion<T> Quaternion<T>::LookAt(const Vec3<T>& direction)
+	{
+		const float dot = Vec3<T>::Dot(Vec3<T>::Forward(), direction);
+
+		if (std::abs(dot + static_cast<T>(1)) < EPSILON)
+		{
+			// vector a and b point exactly in the opposite direction, 
+			// so it is a 180 degrees turn around the up-axis
+			return Quaternion<T>(Vec3<T>::Up(), static_cast<T>(180));
+		}
+
+		if (std::abs(dot - static_cast<T>(1)) < EPSILON)
+		{
+			// vector a and b point exactly in the same direction
+			// so we return the identity quaternion
+			return Quaternion<T>();
+		}
+
+		T rotationAngle = RadToDegrees(std::acos(dot));
+
+		Vec3<T> rotationAxis = Vec3<T>::Cross(Vec3<T>::Forward(), direction);
+
+		return Quaternion<T>(rotationAxis.Normalize(), rotationAngle);
+	}
+
+	template <typename T>
 	Quaternion<T> Quaternion<T>::MakeRotationX(const T angleInDegrees)
 	{
 		T halfAngle = DegreesToRad(angleInDegrees) / static_cast<T>(2);
@@ -339,7 +365,7 @@ namespace NightOwl
 	template <typename T>
 	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
 	{
-		T clampedT = std::max(0.0f, std::min(1.0f, t));
+		T clampedT = std::clamp(t, static_cast<T>(0), static_cast<T>(1));
 
 		T dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
@@ -357,7 +383,7 @@ namespace NightOwl
 		
 		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));
 		T theta = std::acos(dot) * clampedT; // Angle between leftQuaternion and new quaternion at t
-		Quaternion<T> newQuaternion = rightQuaternion - leftQuaternion * dot;
+		Quaternion<T> newQuaternion = newRightQuaternion - leftQuaternion * dot;
 		newQuaternion.Normalize();
 		
 		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);

@@ -5,11 +5,11 @@
 
 namespace NightOwl
 {
-	class Animation;
+	class Motion;
 
 	class AnimationCollection
 	{
 	public:
-		std::map<std::string, Animation*> animationsMap;
+		std::map<std::string, Motion*> motionsMap;
 	};
 }

@@ -149,7 +149,7 @@ namespace NightOwl
 	{
 		T clampedT = std::max(0.0f, std::min(1.0f, t));
 
-		return leftVector * (1.0f - t) + rightVector * clampedT;
+		return leftVector * (1.0f - clampedT) + rightVector * clampedT;
 	}
 
 	template <typename T>

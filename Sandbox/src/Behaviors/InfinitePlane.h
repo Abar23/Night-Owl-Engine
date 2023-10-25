@@ -6,8 +6,5 @@ class InfinitePlane : public NightOwl::OwlBehavior
 {
 public:
 	void Start() override;
-
-private:
-
 };
 
