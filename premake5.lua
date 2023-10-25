@@ -1,41 +1,44 @@
-workspace "NightOwlEngine"  
-    architecture "x86_64"
-    startproject "Sandbox"
-    
-    configurations 
-    { 
-        "Debug", 
-        "Release"
-    } 
+require "clean"
+require "generate"
 
-    flags  
-    {
-        "MultiProcessorCompile"
-    }
+if _ACTION == "vs2022" then
+    workspace "NightOwlEngine"  
+        architecture "x86_64"
+        startproject "Sandbox"
+        
+        configurations 
+        { 
+            "Debug", 
+            "Release"
+        } 
 
-    sourceDir = "./src"
-    vendorDir = "./vendor"
+        flags  
+        {
+            "MultiProcessorCompile"
+        }
 
-    defines
-    {
-        "_USE_MATH_DEFINES",
-        "_CRT_SECURE_NO_WARNINGS",
-    }
+        sourceDir = "./src"
+        vendorDir = "./vendor"
 
-    outputDir = "%{cfg.buildcfg}_%{cfg.system}_%{cfg.architecture}"
+        defines
+        {
+            "_USE_MATH_DEFINES",
+            "_CRT_SECURE_NO_WARNINGS",
+        }
 
-    group "Dependencies"
-        include "NightOwlEngine/vendor/Glad"
-        include "NightOwlEngine/vendor/GLFW"
-        include "NightOwlEngine/vendor/ImGui"
-        include "NightOwlEngine/vendor/SPIRV-Cross"
-        include "NightOwlEngine/vendor/shaderc"
-    group ""
+        outputDir = "%{cfg.buildcfg}_%{cfg.system}_%{cfg.architecture}"
 
-    group "NightOwlEngine"
-        include "NightOwlEngine"
-    group ""
+        group "Dependencies"
+            include "NightOwlEngine/vendor/Glad"
+            include "NightOwlEngine/vendor/GLFW"
+            include "NightOwlEngine/vendor/ImGui"
+        group ""
 
-    group "Sandbox"
-        include "Sandbox"
-    group ""
+        group "NightOwlEngine"
+            include "NightOwlEngine"
+        group ""
+
+        group "Sandbox"
+            include "Sandbox"
+        group ""
+ end

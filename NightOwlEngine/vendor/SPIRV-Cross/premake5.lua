@@ -1,1 +1,0 @@
-os.execute(".\\cmake_build_gen.bat");

@@ -13,7 +13,6 @@ namespace NightOwl
 
 		float timeScale;
 
-		// Comparator for priority_queue
 		bool operator<(const BlendTreeNode& otherBlendTreeNode) const
 		{
 			return this->threshold < otherBlendTreeNode.threshold;

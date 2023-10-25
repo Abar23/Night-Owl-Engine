@@ -60,8 +60,13 @@ project "NightOwlEngine"
         "OpenAL32.lib",
         "sndfile.lib",
         "assimp-vc143-mt.lib",
-        "shaderc.lib",
         "shaderc_combined.lib"
+    }
+
+    libdirs 
+    {
+        vendorDir .. "/OpenAL/libs/Win64",
+        vendorDir .. "/Assimp/lib/x64"
     }
 
     filter "system:windows"
@@ -74,7 +79,6 @@ project "NightOwlEngine"
 
         libdirs 
         {
-            vendorDir .. "/OpenAL/libs/Win64",
             vendorDir .. "/libsndfile/Debug",
             vendorDir .. "/Assimp/lib/x64",
             vendorDir .. "/SPIRV-Cross/build/Debug",
@@ -97,13 +101,12 @@ project "NightOwlEngine"
 
         libdirs 
         {
-            vendorDir .. "/OpenAL/libs/Win64",
             vendorDir .. "/libsndfile/Release",
-            vendorDir .. "/Assimp/lib/x64",
             vendorDir .. "/shaderc/lib/Release",
             vendorDir .. "/SPIRV-Cross/build/Release",
             vendorDir .. "/shaderc/build/libshaderc/Release"
         }
+
         links
         {
             "spirv-cross-core.lib",
