@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ModelLoadingInfo.h"
-#include "NightOwl/Component/Structures/Mesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <string>

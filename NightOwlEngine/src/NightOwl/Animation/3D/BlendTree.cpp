@@ -104,16 +104,13 @@ namespace NightOwl
 		float blendFactor = (blendParameterValue - firstNode.threshold) / (secondNode.threshold - firstNode.threshold);
 
 		// max to min ratio gives the proportion between the fastest and shortest animations in the blend tree
-		float speedFactor = ((blendParameterValue - minThreshold) / (maxThreshold - minThreshold)) * maxToMinDurationRatio; 
+		float speedFactor = Lerp(firstNode.speedFactor, secondNode.speedFactor, blendFactor);
 
-		// Speed multipliers to correctly transition from one animation to another
-		float firstAnimationSpeed = firstAnimation->GetDuration() / maxDuration;
-		float secondAnimationSpeed = secondAnimation->GetDuration() / maxDuration;
 
 		UpdateElapsedTime(deltaTime * speedFactor);
 
-		float firstAnimationElapsedTime = elapsedTime * firstAnimationSpeed * firstAnimation->GetTicksPerSecond() * firstNode.timeScale;
-		float secondAnimationElapsedTime = elapsedTime * secondAnimationSpeed * secondAnimation->GetTicksPerSecond() * secondNode.timeScale;
+		float firstAnimationElapsedTime = elapsedTime * firstNode.normalizedTimeScale * firstAnimation->GetTicksPerSecond() * firstNode.timeScale;
+		float secondAnimationElapsedTime = elapsedTime * secondNode.normalizedTimeScale * secondAnimation->GetTicksPerSecond() * secondNode.timeScale;
 
 		firstAnimationElapsedTime = std::fmod(firstAnimationElapsedTime, firstAnimation->GetDuration());
 		secondAnimationElapsedTime = std::fmod(secondAnimationElapsedTime, secondAnimation->GetDuration());
@@ -200,7 +197,7 @@ namespace NightOwl
 
 		maxDuration = std::numeric_limits<float>::min();
 		minDuration = std::numeric_limits<float>::max();
-		for (const auto & blendTreeNode : nodes)
+		for (const auto& blendTreeNode : nodes)
 		{
 			const Animation* animation = blendTreeNode.animation;
 
@@ -217,5 +214,11 @@ namespace NightOwl
 		}
 
 		maxToMinDurationRatio = maxDuration / minDuration;
+
+		for (auto& blendTreeNode : nodes)
+		{
+			blendTreeNode.speedFactor = maxDuration / blendTreeNode.animation->GetDuration();
+			blendTreeNode.normalizedTimeScale = 1.0f / blendTreeNode.speedFactor;
+		}
 	}
 }

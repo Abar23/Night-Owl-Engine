@@ -7,6 +7,10 @@ namespace NightOwl
 	class BlendTreeNode
 	{
 	public:
+		BlendTreeNode(Animation* animation, float threshold, float timeScale)
+			: animation(animation), threshold(threshold), timeScale(timeScale)
+		{}
+
 		Animation* animation;
 
 		float threshold;
@@ -17,5 +21,12 @@ namespace NightOwl
 		{
 			return this->threshold < otherBlendTreeNode.threshold;
 		}
+
+	private:
+		float speedFactor;
+
+		float normalizedTimeScale;
+
+		friend class BlendTree;
 	};
 }

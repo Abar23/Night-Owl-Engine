@@ -45,6 +45,14 @@ namespace NightOwl
 		return outputStart + (outputEnd - outputStart) / (inputEnd - inputStart) * (value - inputStart);
 	}
 
+	template <typename T>
+	T Lerp(const T startValue, const T endValue, const T t)
+	{
+		T clampedT = std::clamp(t, static_cast<T>(0), static_cast<T>(1));
+
+		return (static_cast<T>(1) - clampedT) * startValue + clampedT * endValue;
+	}
+
 	inline float SinEaseInEaseOutWithConstantVelocity(float time, float totalTime, float timeOne, float timeTwo)
 	{
 		const float clampedTime = std::clamp(time, 0.0f, totalTime);

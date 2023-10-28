@@ -7,6 +7,7 @@
 #include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
+#include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/GameObject/GameObject.h"
