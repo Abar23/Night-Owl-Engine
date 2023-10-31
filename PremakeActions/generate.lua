@@ -28,8 +28,8 @@ local OFF = "0"
 -- Define default values for generator, CMake executable, and vendor directory
 local defaults = {
     generator = "Visual Studio 17 2022",
-    vendorDir = absolutePath .. "/NightOwlEngine/vendor/",
-    cmakeExecutable = absolutePath .. "/NightOwlEngine/vendor/cmake/Windows/bin/cmake.exe"
+    vendorDir = absolutePath .. "/../NightOwlEngine/vendor/",
+    cmakeExecutable = absolutePath .. "/../NightOwlEngine/vendor/cmake/Windows/bin/cmake.exe"
 }
 
 -- Define dependency-specific parameters

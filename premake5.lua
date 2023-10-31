@@ -1,5 +1,5 @@
-require "clean"
-require "generate"
+require "PremakeActions/clean"
+require "PremakeActions/generate"
 
 if _ACTION == "vs2022" then
     workspace "NightOwlEngine"  

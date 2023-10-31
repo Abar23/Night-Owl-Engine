@@ -1,6 +1,5 @@
-premake.modules.lua = {}
-local m = premake.modules.lua
-local p = premake
+premake.modules.clean = {}
+local m = premake.modules.clean
 
 local CMAKE_DEPENDENCY_DIRS = {
     "./NightOwlEngine/vendor/shaderc",

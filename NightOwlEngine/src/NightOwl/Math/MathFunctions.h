@@ -17,6 +17,9 @@ namespace NightOwl
 	template <typename T>
 	T MapValueInRange(const T value, const T inputStart, const T inputEnd, const T outputStart, const T outputEnd);
 
+	template <typename T>
+	T Lerp(const T startValue, const T endValue, const T t);
+
 	float SinEaseInEaseOutWithConstantVelocity(float time, float totalTime, float timeOne, float timeTwo);
 }
 
