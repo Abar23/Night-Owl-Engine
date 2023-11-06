@@ -606,10 +606,10 @@ namespace NightOwl
 	template <typename T>
 	Vec4<T> operator*(const Mat4<T>& matrix, const Vec4<T>& vector)
 	{
-		return Vec4<T>(matrix(0, 0) * vector.x + matrix(1, 0) * vector.y + matrix(2, 0) * vector.z + matrix(3, 0) * vector.w,
-					   matrix(0, 1) * vector.x + matrix(1, 1) * vector.y + matrix(2, 1) * vector.z + matrix(3, 1) * vector.w,
-					   matrix(0, 2) * vector.x + matrix(1, 2) * vector.y + matrix(2, 2) * vector.z + matrix(3, 2) * vector.w,
-					   matrix(0, 3) * vector.x + matrix(1, 3) * vector.y + matrix(2, 3) * vector.z + matrix(3, 3) * vector.w);
+		return Vec4<T>(matrix(0, 0) * vector.x + matrix(0, 1) * vector.y + matrix(0, 2) * vector.z + matrix(0, 3) * vector.w,
+					   matrix(1, 0) * vector.x + matrix(1, 1) * vector.y + matrix(1, 2) * vector.z + matrix(1, 3) * vector.w,
+					   matrix(2, 0) * vector.x + matrix(2, 1) * vector.y + matrix(2, 2) * vector.z + matrix(2, 3) * vector.w,
+					   matrix(3, 0) * vector.x + matrix(3, 1) * vector.y + matrix(3, 2) * vector.z + matrix(3, 3) * vector.w);
 	}
 
 	template <typename T>
