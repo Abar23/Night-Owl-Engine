@@ -212,12 +212,12 @@ namespace NightOwl
 		if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
 		{
 			angles.y = two * std::atan2(x, w);
-			angles.z = static_cast<T>(F_PI) / two;
+			angles.z = static_cast<T>(FLOAT_PI) / two;
 		}
 		else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
 		{
 			angles.y = -two * std::atan2(x, w);
-			angles.z = -static_cast<T>(F_PI) / two;
+			angles.z = -static_cast<T>(FLOAT_PI) / two;
 		}
 		else
 		{

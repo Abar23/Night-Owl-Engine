@@ -20,13 +20,13 @@ namespace NightOwl
 	template <typename T>
 	T DegreesToRad(const T angleInDegrees)
 	{
-		return angleInDegrees * static_cast<T>(F_PI / 180.0f);
+		return angleInDegrees * static_cast<T>(FLOAT_PI / 180.0f);
 	}
 
 	template <typename T>
 	T RadToDegrees(const T angleInDegrees)
 	{
-		return angleInDegrees * static_cast<T>(180.0f / F_PI);
+		return angleInDegrees * static_cast<T>(180.0f / FLOAT_PI);
 	}
 
 	template <typename T>
@@ -61,22 +61,22 @@ namespace NightOwl
 		const float normalizedTimeTwo = timeTwo * inverseTotalTime;
 		const float normalizedTime = clampedTime * inverseTotalTime;
 
-		const float inverseL = 1.0f / ((F_PI / 2.0f - 1.0f) * (normalizedTimeTwo - normalizedTimeOne) + 1.0f);
+		const float inverseL = 1.0f / ((FLOAT_PI / 2.0f - 1.0f) * (normalizedTimeTwo - normalizedTimeOne) + 1.0f);
 
 		float distance;
 
 		if (normalizedTime <= normalizedTimeOne)
 		{
 			const float normalizedTimeOneOverL = normalizedTimeOne * inverseL;
-			distance = normalizedTimeOneOverL * std::sinf(((normalizedTime - normalizedTimeOne) / normalizedTimeOne) * F_PI / 2.0f) + normalizedTimeOneOverL;
+			distance = normalizedTimeOneOverL * std::sinf(((normalizedTime - normalizedTimeOne) / normalizedTimeOne) * FLOAT_PI / 2.0f) + normalizedTimeOneOverL;
 		}
 		else if (normalizedTime > normalizedTimeOne && normalizedTime < normalizedTimeTwo)
 		{
-			distance = (F_PI * 0.5f * inverseL) * (normalizedTime - normalizedTimeOne) + (normalizedTimeOne * inverseL);
+			distance = (FLOAT_PI * 0.5f * inverseL) * (normalizedTime - normalizedTimeOne) + (normalizedTimeOne * inverseL);
 		}
 		else
 		{
-			constexpr float piOverTwo = F_PI / 2.0f;
+			constexpr float piOverTwo = FLOAT_PI / 2.0f;
 
 			const float leftTerm = (1.0f - normalizedTimeTwo) * inverseL * std::sinf(piOverTwo * ((normalizedTime - normalizedTimeTwo) / (1.0f - normalizedTimeTwo)));
 			const float middleTerm = (normalizedTimeTwo - normalizedTimeOne) * piOverTwo * inverseL;
