@@ -10,6 +10,8 @@ namespace NightOwl
 {
 	class Scene;
 
+	class ChainIK;
+
 	class Transform : public Component
 	{
 	public:
@@ -27,11 +29,15 @@ namespace NightOwl
 
 		void SetLocalScale(const Vec3F& scale);
 
+		void Rotate(const QuatF& rotation, Space space);
+
 		void Rotate(float angleX, float angleY, float angleZ, Space space);
 
 		void Rotate(const Vec3F& eulers, Space space);
 
 		const Vec3F GetLocalEulerAngles();
+
+		const QuatF GetLocalRotation();
 
 		void SetLocalRotation(const QuatF& rotation);
 
@@ -111,6 +117,8 @@ namespace NightOwl
 		Transform* parent;
 
 		friend class Scene;
+
+		friend class ChainIK;
 
 		bool isLocalDirty;
 

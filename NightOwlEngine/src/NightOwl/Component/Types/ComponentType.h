@@ -17,7 +17,8 @@ namespace NightOwl
 		AudioSource,
 		OwlBehavior,
 		Animator,
-		CatmullRomSpline
+		CatmullRomSpline,
+		ChainIK
 	};
 
 	inline std::string ComponentTypeToString(ComponentType type)
@@ -50,6 +51,9 @@ namespace NightOwl
 
 		case ComponentType::CatmullRomSpline:
 			return std::string{ "CatmullRomSpline" };
+
+		case ComponentType::ChainIK:
+			return std::string{ "ChainIK" };
 
 		default:
 			return std::string{ "Unknown Component" };

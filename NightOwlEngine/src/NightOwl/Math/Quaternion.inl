@@ -259,6 +259,38 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	Quaternion<T> Quaternion<T>::FromToRotation(const Vec3<T>& fromDirection, const Vec3<T>& toDirection)
+	{
+		Vec3F fromDirectionNormalized = fromDirection.GetNormalize();
+		Vec3F toDirectionNormalized = toDirection.GetNormalize();
+		
+		float dot = Vec3F::Dot(fromDirectionNormalized, toDirectionNormalized);
+
+		if (dot > static_cast<T>(1) - EPSILON)
+		{
+			return Quaternion<T>();
+		}
+
+		if (dot < static_cast<T>(-1) + EPSILON)
+		{
+			Vec3F rotationAxis = Vec3F::Cross(Vec3F::Right(), fromDirectionNormalized);
+			if (rotationAxis.SquareMagnitude() < EPSILON)
+			{
+				rotationAxis = Vec3F::Cross(Vec3F::Up(), fromDirectionNormalized);
+			}
+
+			rotationAxis.Normalize();
+
+			return Quaternion<T>(rotationAxis.x, rotationAxis.y, rotationAxis.z, static_cast<T>(0));
+		}
+
+		Vec3F rotationAxis = Vec3F::Cross(fromDirectionNormalized, toDirectionNormalized).Normalize();
+		float angle = std::acos(dot);
+
+		return Quaternion<T>(rotationAxis, RadToDegrees(angle));
+	}
+
+	template <typename T>
 	Quaternion<T> Quaternion<T>::LookAt(const Vec3<T>& direction)
 	{
 		const float dot = Vec3<T>::Dot(Vec3<T>::Forward(), direction);

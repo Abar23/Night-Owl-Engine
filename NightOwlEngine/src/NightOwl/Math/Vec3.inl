@@ -47,7 +47,10 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T> Vec3<T>::GetNormalize() const
 	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
+		if (NearEquals(Magnitude(), static_cast<T>(0)))
+		{
+			return Vec3F();
+		}
 
 		T inverseMagnitude = static_cast<T>(1) / Magnitude();
 
@@ -57,7 +60,14 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T>& Vec3<T>::Normalize()
 	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
+		if (NearEquals(Magnitude(), static_cast<T>(0)))
+		{
+			this->x = static_cast<T>(0);
+			this->y = static_cast<T>(0);
+			this->z = static_cast<T>(0);
+
+			return *this;
+		}
 
 		*this /= Magnitude();
 

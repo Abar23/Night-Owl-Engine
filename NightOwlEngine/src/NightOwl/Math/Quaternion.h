@@ -60,6 +60,8 @@ namespace NightOwl
 
 		static T Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 
+		static Quaternion<T> FromToRotation(const Vec3<T>& fromDirection, const Vec3<T>& toDirection);
+
 		static Quaternion<T> LookAt(const Vec3<T>& direction);
 
 		static Quaternion<T> MakeRotationX(const T angleInDegrees);
