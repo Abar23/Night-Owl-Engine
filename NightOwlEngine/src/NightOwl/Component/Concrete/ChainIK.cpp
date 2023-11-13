@@ -95,6 +95,11 @@ namespace NightOwl
 
 	void ChainIK::FabrikSolver()
 	{
+		if ((target->GetPosition() - chain.back()->GetPosition()).Magnitude() < 0.01f)
+		{
+			return;
+		}
+
 		std::vector<float> lengths(chain.size() - 1);
 		std::vector<Vec3F> points(chain.size());
 		for (int jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
@@ -137,39 +142,81 @@ namespace NightOwl
 
 		std::shared_ptr<Mesh> mesh = gameObject->GetComponent<Renderer>()->GetMesh();
 		auto& boneInfoMap = mesh->GetBoneInfoMap();
+
+		// get bind pose orientation of beginning of chain
+		QuatF accumulatedBindPose = boneInfoMap.at(chain[0]->GetGameObject().GetName()).offsetRotation.GetInverse();
 		for (int jointIndex = 0; jointIndex < points.size() - 1; ++jointIndex)
 		{
 			Vec3F previousJoint = points[jointIndex];
 			Vec3F currentJoint = points[jointIndex + 1];
 
-			DebugSystemLocator::GetDebugSystem()->DrawPoint(currentJoint, { 1.0f, 0.0f, 0.0f });
+			DebugSystemLocator::GetDebugSystem()->DrawPoint(previousJoint, { 1.0f, 0.0f, 0.0f });
 			DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, currentJoint);
 
 			Vec3F previousToCurrentDirection = (currentJoint - chain[jointIndex]->GetPosition()).Normalize();
 
-			Vec3F dir = (chain[jointIndex + 1]->GetPosition() - chain[jointIndex]->GetPosition()).Normalize();
+			QuatF currentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse();
+			QuatF nextBindPoseOrientation = boneInfoMap.at(chain[jointIndex + 1]->GetGameObject().GetName()).offsetRotation.GetInverse();
+			QuatF offset = currentBindPoseOrientation.GetInverse() * nextBindPoseOrientation;
+			Vec3F dir = (accumulatedBindPose * offset) * Vec3F::Up();
 
-			QuatF bindPostOrientation;
-			bindPostOrientation.SetOrthogonalRotationMatrix(boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetMatrix.GetRotationMatrix());
 
-			QuatF parentBindPoseOrientation;
-			parentBindPoseOrientation.SetOrthogonalRotationMatrix(boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetMatrix.GetRotationMatrix());
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + previousToCurrentDirection * 2.0f);
+			DebugSystemLocator::GetDebugSystem()->DrawLine(chain[jointIndex]->GetPosition(), chain[jointIndex]->GetPosition() + dir * 1.0f);
+			DebugSystemLocator::GetDebugSystem()->DrawPoint(chain[jointIndex]->GetPosition(), {0.0f, 0.0f, 1.0f});
 
-			QuatF toLocal = chain[jointIndex]->GetRotation().GetInverse();
-			QuatF rotation = QuatF::FromToRotation(toLocal * dir, toLocal * previousToCurrentDirection);
+			QuatF toLocalFromBindPose = accumulatedBindPose.GetInverse();
+			QuatF rotation = QuatF::FromToRotation(toLocalFromBindPose * dir, toLocalFromBindPose * previousToCurrentDirection);
 
-			chain[jointIndex]->Rotate(rotation, Space::Local);
+			// validate local bind pose is correct
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * localBindPoseOffset.GetInverse() * Vec3F::Up());
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * localBindPoseOffset.GetInverse() * Vec3F::Forward());
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * localBindPoseOffset.GetInverse() * Vec3F::Right());
+			//
+			// // validate rotation is correct
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * rotation * Vec3F::Up());
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * rotation * Vec3F::Forward());
+			// DebugSystemLocator::GetDebugSystem()->DrawLine(previousJoint, previousJoint + accumulatedBindPose * rotation * Vec3F::Right());
+			// DebugSystemLocator::GetDebugSystem()->DrawPoint(previousJoint + accumulatedBindPose * rotation * Vec3F::Up() * lengths[jointIndex], { 0.0f, 0.0f, 1.0f });
 
 			if (jointIndex == 0)
 			{
-				Vec3F angles = chain[jointIndex]->GetLocalRotation().GetEulerAngles();
+				Vec3F angles = rotation.GetEulerAngles();
+				ENGINE_LOG_INFO("Arm Before: {0}\n", angles.ToString());
 				angles.x = std::clamp(angles.x, -90.0f, 90.0f);
-				angles.y = std::clamp(angles.y, -90.0f, 90.0f);
+				angles.y = 0;// std::clamp(angles.y, -90.0f, 90.0f);
 				angles.z = std::clamp(angles.z, -90.0f, 90.0f);
-				QuatF difference = parentBindPoseOrientation * bindPostOrientation.Inverse();
-				// angles += difference.GetEulerAngles();
-				ENGINE_LOG_INFO("Difference: {0}\n", angles.ToString());
-				chain[jointIndex]->SetLocalRotation(QuatF::MakeRotationFromEulers(angles));
+				ENGINE_LOG_INFO("Arm Angles of local: {0}\n", angles.ToString());
+				rotation = QuatF::MakeRotationFromEulers(angles);
+			}
+
+			if (jointIndex == 1)
+			{
+				Vec3F angles = rotation.GetEulerAngles();
+				ENGINE_LOG_INFO("Elbow Before: {0}\n", angles.ToString());
+				angles.x = 0;// std::clamp(angles.x, 0.0f, 90.0f);
+				angles.y = 0;// std::clamp(angles.y, -90.0f, 90.0f);
+				angles.z = std::clamp(angles.z, 0.0f, 90.0f);
+				ENGINE_LOG_INFO("Angles of local: {0}\n", angles.ToString());
+				rotation = QuatF::MakeRotationFromEulers(angles);
+			}
+
+			QuatF parentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation;
+			QuatF localBindPoseOffset = parentBindPoseOrientation * currentBindPoseOrientation;
+
+			ENGINE_LOG_INFO("Local Bind Pose Offset {0}: {1}", jointIndex, localBindPoseOffset.GetEulerAngles().ToString());
+			ENGINE_LOG_INFO("Offset {0}: {1}", jointIndex, offset.GetEulerAngles().ToString());
+			ENGINE_LOG_INFO("Rotation angles for joing {0}: {1}\n", jointIndex, rotation.GetEulerAngles().ToString());
+
+
+			accumulatedBindPose = accumulatedBindPose * rotation;
+			if (jointIndex == 0)
+			{
+				chain[jointIndex]->SetLocalRotation(localBindPoseOffset * rotation);
+			}
+			else
+			{
+				chain[jointIndex]->SetLocalRotation(rotation);
 			}
 			
 			chain[jointIndex]->GetWorldMatrix();

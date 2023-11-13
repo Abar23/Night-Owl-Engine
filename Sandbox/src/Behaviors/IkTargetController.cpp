@@ -10,7 +10,7 @@ void IkTargetController::Start()
 
 	transform = gameObject->GetTransform();
 	transform->SetPosition({ 0.0f, 2.5f, 1.0f });
-	transform->Scale(NightOwl::Vec3F(0.15f), NightOwl::Space::Local);
+	transform->Scale(NightOwl::Vec3F(0.05f), NightOwl::Space::Local);
 }
 
 void IkTargetController::Update()

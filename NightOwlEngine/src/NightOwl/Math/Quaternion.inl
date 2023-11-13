@@ -204,36 +204,54 @@ namespace NightOwl
 	{
 		Vec3<T> angles;
 
-		T singularityTest = x * y + z * w;
+		// T singularityTest = x * y + z * w;
+		//
+		// T one = static_cast<T>(1);
+		// T two = static_cast<T>(2);
+		//
+		// if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
+		// {
+		// 	angles.y = two * std::atan2(x, w);
+		// 	angles.z = static_cast<T>(FLOAT_PI) / two;
+		// }
+		// else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
+		// {
+		// 	angles.y = -two * std::atan2(x, w);
+		// 	angles.z = static_cast<T>(-FLOAT_PI) / two;
+		// }
+		// else
+		// {
+		// 	T xSquared = x * x;
+		// 	T ySquared = y * y;
+		// 	T zSquared = z * z;
+		//
+		// 	angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
+		// 	angles.x = std::asin(two * singularityTest);
+		// 	angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
+		// }
+		//
+		// angles.x = RadToDegrees(angles.x);
+		// angles.y = RadToDegrees(angles.y);
+		// angles.z = RadToDegrees(angles.z);
 
-		T one = static_cast<T>(1);
-		T two = static_cast<T>(2);
-
-		if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
-		{
-			angles.y = two * std::atan2(x, w);
-			angles.z = static_cast<T>(FLOAT_PI) / two;
-		}
-		else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
-		{
-			angles.y = -two * std::atan2(x, w);
-			angles.z = -static_cast<T>(FLOAT_PI) / two;
-		}
+		// Roll (x-axis rotation)
+		T sinRoll = 2.0f * (w * x + y * z);
+		T cosRoll = 1.0f - 2.0f * (x * x + y * y);
+		angles.x = RadToDegrees(std::atan2(sinRoll, cosRoll));
+		
+		// Pitch (y-axis rotation)
+		T sinPitch = 2.0f * (w * y - z * x);
+		// Handle special cases to avoid undefined behavior with atan2
+		if (std::abs(sinPitch) >= static_cast<T>(1))
+			angles.y = RadToDegrees(std::copysign(static_cast<T>(FLOAT_PI) / static_cast<T>(2), sinPitch));
 		else
-		{
-			T xSquared = x * x;
-			T ySquared = y * y;
-			T zSquared = z * z;
-
-			angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
-			angles.z = std::asin(two * singularityTest);
-			angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
-		}
-
-		angles.x = RadToDegrees(angles.x);
-		angles.y = RadToDegrees(angles.y);
-		angles.z = RadToDegrees(angles.z);
-
+			angles.y = RadToDegrees(std::asin(sinPitch));
+		
+		// Yaw (z-axis rotation)
+		T sinYaw = static_cast<T>(2) * (w * z + x * y);
+		T cosYaw = static_cast<T>(1) - static_cast<T>(2) * (y * y + z * z);
+		angles.z = RadToDegrees(std::atan2(sinYaw, cosYaw));
+		
 		return angles;
 	}
 
@@ -408,7 +426,7 @@ namespace NightOwl
 			newRightQuaternion = rightQuaternion * static_cast<T>(-1);
 		}
 
-		if (dot > DOT_THRESHOLD)
+		if (dot > SLERP_DOT_THRESHOLD)
 		{
 			return Nlerp(leftQuaternion, newRightQuaternion, t);
 		}
