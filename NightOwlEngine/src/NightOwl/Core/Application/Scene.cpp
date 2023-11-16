@@ -24,7 +24,7 @@ namespace NightOwl
 				for (int childIndex = 0; childIndex < parent->GetTransform()->GetNumberOfChildren(); childIndex++)
 				{
 					Transform* childTransform = parent->GetTransform()->GetChildAtIndex(childIndex);
-					childTransform->PropagateParentLocalTransform(parent->GetTransform()->localVecQuatMat);
+					childTransform->PropagateParentTransform(parent->GetTransform()->localVecQuatMat);
 				}
 			}
 		}

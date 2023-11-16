@@ -91,7 +91,7 @@ namespace NightOwl
 
 		Vec3F GetUp();
 
-		void Clone(const Transform& transformToClone, Scene* currentScene = nullptr);	
+		void Clone(const Transform& transformToClone, Scene* currentScene = nullptr, Transform* parent = nullptr);
 
 		REFLECT()
 
@@ -130,7 +130,7 @@ namespace NightOwl
 
 		void SetFlagBasedOnSpace(Space space);
 
-		void PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform);
+		void PropagateParentTransform(const VecQuatMatF& parentLocalTransform);
 
 		void Remove() override;
 	};

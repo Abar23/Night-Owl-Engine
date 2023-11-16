@@ -29,35 +29,6 @@ namespace NightOwl
 			return;
 		}
 
-		// const Vec3F chainStartToTarget = target->GetPosition() - chain.front()->GetPosition();
-		// const float targetDistance = (chainStartToTarget).Magnitude();
-		// if (targetDistance > totalChainLength)
-		// {
-		// 	const Vec3F directionToTarget = chainStartToTarget.GetNormalize();
-		// 	DebugSystemLocator::GetDebugSystem()->DrawLine(chain.front()->GetPosition(), chain.front()->GetPosition() + chainStartToTarget);
-		// 	std::vector<Vec3F> newPositions;
-		// 	for (int jointIndex = 1; jointIndex < chain.size(); ++jointIndex)
-		// 	{
-		// 		Transform* previousJoint = chain[jointIndex - 1];
-		// 		Transform* currentJoint = chain[jointIndex];
-		//
-		// 		Vec3F previousJointPosition = previousJoint->GetPosition();
-		// 		Vec3F currentJointPosition = currentJoint->GetPosition();
-		// 		DebugSystemLocator::GetDebugSystem()->DrawPoint(previousJointPosition, { 0.0f, 0.0f, 1.0f });
-		// 		DebugSystemLocator::GetDebugSystem()->DrawPoint(currentJointPosition, { 0.0f, 0.0f, 1.0f });
-		//
-		// 		float linkLength = (previousJointPosition - currentJointPosition).Magnitude();
-		//
-		// 		Vec3F targetPosition = previousJointPosition + directionToTarget * linkLength;
-		// 		DebugSystemLocator::GetDebugSystem()->DrawPoint(targetPosition, { 1.0f, 0.0f, 0.0f });
-		// 		newPositions.push_back(targetPosition);
-		// 	}
-		// 	for (int jointIndex = 1; jointIndex < chain.size(); ++jointIndex)
-		// 	{
-		// 		chain[jointIndex]->SetPosition(newPositions[jointIndex - 1]);
-		// 	}
-		// }
-
 		FabrikSolver();
 	}
 
@@ -95,43 +66,23 @@ namespace NightOwl
 
 	void ChainIK::FabrikSolver()
 	{
-		static int getInfo = 0;
-		static std::vector<float> lengths(chain.size() - 1);
-		static std::vector<Vec3F> originalPoints(chain.size());
-		if (getInfo == 0)
-		{
-			getInfo = 1;
-			for (int jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
-			{
-				originalPoints[jointIndex] = chain[jointIndex]->GetPosition();
-
-				if (jointIndex < chain.size() - 1)
-				{
-					lengths[jointIndex] = (originalPoints[jointIndex] - chain[jointIndex + 1]->GetPosition()).Magnitude();
-				}
-			}
-		}
-		static std::vector<Vec3F> points = originalPoints;
-
-		for (int jointIndex = 0; jointIndex < points.size() - 1; ++jointIndex)
-		{
-			Vec3F current = points[jointIndex];
-			Vec3F next = points[jointIndex + 1];
-			DebugSystemLocator::GetDebugSystem()->DrawLine(current, next);
-		}
 		static Vec3F prevousPos = target->GetPosition();
 		if ((target->GetPosition() - prevousPos).SquareMagnitude() < EPSILON)
 		{
 			return;
 		}
 		prevousPos = target->GetPosition();
-		
 
-		// std::vector<float> lengths(chain.size() - 1);
-		// std::vector<Vec3F> points(chain.size());
+		std::vector<float> lengths(chain.size() - 1);
+		std::vector<Vec3F> points(chain.size());
 		for (int jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
 		{
 			points[jointIndex] = chain[jointIndex]->GetPosition();
+
+			if (jointIndex < chain.size() - 1)
+			{
+				lengths[jointIndex] = (points[jointIndex] - chain[jointIndex + 1]->GetPosition()).Magnitude();
+			}
 		}
 		
 		for (int iteration = 0; iteration < MAX_ITERATIONS; ++iteration)
@@ -180,7 +131,7 @@ namespace NightOwl
 			for (int childIndex = 0; childIndex < chain[jointIndex]->GetNumberOfChildren(); childIndex++)
 			{
 				Transform* childTransform = chain[jointIndex]->GetChildAtIndex(childIndex);
-				childTransform->PropagateParentLocalTransform(chain[jointIndex]->worldVecQuatMat);
+				childTransform->PropagateParentTransform(chain[jointIndex]->worldVecQuatMat);
 			}
 		}
 	}
@@ -203,7 +154,12 @@ namespace NightOwl
 			Vec3F previous;
 			if (jointIndex == 0)
 			{
-				previous = current - boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation.GetInverse() * Vec3F::Up();
+				previous = current - (current - chain[jointIndex]->GetParent().GetPosition());// boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation.GetInverse() * Vec3F::Up();
+				DebugSystemLocator::GetDebugSystem()->DrawLine(current, chain[jointIndex]->GetParent().GetPosition());
+				DebugSystemLocator::GetDebugSystem()->DrawPoint(chain[jointIndex]->GetPosition(), { 1, 0, 0 });
+				// DebugSystemLocator::GetDebugSystem()->DrawPoint(current, { 1, 1, 0 });
+				DebugSystemLocator::GetDebugSystem()->DrawPoint(chain[jointIndex]->GetParent().GetPosition(), { 1, 1, 1 });
+
 			}
 			else
 			{
@@ -378,20 +334,6 @@ namespace NightOwl
 		float distanceToNearestPoint = nearestPoint.Magnitude();
 		Vec3F nearestPointOnEllipsoid = centerOfCone + unitCenterOfConeToTarget * distanceToNearestPoint;
 		Vec3F currentToNearestEllipsoidalPoint = nearestPointOnEllipsoid - currentPoint;
-
-		// 
-		// if (currentToNearestEllipsoidalPoint == Vec3F::Zero())
-		// {
-		// 	QuatF correctionRotation(Vec3F::Cross(unitPreviousToCurrent, targetDirection).Normalize(), 90.0f);
-		// 	return currentPoint + correctionRotation * unitPreviousToCurrent * jointLength;
-		// }
-
-		// reflect nearest point on the ellipsoid as the center of the cone is on the opposite side of the joint
-		if (Vec3F::Dot(unitPreviousToCurrent, targetDirection) < 0.0f)
-		{
-			currentToNearestEllipsoidalPoint = currentToNearestEllipsoidalPoint.GetNegate() + 2.0f * unitCenterOfConeToTarget * distanceToNearestPoint;
-		}
-
 		Vec3F updatedTargetPoint = currentPoint + currentToNearestEllipsoidalPoint.Normalize() * jointLength;
 		return updatedTargetPoint;
 	}

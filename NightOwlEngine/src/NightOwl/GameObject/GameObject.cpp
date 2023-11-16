@@ -93,14 +93,14 @@ namespace NightOwl
 		return scene;
 	}
 
-	std::shared_ptr<GameObject> GameObject::Clone(Scene* currentScene /* = nullptr */)
+	std::shared_ptr<GameObject> GameObject::Clone(Scene* currentScene /* = nullptr */, Transform* parent /* = nullptr */)
 	{
 		Scene* activeScene = currentScene ? currentScene : scene;
 		auto clonedGameObject = std::make_shared<GameObject>();
 		clonedGameObject->scene = activeScene;
 		clonedGameObject->name = name;
 		clonedGameObject->isActive = true;
-		clonedGameObject->transform.Clone(transform, activeScene);
+		clonedGameObject->transform.Clone(transform, activeScene, parent);
 		clonedGameObject->transform.gameObject = clonedGameObject.get();
 
 		for (const auto& component : componentList)

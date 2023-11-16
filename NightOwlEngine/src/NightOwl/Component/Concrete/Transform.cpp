@@ -215,9 +215,10 @@ namespace NightOwl
 				inverseOfOriginalParentLocalVecQuatMat = parent->localVecQuatMat.GetInverse();
 			}
 
+			parent->GetWorldMatrix();
 			for (const auto& childTransform : parentTransform->children)
 			{
-				childTransform->PropagateParentLocalTransform(parent->localVecQuatMat);
+				childTransform->PropagateParentTransform(parent->worldVecQuatMat);
 			}
 
 			if (gameObject->GetScene() != nullptr)
@@ -336,7 +337,7 @@ namespace NightOwl
 		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
-	void Transform::PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform)
+	void Transform::PropagateParentTransform(const VecQuatMatF& parentLocalTransform)
 	{
 		this->parentLocalVecQuatMat = parentLocalTransform;
 
@@ -345,7 +346,7 @@ namespace NightOwl
 		for (const auto& childTransform : this->children)
 		{
 			GetWorldMatrix();
-			childTransform->PropagateParentLocalTransform(this->worldVecQuatMat);
+			childTransform->PropagateParentTransform(this->worldVecQuatMat);
 		}
 	}
 
@@ -427,7 +428,7 @@ namespace NightOwl
 		return GetRotation() * Vec3F::Up();
 	}
 
-	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */)
+	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */, Transform* parent /* = nullptr */)
 	{
 		localModelMatrix = transformToClone.localModelMatrix;
 		worldMatrix = transformToClone.worldMatrix;
@@ -436,20 +437,14 @@ namespace NightOwl
 		localVecQuatMat = transformToClone.localVecQuatMat;
 		worldOffsetVecQuatMat = transformToClone.worldOffsetVecQuatMat;
 		root = transformToClone.root;
-		parent = transformToClone.parent;
+		this->parent = parent;
 
 		isLocalDirty = transformToClone.isLocalDirty;
 		isWorldDirty = transformToClone.isWorldDirty;
 
-		// TODO: Figure out if this is needed
-		// if(parent != nullptr)
-		// {
-		// 	parent->SetChild(this);
-		// }
-
 		for (auto& transform : transformToClone.children)
 		{
-			const auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr);
+			const auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr, this);
 			children.push_back(clonedChild->GetTransform());
 		}
 	}
