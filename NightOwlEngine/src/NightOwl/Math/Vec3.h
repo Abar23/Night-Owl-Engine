@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MathFunctions.h"
 #include "Swizzle.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
 

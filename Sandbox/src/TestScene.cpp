@@ -82,10 +82,10 @@ void TestScene::Init()
 	chain->AddJointToChain(FindWithName("mixamorig_LeftArm")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftForeArm")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftHand")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb1")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb2")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb3")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb4")->GetTransform());
+	chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb1")->GetTransform());
+	chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb2")->GetTransform());
+	chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb3")->GetTransform());
+	chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb4")->GetTransform());
 	chain->SetTarget(sphereGameObject.GetTransform());
 
 	// Setup Blend tree
