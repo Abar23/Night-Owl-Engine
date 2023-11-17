@@ -78,7 +78,6 @@ void TestScene::Init()
 
 	// Setup ik chain
 	auto* chain = yBotGameObject.AddComponent<NightOwl::ChainIK>();
-	auto test = FindGameObjectsWithName("mixamorig_LeftShoulder");
 	chain->AddJointToChain(FindWithName("mixamorig_LeftShoulder")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftArm")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftForeArm")->GetTransform());

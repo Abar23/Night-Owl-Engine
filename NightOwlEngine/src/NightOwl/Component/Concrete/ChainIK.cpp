@@ -16,7 +16,8 @@ namespace NightOwl
 	ChainIK::ChainIK()
 		: Component(ComponentType::ChainIK),
 		  weight(1.0f),
-		  totalChainLength(0.0f)
+		  totalChainLength(0.0f),
+		  target(nullptr)
 	{
 		AnimatorSystemLocator::GetAnimatorSystem()->AddChainIk(this);
 	}
@@ -24,7 +25,7 @@ namespace NightOwl
 	void ChainIK::Update()
 	{
 		// no need to update if there is only one transform that makes up the chain
-		if (chain.size() < 2 && target != nullptr)
+		if (target != nullptr && chain.size() < 2)
 		{
 			return;
 		}
@@ -78,7 +79,7 @@ namespace NightOwl
 		for (int jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
 		{
 			points[jointIndex] = chain[jointIndex]->GetPosition();
-
+		
 			if (jointIndex < chain.size() - 1)
 			{
 				lengths[jointIndex] = (points[jointIndex] - chain[jointIndex + 1]->GetPosition()).Magnitude();
@@ -98,38 +99,31 @@ namespace NightOwl
 		{
 			Vec3F previousJoint = points[jointIndex];
 			Vec3F currentJoint = points[jointIndex + 1];
-		
+
 			Vec3F previousToCurrentDirection = (currentJoint - previousJoint).GetNormalize();
-		
 			QuatF currentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse();
-			QuatF offset;
-			if(jointIndex < points.size() - 2)
-			{
-				QuatF nextBindPoseOrientation = boneInfoMap.at(chain[jointIndex + 1]->GetGameObject().GetName()).offsetRotation.GetInverse();
-				offset = currentBindPoseOrientation.GetInverse() * nextBindPoseOrientation;
-			}
-		
-			Vec3F dir = (accumulatedBindPose * offset) * Vec3F::Up();
-		
+
+			Vec3F dir = accumulatedBindPose * Vec3F::Up();
 			QuatF toLocalFromBindPose = accumulatedBindPose.GetInverse();
+
 			QuatF rotation = QuatF::FromToRotation(toLocalFromBindPose * dir, toLocalFromBindPose * previousToCurrentDirection);
-		
+
+			// Orientation constraints (y-axis)
+			// QuatF twist, swing;
+			// QuatF::Decompose(rotation, Vec3F::Up(), swing, twist);
+			// ENGINE_LOG_INFO("Twist angles: {0}", twist.GetEulerAngles().ToString());
+			// twist.ConstrainTwist(-1.0f, 0.0f);
+			// rotation = swing * twist;
+
 			QuatF parentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation;
+
 			QuatF localBindPoseOffset = parentBindPoseOrientation * currentBindPoseOrientation;
-		
 			accumulatedBindPose = accumulatedBindPose * rotation;
-			if (jointIndex == 0)
-			{
-				chain[jointIndex]->SetLocalRotation(localBindPoseOffset * rotation);
-			}
-			else
-			{
-				chain[jointIndex]->SetLocalRotation(rotation);
-			}
-		
+
+			chain[jointIndex]->SetLocalRotation((jointIndex == 0) ? (localBindPoseOffset * rotation) : rotation);
 			chain[jointIndex]->GetWorldMatrix();
-			for (int childIndex = 0; childIndex < chain[jointIndex]->GetNumberOfChildren(); childIndex++)
-			{
+
+			for (int childIndex = 0; childIndex < chain[jointIndex]->GetNumberOfChildren(); childIndex++) {
 				Transform* childTransform = chain[jointIndex]->GetChildAtIndex(childIndex);
 				childTransform->PropagateParentTransform(chain[jointIndex]->worldVecQuatMat);
 			}
@@ -154,11 +148,7 @@ namespace NightOwl
 			Vec3F previous;
 			if (jointIndex == 0)
 			{
-				previous = current - (current - chain[jointIndex]->GetParent().GetPosition());// boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation.GetInverse() * Vec3F::Up();
-				DebugSystemLocator::GetDebugSystem()->DrawLine(current, chain[jointIndex]->GetParent().GetPosition());
-				DebugSystemLocator::GetDebugSystem()->DrawPoint(chain[jointIndex]->GetPosition(), { 1, 0, 0 });
-				// DebugSystemLocator::GetDebugSystem()->DrawPoint(current, { 1, 1, 0 });
-				DebugSystemLocator::GetDebugSystem()->DrawPoint(chain[jointIndex]->GetParent().GetPosition(), { 1, 1, 1 });
+				previous = current + (chain[jointIndex]->GetParent().GetPosition() - current);
 
 			}
 			else
@@ -166,7 +156,7 @@ namespace NightOwl
 				previous = points[jointIndex - 1];
 			}
 
-			Vec3F constraints = Constrain(previous, current, targetPoint, boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse(), lengths[jointIndex], true);
+			Vec3F constraints = Constrain(previous, current, targetPoint, boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse(), lengths[jointIndex]);
 
 
 			points[jointIndex + 1] = constraints;
@@ -202,7 +192,7 @@ namespace NightOwl
 		}
 	}
 
-	Vec3F ChainIK::Constrain(const Vec3F& previousPoint, const Vec3F& currentPoint, const Vec3F& targetPoint, const QuatF& currentJointOrientation, float jointLength, bool isBack)
+	Vec3F ChainIK::Constrain(const Vec3F& previousPoint, const Vec3F& currentPoint, const Vec3F& targetPoint, const QuatF& currentJointOrientation, float jointLength)
 	{
 		// calculate unit line from previous to current point
 		Vec3F unitPreviousToCurrent = (currentPoint - previousPoint).Normalize();
@@ -215,9 +205,13 @@ namespace NightOwl
 
 		// Target is behind the current point, must stretch to max limit
 		// Need to determine quadrant to grab proper angle
-		if (distanceToCenterOfCone < 0.0f)
+		if ((distanceToCenterOfCone < 0.0f || NearEquals(distanceToCenterOfCone, 0.0f)))
 		{
-			QuatF correctionRotation(Vec3F::Cross(unitPreviousToCurrent, targetDirection).Normalize(), 90.0f);
+			QuatF toTargetRotation = QuatF::FromToRotation(unitPreviousToCurrent, targetDirection);
+			std::pair<float, Vec3F> angleAxis = toTargetRotation.GetAngleAxis();
+
+			QuatF correctionRotation(angleAxis.second, 30.0f);
+
 			return currentPoint + correctionRotation * unitPreviousToCurrent * jointLength;
 		}
 
@@ -225,10 +219,10 @@ namespace NightOwl
 		Vec3F centerOfCone = currentPoint + unitPreviousToCurrent * distanceToCenterOfCone;
 
 		// calculate lengths of ellipsoidal bounds on the conical region of the cone
-		float ellipsoidalNegativeZ = distanceToCenterOfCone * std::tan(DegreesToRad(90.0f)); // replace 50 with actual angle constraints
-		float ellipsoidalPositiveZ = distanceToCenterOfCone * std::tan(DegreesToRad(90.0f));
-		float ellipsoidalNegativeX = distanceToCenterOfCone * std::tan(DegreesToRad(90.0f));
-		float ellipsoidalPositiveX = distanceToCenterOfCone * std::tan(DegreesToRad(90.0f));
+		float ellipsoidalNegativeZ = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f)); // replace 50 with actual angle constraints
+		float ellipsoidalPositiveZ = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
+		float ellipsoidalNegativeX = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
+		float ellipsoidalPositiveX = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
 
 		// get target position in cross section of the cone
 		Vec3F centerOfConeToTarget = targetPoint - centerOfCone;

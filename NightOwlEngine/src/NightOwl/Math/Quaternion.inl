@@ -3,8 +3,8 @@
 #include "MathFunctions.h"
 #include "Mat3.h"
 #include "Vec4.h"
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace NightOwl
 {
@@ -133,6 +133,65 @@ namespace NightOwl
 
 		return matrix;
 	}
+
+	template <typename T>
+	std::pair<T, Vec3<T>> Quaternion<T>::GetAngleAxis()
+	{
+		// Extract the angle
+		T angle = RadToDegrees(static_cast<T>(2) * std::acos(w));
+
+		// Calculate the sine of the angle
+		T sinAngle = std::sqrt(static_cast<T>(1) - w * w);
+
+		// Handle the case when the angle is close to zero
+		if (std::abs(sinAngle) < EPSILON) {
+			// When close to zero, use a small angle approximation to avoid division by zero
+			return { static_cast<T>(0), Vec3<T>::Zero() };
+		}
+
+		// Calculate the axis components
+		T inverseSinAngle = static_cast<T>(1) / sinAngle;
+		Vec3<T> rotationAxis(x, y, z);
+		rotationAxis *= inverseSinAngle;
+
+		return { angle, rotationAxis };
+	}
+
+	template <typename T>
+	void Quaternion<T>::ConstrainTwist(T minAngleInDegrees, T maxAngleInDegrees)
+	{
+		// // Normalize the quaternion while constraining the twist in the y-axis direction
+		// //T magnitude = Norm();
+		//
+		// T minAngleInRad = DegreesToRad(minAngleInDegrees);
+		// T maxAngleInRad = DegreesToRad(maxAngleInDegrees);
+		//
+		// // Adjust the y-component while maintaining the direction
+		// T inverseMagnitude = static_cast<T>(1) / magnitude;
+		// w *= inverseMagnitude;
+		// x *= inverseMagnitude;
+		// y = std::max(maxAngleInRad, std::min(minAngleInRad, y * inverseMagnitude)); // Constrain y-component
+		// z *= inverseMagnitude;
+
+		T magnitude = std::sin(DegreesToRad(maxAngleInDegrees) / static_cast<T>(2));
+		T squareMagnitude = magnitude * magnitude;
+		
+		Vec3F vector(x, y, z);
+		
+		if (vector.SquareMagnitude() > squareMagnitude)
+		{
+			vector = vector.GetNormalize() * magnitude;
+		
+			x = vector.x;
+			y = vector.y;
+			z = vector.z;
+		
+			T signOfW = std::signbit(w) == 0 ? static_cast<T>(1) : static_cast<T>(-1);
+		
+			w = std::sqrt(static_cast<T>(1) - squareMagnitude) * signOfW;
+		}
+	}
+
 
 	template <typename T>
 	void Quaternion<T>::SetOrthogonalRotationMatrix(const Mat3<T>& matrix)
@@ -437,6 +496,16 @@ namespace NightOwl
 		newQuaternion.Normalize();
 		
 		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);
+	}
+
+	template <typename T>
+	void Quaternion<T>::Decompose(const Quaternion<T>& quaternion, const Vec3<T>& direction, Quaternion<T>& outSwing, Quaternion<T>& outTwist)
+	{
+		Vec3<T> vector(quaternion.x, quaternion.y, quaternion.z);
+		Vec3<T> projection = Vec3<T>::Project(vector, direction);
+
+		outTwist = Quaternion<T>(projection.x, projection.y, projection.z, quaternion.w).Normalize();
+		outSwing = quaternion * outTwist.GetInverse();
 	}
 
 	template <typename T>

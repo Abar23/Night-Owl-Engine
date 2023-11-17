@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 namespace NightOwl
 {
 	template <typename T> class Vec4;
@@ -50,6 +52,10 @@ namespace NightOwl
 
 		Mat3<T> GetRotationMatrix() const;
 
+		std::pair<T, Vec3<T>> GetAngleAxis();
+
+		void ConstrainTwist(T minAngleInDegrees, T maxAngleInDegrees);
+
 		void SetOrthogonalRotationMatrix(const Mat3<T>& matrix);
 
 		void SetNonOrthogonalRotationMatrix(const Mat3<T>& matrix);
@@ -81,6 +87,8 @@ namespace NightOwl
 		static Quaternion<T> Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 
 		static Quaternion<T> Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
+
+		static void Decompose(const Quaternion<T>& quaternion, const Vec3<T>& direction, Quaternion<T>& outSwing, Quaternion<T>& outTwist);
 
 		Quaternion<T>& operator=(const Quaternion<T>& quaternion);
 

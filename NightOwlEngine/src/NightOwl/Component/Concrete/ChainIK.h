@@ -43,7 +43,7 @@ namespace NightOwl
 
 		void Backward(std::vector<Vec3F>& points, std::vector<float>& lengths);
 
-		Vec3F Constrain(const Vec3F& previousPoint, const Vec3F& currentPoint, const Vec3F& targetPoint, const QuatF& currentJointOrientation, float jointLength, bool isBack = false);
+		Vec3F Constrain(const Vec3F& previousPoint, const Vec3F& currentPoint, const Vec3F& targetPoint, const QuatF& currentJointOrientation, float jointLength);
 
 		static float EvaluateEllipse(float x, float y, float a, float b);
 
