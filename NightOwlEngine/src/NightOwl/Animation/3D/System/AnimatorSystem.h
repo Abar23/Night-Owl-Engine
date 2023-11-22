@@ -17,6 +17,8 @@ namespace NightOwl
 
 		void AddChainIk(ChainIK* chainIk);
 
+		void RemoveChainIk(const ChainIK* chainIkToFind);
+
 		void AddAnimator(Animator* animator);
 
 		void RemoveAnimator(const Animator* animator);

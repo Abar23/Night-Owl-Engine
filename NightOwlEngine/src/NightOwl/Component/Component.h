@@ -3,13 +3,11 @@
 #include "Types/ComponentType.h"
 #include <memory>
 
-namespace NightOwl
-{
-	class GameObject;
-}
 
 namespace NightOwl
 {
+	class GameObject;
+
 	class Component
 	{
 	public:
@@ -28,6 +26,8 @@ namespace NightOwl
 		{ }
 
 		virtual ~Component() = default;
+
+		virtual void Start() { }
 
 		virtual std::shared_ptr<Component> Clone() { return nullptr; }
 

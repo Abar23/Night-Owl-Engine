@@ -15,6 +15,8 @@ namespace NightOwl
 
 		void FixedUpdate();
 
+		void LateUpdate();
+
 		void InitBehaviors();
 
 		void AddOwlBehavior(OwlBehavior* owlBehavior);

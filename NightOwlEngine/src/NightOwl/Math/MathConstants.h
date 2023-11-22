@@ -6,6 +6,8 @@ namespace NightOwl
 {
 	constexpr float EPSILON = 1.0e-4f;
 
+	constexpr float SQUARE_EPSILON = EPSILON * EPSILON;
+
 	constexpr float FLOAT_PI = static_cast<float>(M_PI);
 
 	constexpr float SLERP_DOT_THRESHOLD = 0.9f;

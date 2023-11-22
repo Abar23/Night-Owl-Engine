@@ -97,6 +97,8 @@ namespace NightOwl
 
 				animatorSystem.Update();
 
+				owlBehaviorManager.LateUpdate();
+
 				sceneManager.Update();
 
 				meshRendererSystem.Update();

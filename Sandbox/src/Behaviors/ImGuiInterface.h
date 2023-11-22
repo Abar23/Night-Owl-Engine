@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IkTargetController.h"
 #include "SplineAnimator.h"
 #include "NightOwl/Behavior/OwlBehavior.h"
 #include "NightOwl/Component/Abstrtact/Renderer.h"
@@ -23,7 +24,11 @@ private:
 
 	NightOwl::Renderer* characterRenderer;
 
+	NightOwl::ChainIK* chainIk;
+
 	SplineAnimator* splineAnimator;
+
+	IkTargetController* ikTargetController;
 
 	void InitImGui();
 

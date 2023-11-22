@@ -45,17 +45,13 @@ void TestScene::Init()
 	// Get loaded assets
 	NightOwl::Model* model = assetManager->GetModelRepository().GetAsset("Y Bot");
 	NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
-	NightOwl::Animation* shoveAnimation = assetManager->GetAnimationRepository().GetAsset("Shoved Reaction With Spin");
-	NightOwl::Animation* startWalkingAnimation = assetManager->GetAnimationRepository().GetAsset("Start Walking");
-	NightOwl::Animation* drunkWalkingTurn = assetManager->GetAnimationRepository().GetAsset("Drunk Walking Turn");
-	NightOwl::Animation* runningSlideAnimation = assetManager->GetAnimationRepository().GetAsset("Running Slide");
 	NightOwl::Animation* idle = assetManager->GetAnimationRepository().GetAsset("Standard Idle");
 	NightOwl::Animation* walk = assetManager->GetAnimationRepository().GetAsset("Standard Walk");
 	NightOwl::Animation* run = assetManager->GetAnimationRepository().GetAsset("Standard Run");
 
 
 	// Sphere IK control object
-	auto& sphereGameObject = AddGameObject("Sphere");
+	auto& sphereGameObject = AddGameObject("Target");
 
 	sphereGameObject.AddComponent<IkTargetController>();
 
@@ -66,6 +62,7 @@ void TestScene::Init()
 
 	yBotGameObject.AddComponent<NightOwl::CatmullRomSpline>();
 	yBotGameObject.AddComponent<SplineDebugger>();
+	yBotGameObject.AddComponent<SplineAnimator>();
 
 	auto* renderer = yBotGameObject.AddComponent<NightOwl::MeshRenderer>();
 	// Make sure mesh gets a copy
@@ -82,11 +79,23 @@ void TestScene::Init()
 	chain->AddJointToChain(FindWithName("mixamorig_LeftArm")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftForeArm")->GetTransform());
 	chain->AddJointToChain(FindWithName("mixamorig_LeftHand")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb1")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb2")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb3")->GetTransform());
-	// chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb4")->GetTransform());
+	chain->AddJointToChain(FindWithName("mixamorig_LeftHandThumb1")->GetTransform());
 	chain->SetTarget(sphereGameObject.GetTransform());
+
+	NightOwl::BallAndSocketConstraint shoulderConstraints;
+	shoulderConstraints.xAxisJointAngles = { 55.0f , 45.0f };
+	shoulderConstraints.zAxisJointAngles = { 90.0f , 0.0f };
+
+	NightOwl::BallAndSocketConstraint ElbowConstraints;
+	ElbowConstraints.xAxisJointAngles = { 90.0f , 90.0f };
+	ElbowConstraints.zAxisJointAngles = { 90.0f , 90.0f };
+
+	NightOwl::BallAndSocketConstraint ArmConstraints;
+	ArmConstraints.zAxisJointAngles = { 90.0f , 90.0f };
+	ArmConstraints.xAxisJointAngles = { 90.0f , 90.0f };
+	chain->SetBallAndSocketConstraintForJoint(0, shoulderConstraints);
+	chain->SetBallAndSocketConstraintForJoint(1, ArmConstraints);
+	chain->SetBallAndSocketConstraintForJoint(2, ElbowConstraints);
 
 	// Setup Blend tree
 	simple1DBlendTree = std::make_shared<NightOwl::BlendTree>();
@@ -97,15 +106,11 @@ void TestScene::Init()
 	simple1DBlendTree->SetBlendParameterXName("velocity");
 
 	auto* animator = yBotGameObject.AddComponent<NightOwl::Animator>();
-	// animator->AddMotion(shoveAnimation);
-	// animator->AddMotion(startWalkingAnimation);
-	// animator->AddMotion(drunkWalkingTurn);
-	// animator->AddMotion(runningSlideAnimation);
-	// animator->AddMotion(simple1DBlendTree.get());
-	// animator->SetCurrentMotion("simple1DBlendTree");
-	// animator->SetFloat(simple1DBlendTree->GetBlendParameterXName(), 0.0f);
+	animator->AddMotion(simple1DBlendTree.get());
+	animator->SetCurrentMotion("simple1DBlendTree");
+	animator->SetFloat(simple1DBlendTree->GetBlendParameterXName(), 0.0f);
 	animator->SetSkeleton(skeleton.GetTransform());
-	// animator->Play();
+	animator->Play();
 	
 	yBotGameObject.AddComponent<ImGuiInterface>();
 

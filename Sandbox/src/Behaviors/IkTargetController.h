@@ -12,8 +12,12 @@ public:
 
 	void SetSpeed(float speed);
 
+	void Reset();
+
 private:
 	float speed;
+
+	NightOwl::Vec3F originalLocation;
 
 	NightOwl::Transform* transform;
 };

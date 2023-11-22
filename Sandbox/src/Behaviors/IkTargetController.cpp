@@ -10,45 +10,69 @@ void IkTargetController::Start()
 
 	transform = gameObject->GetTransform();
 	transform->SetPosition({ 0.0f, 2.5f, 1.0f });
-	transform->Scale(NightOwl::Vec3F(0.05f), NightOwl::Space::Local);
+	transform->Scale(NightOwl::Vec3F(0.075f), NightOwl::Space::Local);
+	originalLocation = transform->GetPosition();
 }
 
 void IkTargetController::Update()
 {
-	const float deltaTime = NightOwl::Time::GetDeltaTime();
+	NightOwl::Vec3F directionToMoveTarget;
+
+	int leftRightHeld = 0;
+	int upDownHeld = 0;
+	int forwardBackHeld = 0;
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::W))
 	{
-		transform->Translate(transform->GetForward() * speed * deltaTime, NightOwl::Space::Local);
+		forwardBackHeld--;
+		directionToMoveTarget -= transform->GetForward() * speed;
 	}
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::S))
 	{
-		transform->Translate(transform->GetForward() * -1.0f * speed * deltaTime, NightOwl::Space::Local);
+		forwardBackHeld++;
+		directionToMoveTarget += transform->GetForward() * speed;
 	}
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::A))
 	{
-		transform->Translate(transform->GetRight() * -1.0f * speed * deltaTime, NightOwl::Space::Local);
+		leftRightHeld--;
+		directionToMoveTarget -= transform->GetRight() * speed;
 	}
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::D))
 	{
-		transform->Translate(transform->GetRight() * speed * deltaTime, NightOwl::Space::Local);
+		leftRightHeld++;
+		directionToMoveTarget += transform->GetRight() * speed;
 	}
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::Q))
 	{
-		transform->Translate(transform->GetUp() * speed * deltaTime, NightOwl::Space::Local);
+		upDownHeld++;
+		directionToMoveTarget += transform->GetUp() * speed;
 	}
 
 	if (NightOwl::Input::IsKeyHeld(NightOwl::KeyCode::E))
 	{
-		transform->Translate(transform->GetUp() * -1.0f * speed * deltaTime, NightOwl::Space::Local);
+		upDownHeld--;
+		directionToMoveTarget -= transform->GetUp() * speed;
 	}
+
+	int directionsHeld = std::abs(upDownHeld) + std::abs(forwardBackHeld) + std::abs(leftRightHeld);
+	if (directionsHeld > 1)
+	{
+		directionToMoveTarget /= static_cast<float>(directionsHeld);
+	}
+
+	transform->Translate(directionToMoveTarget * NightOwl::Time::GetDeltaTime(), NightOwl::Space::Local);
 }
 
 void IkTargetController::SetSpeed(float speed)
 {
 	this->speed = speed;
+}
+
+void IkTargetController::Reset()
+{
+	transform->SetPosition(originalLocation);
 }

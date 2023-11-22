@@ -135,7 +135,7 @@ namespace NightOwl
 	}
 
 	template <typename T>
-	std::pair<T, Vec3<T>> Quaternion<T>::GetAngleAxis()
+	std::pair<T, Vec3<T>> Quaternion<T>::GetAngleAxis() const
 	{
 		// Extract the angle
 		T angle = RadToDegrees(static_cast<T>(2) * std::acos(w));
@@ -285,7 +285,7 @@ namespace NightOwl
 		// 	T zSquared = z * z;
 		//
 		// 	angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
-		// 	angles.x = std::asin(two * singularityTest);
+		// 	angles.z = std::asin(two * singularityTest);
 		// 	angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
 		// }
 		//
@@ -336,7 +336,7 @@ namespace NightOwl
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::FromToRotation(const Vec3<T>& fromDirection, const Vec3<T>& toDirection)
+	Quaternion<T> Quaternion<T>::RotateFromTo(const Vec3<T>& fromDirection, const Vec3<T>& toDirection)
 	{
 		Vec3F fromDirectionNormalized = fromDirection.GetNormalize();
 		Vec3F toDirectionNormalized = toDirection.GetNormalize();
@@ -499,12 +499,36 @@ namespace NightOwl
 	}
 
 	template <typename T>
-	void Quaternion<T>::Decompose(const Quaternion<T>& quaternion, const Vec3<T>& direction, Quaternion<T>& outSwing, Quaternion<T>& outTwist)
+	void Quaternion<T>::Decompose(const Quaternion<T>& quaternion, const Vec3<T>& twistAxis, Quaternion<T>& outSwing, Quaternion<T>& outTwist)
 	{
-		Vec3<T> vector(quaternion.x, quaternion.y, quaternion.z);
-		Vec3<T> projection = Vec3<T>::Project(vector, direction);
+		Vec3<T> r = quaternion.vector;
 
-		outTwist = Quaternion<T>(projection.x, projection.y, projection.z, quaternion.w).Normalize();
+		// singularity: rotation by 180 degree
+		if (r.SquareMagnitude() < EPSILON)
+		{
+			Vec3<T> rotatedTwistAxis = quaternion * twistAxis;
+			Vec3<T> swingAxis = Vec3<T>::Cross(twistAxis, rotatedTwistAxis);
+
+			if (swingAxis.SquareMagnitude() > EPSILON)
+			{
+				float swingAngle = Vec3<T>::Angle(twistAxis, rotatedTwistAxis);
+				outSwing = Quaternion<T>(swingAxis, swingAngle);
+			}
+			else
+			{
+				// more singularity:
+				// rotation axis parallel to twist axis
+				outSwing = Quaternion<T>(); // no swing
+			}
+
+			// always twist 180 degree on singularity
+			outTwist = Quaternion<T>(twistAxis, 180.0f);
+			return;
+		}
+
+		Vec3<T> p = Vec3<T>::Project(r, twistAxis);
+		outTwist = Quaternion<T>(p.x, p.y, p.z, quaternion.w);
+		outTwist.Normalize();
 		outSwing = quaternion * outTwist.GetInverse();
 	}
 

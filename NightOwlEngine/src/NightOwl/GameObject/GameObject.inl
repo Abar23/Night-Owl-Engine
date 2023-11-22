@@ -11,11 +11,11 @@ namespace NightOwl
 	{
 		ENGINE_ASSERT(CheckForComponent<T>() == -1, "Game object {0} already has component {1}", name, typeid(T).name());
 
-		std::shared_ptr<Component> component = std::make_shared<T>();
-
-		componentList.push_back(component);
+		const std::shared_ptr<Component> component = std::make_shared<T>();
 
 		component->gameObject = this;
+
+		componentList.push_back(component);
 
 		// Check if new component is an owl behavior. If so, add to the owl behavior manager
 		OwlBehavior* owlBehavior = dynamic_cast<OwlBehavior*>(component.get());
@@ -24,6 +24,11 @@ namespace NightOwl
 		{
 			OwlBehaviorManagerLocator::GetOwlBehaviorManager()->AddOwlBehavior(owlBehavior);
 			owlBehaviorList.insert(owlBehavior);
+		}
+		else
+		{
+			// TODO: Create a better way to allow engine components to start up if they are dependent on components
+			component->Start();
 		}
 
 		return dynamic_cast<T*>(componentList.back().get());

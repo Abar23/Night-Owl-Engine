@@ -19,6 +19,8 @@ namespace NightOwl
 
 		Vec3F EvaluateTangentUsingArcLength(float s);
 
+		void UpdateControlPointAtIndex(int index, const Vec3F& point);
+
 		void AddControlPoint(const Vec3F& controlPoint);
 
 		void RemoveControlPointAtIndex(unsigned int index);

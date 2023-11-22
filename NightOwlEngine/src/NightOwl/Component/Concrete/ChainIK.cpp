@@ -2,10 +2,11 @@
 
 #include "ChainIK.h"
 #include "Transform.h"
+#include "NightOwl/Animation/3D/Constants.h"
 #include "NightOwl/Animation/3D/System/AnimatorSystem.h"
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
+#include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/Input/Input.h"
@@ -17,9 +18,16 @@ namespace NightOwl
 		: Component(ComponentType::ChainIK),
 		  weight(1.0f),
 		  totalChainLength(0.0f),
+		  shouldApplyJointConstraints(false),
 		  target(nullptr)
 	{
 		AnimatorSystemLocator::GetAnimatorSystem()->AddChainIk(this);
+	}
+
+	void ChainIK::Start()
+	{
+		mesh = gameObject->GetComponent<Renderer>()->GetMesh();
+		ENGINE_ASSERT(mesh != nullptr, "ChainIK component must be on the same Game Object containing the renderer.");
 	}
 
 	void ChainIK::Update()
@@ -30,27 +38,78 @@ namespace NightOwl
 			return;
 		}
 
+		const Vec3F currentTargetPosition = target->GetPosition();
+		const Vec3F currentPosition = gameObject->GetTransform()->GetPosition();
+		if ((currentTargetPosition - previousTargetPosition).SquareMagnitude() < SQUARE_EPSILON &&
+			(currentPosition - previousGameObjectPosition).SquareMagnitude() < SQUARE_EPSILON)
+		{
+			return;
+		}
+		previousTargetPosition = currentTargetPosition;
+		previousGameObjectPosition = currentPosition;
+
 		FabrikSolver();
+	}
+
+	std::shared_ptr<Component> ChainIK::Clone()
+	{
+		std::shared_ptr<ChainIK> clone = std::make_shared<ChainIK>();
+
+		clone->weight = weight;
+		clone->totalChainLength = totalChainLength;
+		clone->previousTargetPosition = previousTargetPosition;
+		clone->previousGameObjectPosition = previousGameObjectPosition;
+		clone->target = target;
+		clone->mesh = mesh;
+		clone->shouldApplyJointConstraints = shouldApplyJointConstraints;
+		clone->chain = chain;
+		clone->bindPoses = bindPoses;
+		clone->parentBoneInfo = parentBoneInfo;
+
+		return clone;
+	}
+
+	void ChainIK::SetBallAndSocketConstraintForJoint(int jointIndex, const BallAndSocketConstraint& constraints)
+	{
+		ENGINE_ASSERT(jointIndex >= 0 && jointIndex < chain.size(), "Invalid joint index for setting constraints.");
+
+		jointBallAndSocketMap[jointIndex] = constraints;
 	}
 
 	void ChainIK::AddJointToChain(Transform* joint)
 	{
 		chain.push_back(joint);
+
+		const BoneInfo& boneInfo = mesh->GetBoneInfoMap().at(joint->gameObject->GetName());
+		bindPoses.push_back(&boneInfo);
+
+		if (chain.size() > 1)
+		{
+			return;
+		}
+
+		Transform& parentTransform = joint->gameObject->GetTransform()->GetParent();
+		parentBoneInfo = &mesh->GetBoneInfoMap().at(parentTransform.GetGameObject().GetName());
 	}
 
 	void ChainIK::RemoveBackJoint()
 	{
-		if (chain.size() > 2)
+		if (chain.empty())
 		{
-			Transform* lastJoint = chain.back();
-			Transform* secondToLastJoint = chain[chain.size() - 2];
-			totalChainLength -= (lastJoint->GetPosition() - secondToLastJoint->GetPosition()).Magnitude();
+			return;
+		}
+
+		if (chain.size() > 1)
+		{
+			totalChainLength -= chainLengths.back();
+			chainLengths.pop_back();
 		}
 
 		chain.pop_back();
+		bindPoses.pop_back();
 	}
 
-	float ChainIK::GetWeight()
+	float ChainIK::GetWeight() const
 	{
 		return weight;
 	}
@@ -67,133 +126,171 @@ namespace NightOwl
 
 	void ChainIK::FabrikSolver()
 	{
-		static Vec3F prevousPos = target->GetPosition();
-		if ((target->GetPosition() - prevousPos).SquareMagnitude() < EPSILON)
+		if (fabrikPoints.size() != chain.size())
+		{
+			fabrikPoints.resize(chain.size());
+			chainLengths.resize(chain.size() - 1);
+		}
+
+		for (size_t jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
+		{
+			fabrikPoints[jointIndex] = chain[jointIndex]->GetPosition();
+
+			if (jointIndex < chain.size() - 1)
+			{
+				const float lengthOfJoint = (chain[jointIndex]->GetPosition() - chain[jointIndex + 1]->GetPosition()).Magnitude();
+				chainLengths[jointIndex] = lengthOfJoint;
+				totalChainLength += lengthOfJoint;
+			}
+		}
+
+		int numberOfIterations = MAX_FABRIK_ITERATIONS;
+
+		const float distanceToTarget = (target->GetPosition() - chain.front()->GetPosition()).Magnitude();
+		if (totalChainLength < distanceToTarget)
+		{
+			numberOfIterations = 1;
+		}
+
+		for (int iteration = 0; iteration < numberOfIterations; ++iteration)
+		{
+			Backward();
+			Forward();
+
+			const Vec3F endEffectorToTarget = target->GetPosition() - chain.back()->GetPosition();
+			if (endEffectorToTarget.SquareMagnitude() < FABRIK_TOLERANCE_SQUARED)
+			{
+				break;
+			}
+		}
+	}
+
+	void ChainIK::ApplySolveToChain()
+	{
+		if (fabrikPoints.empty())
 		{
 			return;
 		}
-		prevousPos = target->GetPosition();
 
-		std::vector<float> lengths(chain.size() - 1);
-		std::vector<Vec3F> points(chain.size());
-		for (int jointIndex = 0; jointIndex < chain.size(); ++jointIndex)
+		for (size_t jointIndex = 0; jointIndex < fabrikPoints.size() - 1; ++jointIndex)
 		{
-			points[jointIndex] = chain[jointIndex]->GetPosition();
+			Vec3F current = fabrikPoints[jointIndex];
+			Vec3F next = fabrikPoints[jointIndex + 1];
 		
-			if (jointIndex < chain.size() - 1)
-			{
-				lengths[jointIndex] = (points[jointIndex] - chain[jointIndex + 1]->GetPosition()).Magnitude();
-			}
-		}
+			Vec3F currentToNextDirection = (next - current).GetNormalize();
 		
-		for (int iteration = 0; iteration < MAX_ITERATIONS; ++iteration)
-		{
-			Backward(points, lengths);
-			Forward(points, lengths);
-		}
-
-		std::shared_ptr<Mesh> mesh = gameObject->GetComponent<Renderer>()->GetMesh();
-		auto& boneInfoMap = mesh->GetBoneInfoMap();
-		QuatF accumulatedBindPose = boneInfoMap.at(chain[0]->GetGameObject().GetName()).offsetRotation.GetInverse();
-		for (int jointIndex = 0; jointIndex < points.size() - 1; ++jointIndex)
-		{
-			Vec3F previousJoint = points[jointIndex];
-			Vec3F currentJoint = points[jointIndex + 1];
-
-			Vec3F previousToCurrentDirection = (currentJoint - previousJoint).GetNormalize();
-			QuatF currentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse();
-
-			Vec3F dir = accumulatedBindPose * Vec3F::Up();
-			QuatF toLocalFromBindPose = accumulatedBindPose.GetInverse();
-
-			QuatF rotation = QuatF::FromToRotation(toLocalFromBindPose * dir, toLocalFromBindPose * previousToCurrentDirection);
-
-			// Orientation constraints (y-axis)
-			// QuatF twist, swing;
-			// QuatF::Decompose(rotation, Vec3F::Up(), swing, twist);
-			// ENGINE_LOG_INFO("Twist angles: {0}", twist.GetEulerAngles().ToString());
-			// twist.ConstrainTwist(-1.0f, 0.0f);
-			// rotation = swing * twist;
-
-			QuatF parentBindPoseOrientation = boneInfoMap.at(chain[jointIndex]->GetParent().GetGameObject().GetName()).offsetRotation;
-
-			QuatF localBindPoseOffset = parentBindPoseOrientation * currentBindPoseOrientation;
-			accumulatedBindPose = accumulatedBindPose * rotation;
-
-			chain[jointIndex]->SetLocalRotation((jointIndex == 0) ? (localBindPoseOffset * rotation) : rotation);
+			Vec3F bindPoseDirection = chain[jointIndex]->GetRotation() * Vec3F::Up();
+			QuatF toLocalFromBindPose = chain[jointIndex]->GetRotation().GetInverse();
+		
+			QuatF rotation = QuatF::RotateFromTo(toLocalFromBindPose * bindPoseDirection, toLocalFromBindPose * currentToNextDirection);
+			QuatF localRotation = chain[jointIndex]->GetLocalRotation() * rotation;
+			localRotation = QuatF::Slerp(chain[jointIndex]->GetLocalRotation(), localRotation, weight);
+		
+			chain[jointIndex]->SetLocalRotation(localRotation.Normalize());
 			chain[jointIndex]->GetWorldMatrix();
-
-			for (int childIndex = 0; childIndex < chain[jointIndex]->GetNumberOfChildren(); childIndex++) {
+		
+			for (int childIndex = 0; childIndex < chain[jointIndex]->GetNumberOfChildren(); childIndex++)
+			{
 				Transform* childTransform = chain[jointIndex]->GetChildAtIndex(childIndex);
 				childTransform->PropagateParentTransform(chain[jointIndex]->worldVecQuatMat);
 			}
 		}
 	}
 
-	void ChainIK::Forward(std::vector<Vec3F>& points, std::vector<float>& lengths)
+	void ChainIK::EnableConstraints(bool enable)
 	{
-		std::shared_ptr<Mesh> mesh = gameObject->GetComponent<Renderer>()->GetMesh();
-		auto& boneInfoMap = mesh->GetBoneInfoMap();
+		shouldApplyJointConstraints = enable;
+	}
 
-		points.front() = chain.front()->GetPosition();
-		for (int jointIndex = 0; jointIndex < points.size() - 1; ++jointIndex)
+	bool ChainIK::AreConstraintsEnabled() const
+	{
+		return shouldApplyJointConstraints;
+	}
+
+	void ChainIK::ForceSolve()
+	{
+		FabrikSolver();
+	}
+
+	void ChainIK::Forward()
+	{
+		fabrikPoints.front() = chain.front()->GetPosition();
+		for (size_t jointIndex = 0; jointIndex < fabrikPoints.size() - 1; ++jointIndex)
 		{
-			Vec3F current = points[jointIndex];
-			Vec3F next = points[jointIndex + 1];
+			Vec3F current = fabrikPoints[jointIndex];
+			Vec3F next = fabrikPoints[jointIndex + 1];
 
-			Vec3F previousToCurrent = (next - current).GetNormalize() * lengths[jointIndex];
+			Vec3F currentToNext = (next - current).GetNormalize() * chainLengths[jointIndex];
 
-			Vec3F targetPoint = current + previousToCurrent;
+			Vec3F targetPoint = current + currentToNext;
 
 			Vec3F previous;
 			if (jointIndex == 0)
 			{
 				previous = current + (chain[jointIndex]->GetParent().GetPosition() - current);
-
+			
 			}
 			else
 			{
-				previous = points[jointIndex - 1];
+				previous = fabrikPoints[jointIndex - 1];
 			}
 
-			Vec3F constraints = Constrain(previous, current, targetPoint, boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse(), lengths[jointIndex]);
-
-
-			points[jointIndex + 1] = constraints;
+			Vec3F constraints = targetPoint;
+			if (shouldApplyJointConstraints)
+			{
+				if (jointBallAndSocketMap.contains(jointIndex))
+				{
+					constraints = ConstrainBallAndSocket(previous, current, targetPoint, chain[jointIndex]->GetParent().GetRotation(), chainLengths[jointIndex], jointIndex);
+				}
+			}
+			
+			fabrikPoints[jointIndex + 1] = constraints;
 		}
 	}
 
-	void ChainIK::Backward(std::vector<Vec3F>& points, std::vector<float>& lengths)
+	void ChainIK::Backward()
 	{
-		std::shared_ptr<Mesh> mesh = gameObject->GetComponent<Renderer>()->GetMesh();
-		auto& boneInfoMap = mesh->GetBoneInfoMap();
-
-		points.back() = target->GetPosition();
-		for (int jointIndex = points.size() - 1; jointIndex > 0; --jointIndex)
+		fabrikPoints.back() = target->GetPosition();
+		for (size_t jointIndex = fabrikPoints.size() - 1; jointIndex > 0; --jointIndex)
 		{
-			Vec3F current = points[jointIndex];
-			Vec3F next = points[jointIndex - 1];
+			Vec3F current = fabrikPoints[jointIndex];
+			Vec3F next = fabrikPoints[jointIndex - 1];
 
-			Vec3F previousToCurrent = (next - current).GetNormalize() * lengths[jointIndex - 1];
+			Vec3F currentToNext = (next - current).GetNormalize() * chainLengths[jointIndex - 1];
 
-			Vec3F targetPoint = current + previousToCurrent;
+			Vec3F targetPoint = current + currentToNext;
 
-			if (jointIndex == points.size() - 1)
+			if (jointIndex == fabrikPoints.size() - 1)
 			{
-				points[jointIndex - 1] = targetPoint;
+				fabrikPoints[jointIndex - 1] = targetPoint;
 				continue;
 			}
 
-			Vec3F previous = points[jointIndex + 1];
+			Vec3F previous = fabrikPoints[jointIndex + 1];
 
-			Vec3F constraints = Constrain(previous, current, targetPoint, boneInfoMap.at(chain[jointIndex]->GetGameObject().GetName()).offsetRotation.GetInverse(), lengths[jointIndex - 1]);
+			Vec3F constraints = targetPoint;
+			if (shouldApplyJointConstraints)
+			{
+				if (jointBallAndSocketMap.contains(jointIndex))
+				{
+					constraints = ConstrainBallAndSocket(previous, current, targetPoint, chain[jointIndex]->GetParent().GetRotation(), chainLengths[jointIndex], jointIndex);
+				}
+			}
 
-			points[jointIndex - 1] = constraints;
+			fabrikPoints[jointIndex - 1] = constraints;
 		}
 	}
 
-	Vec3F ChainIK::Constrain(const Vec3F& previousPoint, const Vec3F& currentPoint, const Vec3F& targetPoint, const QuatF& currentJointOrientation, float jointLength)
+	Vec3F ChainIK::ConstrainBallAndSocket(const Vec3F& previousPoint, 
+										  const Vec3F& currentPoint,
+										  const Vec3F& targetPoint, 
+										  const QuatF& currentJointOrientation, 
+										  float jointLength,
+										  int jointIndex) const
 	{
+		// Ellipsoidal ball and socket
+		const BallAndSocketConstraint& constraints = jointBallAndSocketMap.at(jointIndex);
+
 		// calculate unit line from previous to current point
 		Vec3F unitPreviousToCurrent = (currentPoint - previousPoint).Normalize();
 
@@ -203,42 +300,45 @@ namespace NightOwl
 		// calculate distance from current point to center of cone
 		float distanceToCenterOfCone = Vec3F::Dot(unitPreviousToCurrent, targetDirection);
 
-		// Target is behind the current point, must stretch to max limit
-		// Need to determine quadrant to grab proper angle
-		if ((distanceToCenterOfCone < 0.0f || NearEquals(distanceToCenterOfCone, 0.0f)))
+		Vec3F updatedTargetPoint = targetPoint;
+		if (distanceToCenterOfCone < 0.0f)
 		{
-			QuatF toTargetRotation = QuatF::FromToRotation(unitPreviousToCurrent, targetDirection);
-			std::pair<float, Vec3F> angleAxis = toTargetRotation.GetAngleAxis();
+			Vec3F projectionAlongConeCenter = Vec3F::Project(targetPoint - currentPoint, unitPreviousToCurrent);
+			updatedTargetPoint -= 2.0f * projectionAlongConeCenter;
+			distanceToCenterOfCone *= -1.0f;
+			targetDirection = updatedTargetPoint - currentPoint;
+		}
 
-			QuatF correctionRotation(angleAxis.second, 30.0f);
-
-			return currentPoint + correctionRotation * unitPreviousToCurrent * jointLength;
+		if (NearEquals(distanceToCenterOfCone, 0.0f))
+		{
+			// don't allow this value to go zero, otherwise will produce nan values down below
+			distanceToCenterOfCone = 0.1f;
 		}
 
 		// calculate center of cone from current point to target using projection
 		Vec3F centerOfCone = currentPoint + unitPreviousToCurrent * distanceToCenterOfCone;
 
 		// calculate lengths of ellipsoidal bounds on the conical region of the cone
-		float ellipsoidalNegativeZ = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f)); // replace 50 with actual angle constraints
-		float ellipsoidalPositiveZ = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
-		float ellipsoidalNegativeX = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
-		float ellipsoidalPositiveX = distanceToCenterOfCone * std::tan(DegreesToRad(30.0f));
+		float ellipsoidalNegativeZ = distanceToCenterOfCone * std::tan(DegreesToRad(constraints.zAxisJointAngles.min));
+		float ellipsoidalPositiveZ = distanceToCenterOfCone * std::tan(DegreesToRad(constraints.zAxisJointAngles.max));
+		float ellipsoidalNegativeX = distanceToCenterOfCone * std::tan(DegreesToRad(constraints.xAxisJointAngles.min));
+		float ellipsoidalPositiveX = distanceToCenterOfCone * std::tan(DegreesToRad(constraints.xAxisJointAngles.max));
 
 		// get target position in cross section of the cone
-		Vec3F centerOfConeToTarget = targetPoint - centerOfCone;
+		Vec3F centerOfConeToTarget = updatedTargetPoint - centerOfCone;
 		Vec3F unitCenterOfConeToTarget = centerOfConeToTarget.GetNormalize();
 
 		// joint reference axes for cross section of cone
-		QuatF toRotation = QuatF::FromToRotation(currentJointOrientation * Vec3F::Up(), unitPreviousToCurrent * -1.0f);
+		QuatF toRotation = QuatF::RotateFromTo(currentJointOrientation * Vec3F::Up(), unitPreviousToCurrent * -1.0f);
 		Vec3F zReferenceAxis = toRotation * Vec3F::Forward();
-		Vec3F yReferenceAxis = toRotation * Vec3F::Up();
+		Vec3F yReferenceAxis = toRotation * Vec3F::Right();
 
 		// get components of center of cone to target direction vector using reference axes
 		float upComponent = Vec3F::Dot(centerOfConeToTarget, yReferenceAxis);
 		float rightComponent = Vec3F::Dot(centerOfConeToTarget, zReferenceAxis);
 
 		// get quadrant target is located within the cone cross section
-		int quadrant;
+		int quadrant = 1;
 		if (upComponent > 0.0f && rightComponent >= 0.0f)
 		{
 			quadrant = 1;
@@ -254,6 +354,14 @@ namespace NightOwl
 		else if (upComponent <= 0.0f && rightComponent > 0.0f)
 		{
 			quadrant = 4;
+		}
+
+		// Target is behind the current point, must stretch to max limit
+		// Need to determine quadrant to grab proper angle
+		bool isBehindConeCrossSection = false;
+		if (distanceToCenterOfCone < 0.0f)
+		{
+			isBehindConeCrossSection = true;
 		}
 
 		// check if target is in cross section of cone
@@ -279,7 +387,7 @@ namespace NightOwl
 			isInConeCrossSection = true;
 		}
 
-		if (isInConeCrossSection)
+		if (isInConeCrossSection && isBehindConeCrossSection == false)
 		{
 			if (Vec3F::Dot(unitPreviousToCurrent, targetDirection) < 0.0f)
 			{
@@ -287,7 +395,7 @@ namespace NightOwl
 				return currentPoint + (targetDirection.Negate() + 2.0f * unitCenterOfConeToTarget * distanceFromConeCenterToTarget);
 			}
 
-			return  targetPoint;
+			return  updatedTargetPoint;
 		}
 
 		// Target is outside of cross section, get nearest point on ellipsoidal region of cross section
@@ -328,7 +436,8 @@ namespace NightOwl
 		float distanceToNearestPoint = nearestPoint.Magnitude();
 		Vec3F nearestPointOnEllipsoid = centerOfCone + unitCenterOfConeToTarget * distanceToNearestPoint;
 		Vec3F currentToNearestEllipsoidalPoint = nearestPointOnEllipsoid - currentPoint;
-		Vec3F updatedTargetPoint = currentPoint + currentToNearestEllipsoidalPoint.Normalize() * jointLength;
+		updatedTargetPoint = currentPoint + currentToNearestEllipsoidalPoint.GetNormalize() * jointLength;
+
 		return updatedTargetPoint;
 	}
 
@@ -350,5 +459,6 @@ namespace NightOwl
 
 	void ChainIK::Remove()
 	{
+		AnimatorSystemLocator::GetAnimatorSystem()->RemoveChainIk(this);
 	}
 }

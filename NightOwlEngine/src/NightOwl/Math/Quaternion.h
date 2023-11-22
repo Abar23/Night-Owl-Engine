@@ -4,6 +4,8 @@
 
 namespace NightOwl
 {
+	template <typename T> class Vec3;
+
 	template <typename T> class Vec4;
 
 	template <typename T> class Mat3;
@@ -18,6 +20,13 @@ namespace NightOwl
 			{
 				T x, y, z, w;
 			};
+
+			struct
+			{
+				Vec3<T> vector;
+				T imaginary;
+			};
+
 
 			Vec4<T> components;
 		};
@@ -52,7 +61,7 @@ namespace NightOwl
 
 		Mat3<T> GetRotationMatrix() const;
 
-		std::pair<T, Vec3<T>> GetAngleAxis();
+		std::pair<T, Vec3<T>> GetAngleAxis() const;
 
 		void ConstrainTwist(T minAngleInDegrees, T maxAngleInDegrees);
 
@@ -66,7 +75,7 @@ namespace NightOwl
 
 		static T Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 
-		static Quaternion<T> FromToRotation(const Vec3<T>& fromDirection, const Vec3<T>& toDirection);
+		static Quaternion<T> RotateFromTo(const Vec3<T>& fromDirection, const Vec3<T>& toDirection);
 
 		static Quaternion<T> LookAt(const Vec3<T>& direction);
 
@@ -88,7 +97,7 @@ namespace NightOwl
 
 		static Quaternion<T> Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 
-		static void Decompose(const Quaternion<T>& quaternion, const Vec3<T>& direction, Quaternion<T>& outSwing, Quaternion<T>& outTwist);
+		static void Decompose(const Quaternion<T>& quaternion, const Vec3<T>& twistAxis, Quaternion<T>& outSwing, Quaternion<T>& outTwist);
 
 		Quaternion<T>& operator=(const Quaternion<T>& quaternion);
 

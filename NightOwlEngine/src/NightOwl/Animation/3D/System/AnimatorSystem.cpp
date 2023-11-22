@@ -42,6 +42,24 @@ namespace NightOwl
 		chainIkComponents.push_back(chainIk);
 	}
 
+	void AnimatorSystem::RemoveChainIk(const ChainIK* chainIkToFind)
+	{
+		int chainIkIndex = 0;
+		for (const auto& chainIk : chainIkComponents)
+		{
+			if (chainIk == chainIkToFind)
+			{
+				break;
+			}
+			chainIkIndex++;
+		}
+
+		if (chainIkIndex != chainIkComponents.size())
+		{
+			chainIkComponents.erase(chainIkComponents.begin() + chainIkIndex);
+		}
+	}
+
 	void AnimatorSystem::AddAnimator(Animator* animator)
 	{
 		animators.push_back(animator);
