@@ -22,6 +22,8 @@ namespace NightOwl
 
 		virtual void FixedUpdate() { }
 
+		virtual void LateUpdate() { }
+
 		virtual void OnEnable() { }
 
 		virtual void OnDisable() { }

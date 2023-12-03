@@ -2,8 +2,9 @@
 
 #include "AnimatorSystem.h"
 #include "NightOwl/Animation/Types/AnimatorUpdateMode.h"
-#include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Component/Concrete/Animator.h"
+#include "NightOwl/Component/Concrete/ChainIK.h"
+#include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl
 {
@@ -17,6 +18,11 @@ namespace NightOwl
 				animator->Update();
 			}
 		}
+
+		for (const auto& chainIkComponent : chainIkComponents)
+		{
+			chainIkComponent->Update();
+		}
 	}
 
 	void AnimatorSystem::FixedUpdate()
@@ -28,6 +34,29 @@ namespace NightOwl
 			{
 				animator->Update();
 			}
+		}
+	}
+
+	void AnimatorSystem::AddChainIk(ChainIK* chainIk)
+	{
+		chainIkComponents.push_back(chainIk);
+	}
+
+	void AnimatorSystem::RemoveChainIk(const ChainIK* chainIkToFind)
+	{
+		int chainIkIndex = 0;
+		for (const auto& chainIk : chainIkComponents)
+		{
+			if (chainIk == chainIkToFind)
+			{
+				break;
+			}
+			chainIkIndex++;
+		}
+
+		if (chainIkIndex != chainIkComponents.size())
+		{
+			chainIkComponents.erase(chainIkComponents.begin() + chainIkIndex);
 		}
 	}
 

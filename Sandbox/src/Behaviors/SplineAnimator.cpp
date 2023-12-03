@@ -1,80 +1,112 @@
 #include "SplineAnimator.h"
 
+#include "NightOwl/Component/Concrete/ChainIK.h"
+#include "NightOwl/Core/Application/Scene.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 
 void SplineAnimator::Awake()
 {
-	t = 0.0f;
-	previousT = 0.0f;
-	shouldPlay = true;
+	speedFactor = 0.25f;
+	distanceToMinSpeed = 1.0f;
+	distanceToMaxSpeed = 3.0f;
+	maxSpeed = 1.0f;
+	chainIkWeightSpeed = 1.25f;
+	wasReset = false;
 
 	splineComponent = gameObject->GetComponent<NightOwl::CatmullRomSpline>();
 	transform = gameObject->GetTransform();
 	animator = gameObject->GetComponent<NightOwl::Animator>();
+	chain = gameObject->GetComponent<NightOwl::ChainIK>();
+	target = gameObject->GetScene()->FindWithName("Target")->GetTransform();
 }
 
 void SplineAnimator::Start()
 {
-	constexpr int numPoints = 10;
-	for (int i = 0; i <= numPoints; ++i) 
-	{
-		const float angleRadians = NightOwl::DegreesToRad(i * (360.0f / numPoints));
+	const NightOwl::Vec3F playerPosition = transform->GetPosition();
+	const NightOwl::Vec3F targetPosition = { target->GetPosition().x, 0, target->GetPosition().z };
 
-		const float x = std::cos(angleRadians) * 10.f;
-		const float z = std::sin(angleRadians) * 10.f;
+	splineComponent->AddControlPoint({ playerPosition.x, 0, playerPosition.z });
+	splineComponent->AddControlPoint(targetPosition);
 
-		splineComponent->AddControlPoint(NightOwl::Vec3F(x, 0.1f, z));
-	}
-
-	splineComponent->ShouldLoop(true);
+	chain->SetWeight(0.0f);
 }
 
 void SplineAnimator::Update()
 {
-	if (shouldPlay == false)
+	UpdatePath();
+
+	AnimateChainToTarget();
+
+	MoveCharacter();
+
+	if (wasReset)
 	{
-		return;
+		chain->ForceSolve();
+		wasReset = false;
 	}
+}
 
-	previousPoint = transform->GetPosition();
-	previousT = t;
-	t += NightOwl::Time::GetDeltaTime();
-	if (t > 11.0f)
-	{
-		previousT = 0.0f;
-		t = NightOwl::Time::GetDeltaTime();
-	}
-
-	if (t > 10.0f)
-	{
-		return;
-	}
-
-	const float s = NightOwl::SinEaseInEaseOutWithConstantVelocity(t, 10.0f, 3.0f, 6.0f);
-
-	const NightOwl::Vec3F currentPoint = splineComponent->EvaluateUsingArcLength(s);
-	transform->SetPosition(currentPoint);
-
-	const NightOwl::Vec3F tangent = splineComponent->EvaluateTangentUsingArcLength(s);
-	transform->LookAt(transform->GetPosition() + tangent);
-
-	const NightOwl::Vec3F velocity = (transform->GetPosition() - previousPoint) / (t - previousT);
-	animator->SetFloat("velocity", velocity.Magnitude() * 0.1f);
+void SplineAnimator::LateUpdate()
+{
+	chain->ApplySolveToChain();
 }
 
 void SplineAnimator::Reset()
 {
-	t = 0.0f;
-	transform->SetPosition(splineComponent->EvaluateUsingParameter(0));
+	transform->SetPosition(NightOwl::Vec3F::Zero());
+	chain->SetWeight(0);
+	wasReset = true;
 }
 
-void SplineAnimator::Play()
+void SplineAnimator::UpdatePath()
 {
-	shouldPlay = true;
+	playerPosition = transform->GetPosition();
+	targetPosition = { target->GetPosition().x, 0, target->GetPosition().z };
+
+	splineComponent->UpdateControlPointAtIndex(0, { playerPosition.x, 0, playerPosition.z });
+	splineComponent->UpdateControlPointAtIndex(1, targetPosition);
 }
 
-void SplineAnimator::Pause()
+void SplineAnimator::MoveCharacter()
 {
-	shouldPlay = false;
+	float distanceFromPlayerToTarget = splineComponent->GetArcLength();
+	float speed = maxSpeed;
+	if (distanceFromPlayerToTarget < distanceToMaxSpeed)
+	{
+		speed = NightOwl::MapValueInRange(distanceFromPlayerToTarget, distanceToMinSpeed, distanceToMaxSpeed, 0.0f, maxSpeed);
+	}
+
+	float distanceToTravelAlongSpline = speed * NightOwl::Time::GetDeltaTime();
+
+	const NightOwl::Vec3F currentPoint = splineComponent->EvaluateUsingArcLength(distanceToTravelAlongSpline);
+	transform->SetPosition(currentPoint);
+
+	const NightOwl::Vec3F tangent = splineComponent->EvaluateTangentUsingArcLength(distanceToTravelAlongSpline);
+	transform->LookAt(transform->GetPosition() + tangent);
+
+	animator->SetFloat("velocity", speed * speedFactor);
+}
+
+void SplineAnimator::AnimateChainToTarget()
+{
+	const float distanceFromPlayerToTarget = splineComponent->GetArcLength();
+	if (distanceFromPlayerToTarget < 1.4f)
+	{
+		float currentVelocity = animator->GetFloat("velocity");
+		if (currentVelocity > NightOwl::EPSILON)
+		{
+			currentVelocity *= 0.5f;
+			animator->SetFloat("velocity", currentVelocity);
+		}
+
+		const float currentWeight = chain->GetWeight();
+		const float newWeight = NightOwl::Lerp(currentWeight, 1.0f, chainIkWeightSpeed * NightOwl::Time::GetDeltaTime());
+		chain->SetWeight(newWeight);
+		return;
+	}
+
+	const float currentWeight = chain->GetWeight();
+	const float newWeight = NightOwl::Lerp(currentWeight, 0.0f, chainIkWeightSpeed * NightOwl::Time::GetDeltaTime());
+	chain->SetWeight(newWeight);
 }

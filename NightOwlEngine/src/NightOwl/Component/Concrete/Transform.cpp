@@ -51,6 +51,27 @@ namespace NightOwl
 		}
 	}
 
+	void Transform::Rotate(const QuatF& rotation, Space space)
+	{
+		if (parent == nullptr || space == Space::Local)
+		{
+			localVecQuatMat.quaternion = localVecQuatMat.quaternion * rotation;
+
+			localVecQuatMat.quaternion.Renormalize();
+
+			SetLocalDirtyFlag();
+
+		}
+		else if (space == Space::World)
+		{
+			worldOffsetVecQuatMat.quaternion = worldOffsetVecQuatMat.quaternion * rotation;
+
+			worldOffsetVecQuatMat.quaternion.Renormalize();
+
+			SetWorldDirtyFlag();
+		}
+	}
+
 	void Transform::Rotate(float angleX, float angleY, float angleZ, Space space)
 	{
 		const Vec3F eulers(angleX, angleY, angleZ);
@@ -62,7 +83,7 @@ namespace NightOwl
 	{
 		if (parent == nullptr || space == Space::Local)
 		{
-			localVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(eulers) * localVecQuatMat.quaternion;
+			localVecQuatMat.quaternion =  localVecQuatMat.quaternion * QuatF::MakeRotationFromEulers(eulers);
 
 			localVecQuatMat.quaternion.Renormalize();
 
@@ -71,7 +92,7 @@ namespace NightOwl
 		}
 		else if (space == Space::World)
 		{
-			worldOffsetVecQuatMat.quaternion = QuatF::MakeRotationFromEulers(eulers) * worldOffsetVecQuatMat.quaternion;
+			worldOffsetVecQuatMat.quaternion = worldOffsetVecQuatMat.quaternion * QuatF::MakeRotationFromEulers(eulers);
 
 			worldOffsetVecQuatMat.quaternion.Renormalize();
 
@@ -125,6 +146,11 @@ namespace NightOwl
 	const Vec3F Transform::GetLocalEulerAngles()
 	{
 		return localVecQuatMat.GetRotation().GetEulerAngles();
+	}
+
+	const QuatF Transform::GetLocalRotation()
+	{
+		return localVecQuatMat.quaternion;
 	}
 
 	void Transform::SetLocalRotation(const QuatF& rotation)
@@ -189,9 +215,10 @@ namespace NightOwl
 				inverseOfOriginalParentLocalVecQuatMat = parent->localVecQuatMat.GetInverse();
 			}
 
+			parent->GetWorldMatrix();
 			for (const auto& childTransform : parentTransform->children)
 			{
-				childTransform->PropagateParentLocalTransform(parent->localVecQuatMat);
+				childTransform->PropagateParentTransform(parent->worldVecQuatMat);
 			}
 
 			if (gameObject->GetScene() != nullptr)
@@ -310,16 +337,17 @@ namespace NightOwl
 		(space == Space::Local) ? SetLocalDirtyFlag() : SetWorldDirtyFlag();
 	}
 
-	void Transform::PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform)
+	void Transform::PropagateParentTransform(const VecQuatMatF& parentLocalTransform)
 	{
 		this->parentLocalVecQuatMat = parentLocalTransform;
 
+		SetWorldDirtyFlag();
+
 		for (const auto& childTransform : this->children)
 		{
-			childTransform->PropagateParentLocalTransform(parentLocalTransform * this->localVecQuatMat);
+			GetWorldMatrix();
+			childTransform->PropagateParentTransform(this->worldVecQuatMat);
 		}
-
-		SetWorldDirtyFlag();
 	}
 
 	void Transform::Remove()
@@ -343,7 +371,6 @@ namespace NightOwl
 		}
 
 		worldOffsetVecQuatMat.quaternion = newRotation.GetNormalize();
-
 		isWorldDirty = true;
 	}
 
@@ -355,19 +382,25 @@ namespace NightOwl
 
 	void Transform::SetPosition(const Vec3F& worldPosition)
 	{
-		if(parent != nullptr)
-		{
-			// Add to the local position the world offset of the desired position coming in
-			Vec3F worldOffset = worldPosition - GetPosition();
-			// Apply rotation to the offset so that it is aligned with the local position axes
-			localVecQuatMat.vector += GetWorldMatrix().GetRotationMatrix() * localVecQuatMat.quaternion.GetRotationMatrix().GetInverse() * worldOffset;
-		}
-		else
+		if(parent == nullptr)
 		{
 			localVecQuatMat.vector = worldPosition;
+			isLocalDirty = true;
+			return;
 		}
 
-		isLocalDirty = true;
+		// Add to the local position the world offset of the desired position coming in
+		const Vec3F worldOffset = worldPosition - (GetPosition() - worldOffsetVecQuatMat.vector);
+
+		// if (worldOffset.Magnitude() < EPSILON)
+		// {
+		// 	return;
+		// }
+
+		// Apply rotation to the offset so that it is aligned with the local position axes
+		worldOffsetVecQuatMat.vector = worldOffset;//+= GetWorldMatrix().GetRotationMatrix() * localVecQuatMat.quaternion.GetRotationMatrix().GetInverse() * worldOffset;
+
+		isWorldDirty = true;
 	}
 
 	bool Transform::HasParent() const
@@ -395,7 +428,7 @@ namespace NightOwl
 		return GetRotation() * Vec3F::Up();
 	}
 
-	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */)
+	void Transform::Clone(const Transform& transformToClone, Scene* currentScene /* = nullptr */, Transform* parent /* = nullptr */)
 	{
 		localModelMatrix = transformToClone.localModelMatrix;
 		worldMatrix = transformToClone.worldMatrix;
@@ -404,20 +437,14 @@ namespace NightOwl
 		localVecQuatMat = transformToClone.localVecQuatMat;
 		worldOffsetVecQuatMat = transformToClone.worldOffsetVecQuatMat;
 		root = transformToClone.root;
-		parent = transformToClone.parent;
+		this->parent = parent;
 
 		isLocalDirty = transformToClone.isLocalDirty;
 		isWorldDirty = transformToClone.isWorldDirty;
 
-		// TODO: Figure out if this is needed
-		// if(parent != nullptr)
-		// {
-		// 	parent->SetChild(this);
-		// }
-
 		for (auto& transform : transformToClone.children)
 		{
-			const auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr);
+			const auto clonedChild = transform->GetGameObject().Clone(currentScene ? currentScene : nullptr, this);
 			children.push_back(clonedChild->GetTransform());
 		}
 	}

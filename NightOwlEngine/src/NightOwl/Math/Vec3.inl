@@ -47,7 +47,10 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T> Vec3<T>::GetNormalize() const
 	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
+		if (NearEquals(Magnitude(), static_cast<T>(0)))
+		{
+			return Vec3F();
+		}
 
 		T inverseMagnitude = static_cast<T>(1) / Magnitude();
 
@@ -57,7 +60,14 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T>& Vec3<T>::Normalize()
 	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
+		if (NearEquals(Magnitude(), static_cast<T>(0)))
+		{
+			this->x = static_cast<T>(0);
+			this->y = static_cast<T>(0);
+			this->z = static_cast<T>(0);
+
+			return *this;
+		}
 
 		*this /= Magnitude();
 
@@ -113,6 +123,14 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	T Vec3<T>::Angle(const Vec3<T>& leftVector, const Vec3<T>& rightVector)
+	{
+		const float dot = Vec3F::Dot(leftVector, rightVector);
+		const float determinant = Vec3F::Cross(leftVector, rightVector).Magnitude();
+		return RadToDegrees(std::atan2(determinant, dot));
+	}
+
+	template <typename T>
 	Vec3<T> Vec3<T>::Max(const Vec3<T>& leftVector, const Vec3<T>& rightVector)
 	{
 		return Vec3<T>(std::max(leftVector.x, rightVector.x), std::max(leftVector.y, rightVector.y), std::max(leftVector.z, rightVector.z));
@@ -135,6 +153,11 @@ namespace NightOwl
 	template <typename T>
 	Vec3<T> Vec3<T>::Project(const Vec3& leftVector, const Vec3& rightVector)
 	{
+		if (NearEquals(Dot(rightVector, rightVector), 0.0f))
+		{
+			return Vec3<T>::Zero();
+		}
+
 		return rightVector * (Dot(leftVector, rightVector) / Dot(rightVector, rightVector));
 	}
 

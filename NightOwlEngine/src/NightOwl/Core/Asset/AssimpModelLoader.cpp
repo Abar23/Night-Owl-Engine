@@ -224,7 +224,14 @@ namespace NightOwl
 				BoneInfo boneInfo;
 				boneId = modelMesh->boneInfoMap.size();
 				boneInfo.id = boneId;
+
+				aiVector3D scale;
+				aiVector3D position;
+				aiQuaternion rotation;
+				bone->mOffsetMatrix.Decompose(scale, rotation, position);
 				boneInfo.offsetMatrix = Utility::AssimpMat4ToNightOwlMat4F(bone->mOffsetMatrix);
+				boneInfo.offsetRotation = Utility::AssimpQuaternionToNightOwlQuatF(rotation);
+
 				modelMesh->boneInfoMap[boneName] = boneInfo;
 			}
 			else

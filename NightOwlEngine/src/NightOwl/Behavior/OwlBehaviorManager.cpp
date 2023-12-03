@@ -124,9 +124,23 @@ namespace NightOwl
 
 	void OwlBehaviorManager::FixedUpdate()
 	{
-		for (auto& behaviorsToUpdate : owlBehaviorsToUpdate)
+		for (auto& owlBehavior : owlBehaviorsToUpdate)
 		{
-			behaviorsToUpdate->FixedUpdate();
+			if (owlBehavior->state == OwlBehaviorState::Update && owlBehavior->IsActiveAndEnabled())
+			{
+				owlBehavior->FixedUpdate();
+			}
+		}
+	}
+
+	void OwlBehaviorManager::LateUpdate()
+	{
+		for (auto& owlBehavior : owlBehaviorsToUpdate)
+		{
+			if (owlBehavior->state == OwlBehaviorState::Update && owlBehavior->IsActiveAndEnabled())
+			{
+				owlBehavior->LateUpdate();
+			}
 		}
 	}
 }

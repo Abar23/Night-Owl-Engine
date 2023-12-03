@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MathFunctions.h"
 #include "Swizzle.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
 
@@ -176,6 +177,8 @@ namespace NightOwl
 		const std::string ToString() const;
 
 		static T Dot(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
+
+		static T Angle(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 
 		static Vec3<T> Max(const Vec3<T>& leftVector, const Vec3<T>& rightVector);
 

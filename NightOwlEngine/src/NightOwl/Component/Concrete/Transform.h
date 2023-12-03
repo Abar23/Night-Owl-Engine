@@ -10,6 +10,8 @@ namespace NightOwl
 {
 	class Scene;
 
+	class ChainIK;
+
 	class Transform : public Component
 	{
 	public:
@@ -27,11 +29,15 @@ namespace NightOwl
 
 		void SetLocalScale(const Vec3F& scale);
 
+		void Rotate(const QuatF& rotation, Space space);
+
 		void Rotate(float angleX, float angleY, float angleZ, Space space);
 
 		void Rotate(const Vec3F& eulers, Space space);
 
 		const Vec3F GetLocalEulerAngles();
+
+		const QuatF GetLocalRotation();
 
 		void SetLocalRotation(const QuatF& rotation);
 
@@ -85,7 +91,7 @@ namespace NightOwl
 
 		Vec3F GetUp();
 
-		void Clone(const Transform& transformToClone, Scene* currentScene = nullptr);	
+		void Clone(const Transform& transformToClone, Scene* currentScene = nullptr, Transform* parent = nullptr);
 
 		REFLECT()
 
@@ -112,6 +118,8 @@ namespace NightOwl
 
 		friend class Scene;
 
+		friend class ChainIK;
+
 		bool isLocalDirty;
 
 		bool isWorldDirty;
@@ -122,7 +130,7 @@ namespace NightOwl
 
 		void SetFlagBasedOnSpace(Space space);
 
-		void PropagateParentLocalTransform(const VecQuatMatF& parentLocalTransform);
+		void PropagateParentTransform(const VecQuatMatF& parentLocalTransform);
 
 		void Remove() override;
 	};

@@ -80,12 +80,12 @@ namespace NightOwl
 				owlBehaviorManager.FixedUpdate();
 			
 				physicsEngine2D.Update();
-			
-				sceneManager.Update();
-			
-				audioSystem.Update();
-			
+
 				animatorSystem.FixedUpdate();
+
+				sceneManager.Update();
+
+				audioSystem.Update();
 			}
 
 			if (Time::ShouldRenderFrame())
@@ -96,6 +96,8 @@ namespace NightOwl
 				owlBehaviorManager.Update();
 
 				animatorSystem.Update();
+
+				owlBehaviorManager.LateUpdate();
 
 				sceneManager.Update();
 

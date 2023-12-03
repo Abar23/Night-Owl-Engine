@@ -124,6 +124,15 @@ namespace NightOwl
 		return EvaluateTangentUsingParameter(u + static_cast<float>(curveIndex)).Normalize();
 	}
 
+	void CatmullRomSpline::UpdateControlPointAtIndex(int index, const Vec3F& point)
+	{
+		ENGINE_ASSERT(index >= 0 && index < controlPoints.size(), "Trying to retrieve control point with invalid index!");
+
+		controlPoints[index] = point;
+
+		UpdateStartAndEndPoint();
+	}
+
 	void CatmullRomSpline::AddControlPoint(const Vec3F& controlPoint)
 	{
 		controlPoints.push_back(controlPoint);

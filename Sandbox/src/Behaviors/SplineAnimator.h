@@ -14,25 +14,41 @@ public:
 
 	void Update() override;
 
+	void LateUpdate() override;
+
 	void Reset();
 
-	void Play();
-
-	void Pause();
-
 private:
-	NightOwl::Vec3F previousPoint;
+	float speedFactor;
 
-	float t;
+	float maxSpeed;
 
-	float previousT;
+	float distanceToMinSpeed;
 
-	bool shouldPlay;
+	float distanceToMaxSpeed;
+
+	float chainIkWeightSpeed;
+
+	bool wasReset;
 
 	NightOwl::CatmullRomSpline* splineComponent;
 
 	NightOwl::Transform* transform;
 
 	NightOwl::Animator* animator;
+
+	NightOwl::ChainIK* chain;
+
+	NightOwl::Transform* target;
+
+	NightOwl::Vec3F playerPosition;
+
+	NightOwl::Vec3F targetPosition;
+
+	void UpdatePath();
+
+	void MoveCharacter();
+
+	void AnimateChainToTarget();
 };
 

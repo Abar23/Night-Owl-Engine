@@ -3,8 +3,8 @@
 #include "MathFunctions.h"
 #include "Mat3.h"
 #include "Vec4.h"
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace NightOwl
 {
@@ -135,6 +135,65 @@ namespace NightOwl
 	}
 
 	template <typename T>
+	std::pair<T, Vec3<T>> Quaternion<T>::GetAngleAxis() const
+	{
+		// Extract the angle
+		T angle = RadToDegrees(static_cast<T>(2) * std::acos(w));
+
+		// Calculate the sine of the angle
+		T sinAngle = std::sqrt(static_cast<T>(1) - w * w);
+
+		// Handle the case when the angle is close to zero
+		if (std::abs(sinAngle) < EPSILON) {
+			// When close to zero, use a small angle approximation to avoid division by zero
+			return { static_cast<T>(0), Vec3<T>::Zero() };
+		}
+
+		// Calculate the axis components
+		T inverseSinAngle = static_cast<T>(1) / sinAngle;
+		Vec3<T> rotationAxis(x, y, z);
+		rotationAxis *= inverseSinAngle;
+
+		return { angle, rotationAxis };
+	}
+
+	template <typename T>
+	void Quaternion<T>::ConstrainTwist(T minAngleInDegrees, T maxAngleInDegrees)
+	{
+		// // Normalize the quaternion while constraining the twist in the y-axis direction
+		// //T magnitude = Norm();
+		//
+		// T minAngleInRad = DegreesToRad(minAngleInDegrees);
+		// T maxAngleInRad = DegreesToRad(maxAngleInDegrees);
+		//
+		// // Adjust the y-component while maintaining the direction
+		// T inverseMagnitude = static_cast<T>(1) / magnitude;
+		// w *= inverseMagnitude;
+		// x *= inverseMagnitude;
+		// y = std::max(maxAngleInRad, std::min(minAngleInRad, y * inverseMagnitude)); // Constrain y-component
+		// z *= inverseMagnitude;
+
+		T magnitude = std::sin(DegreesToRad(maxAngleInDegrees) / static_cast<T>(2));
+		T squareMagnitude = magnitude * magnitude;
+		
+		Vec3F vector(x, y, z);
+		
+		if (vector.SquareMagnitude() > squareMagnitude)
+		{
+			vector = vector.GetNormalize() * magnitude;
+		
+			x = vector.x;
+			y = vector.y;
+			z = vector.z;
+		
+			T signOfW = std::signbit(w) == 0 ? static_cast<T>(1) : static_cast<T>(-1);
+		
+			w = std::sqrt(static_cast<T>(1) - squareMagnitude) * signOfW;
+		}
+	}
+
+
+	template <typename T>
 	void Quaternion<T>::SetOrthogonalRotationMatrix(const Mat3<T>& matrix)
 	{
 		T m00 = matrix(0, 0);
@@ -204,36 +263,54 @@ namespace NightOwl
 	{
 		Vec3<T> angles;
 
-		T singularityTest = x * y + z * w;
+		// T singularityTest = x * y + z * w;
+		//
+		// T one = static_cast<T>(1);
+		// T two = static_cast<T>(2);
+		//
+		// if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
+		// {
+		// 	angles.y = two * std::atan2(x, w);
+		// 	angles.z = static_cast<T>(FLOAT_PI) / two;
+		// }
+		// else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
+		// {
+		// 	angles.y = -two * std::atan2(x, w);
+		// 	angles.z = static_cast<T>(-FLOAT_PI) / two;
+		// }
+		// else
+		// {
+		// 	T xSquared = x * x;
+		// 	T ySquared = y * y;
+		// 	T zSquared = z * z;
+		//
+		// 	angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
+		// 	angles.z = std::asin(two * singularityTest);
+		// 	angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
+		// }
+		//
+		// angles.x = RadToDegrees(angles.x);
+		// angles.y = RadToDegrees(angles.y);
+		// angles.z = RadToDegrees(angles.z);
 
-		T one = static_cast<T>(1);
-		T two = static_cast<T>(2);
-
-		if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
-		{
-			angles.y = two * std::atan2(x, w);
-			angles.z = static_cast<T>(FLOAT_PI) / two;
-		}
-		else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
-		{
-			angles.y = -two * std::atan2(x, w);
-			angles.z = -static_cast<T>(FLOAT_PI) / two;
-		}
+		// Roll (x-axis rotation)
+		T sinRoll = 2.0f * (w * x + y * z);
+		T cosRoll = 1.0f - 2.0f * (x * x + y * y);
+		angles.x = RadToDegrees(std::atan2(sinRoll, cosRoll));
+		
+		// Pitch (y-axis rotation)
+		T sinPitch = 2.0f * (w * y - z * x);
+		// Handle special cases to avoid undefined behavior with atan2
+		if (std::abs(sinPitch) >= static_cast<T>(1))
+			angles.y = RadToDegrees(std::copysign(static_cast<T>(FLOAT_PI) / static_cast<T>(2), sinPitch));
 		else
-		{
-			T xSquared = x * x;
-			T ySquared = y * y;
-			T zSquared = z * z;
-
-			angles.y = std::atan2(two * y * w - two * x * z, one - two * ySquared - two * zSquared);
-			angles.z = std::asin(two * singularityTest);
-			angles.x = std::atan2(two * x * w - two * y * z, one - two * xSquared - two * zSquared);
-		}
-
-		angles.x = RadToDegrees(angles.x);
-		angles.y = RadToDegrees(angles.y);
-		angles.z = RadToDegrees(angles.z);
-
+			angles.y = RadToDegrees(std::asin(sinPitch));
+		
+		// Yaw (z-axis rotation)
+		T sinYaw = static_cast<T>(2) * (w * z + x * y);
+		T cosYaw = static_cast<T>(1) - static_cast<T>(2) * (y * y + z * z);
+		angles.z = RadToDegrees(std::atan2(sinYaw, cosYaw));
+		
 		return angles;
 	}
 
@@ -256,6 +333,38 @@ namespace NightOwl
 			   leftQuaternion.y * rightQuaternion.y +
 			   leftQuaternion.z * rightQuaternion.z +
 			   leftQuaternion.w * rightQuaternion.w;
+	}
+
+	template <typename T>
+	Quaternion<T> Quaternion<T>::RotateFromTo(const Vec3<T>& fromDirection, const Vec3<T>& toDirection)
+	{
+		Vec3F fromDirectionNormalized = fromDirection.GetNormalize();
+		Vec3F toDirectionNormalized = toDirection.GetNormalize();
+		
+		float dot = Vec3F::Dot(fromDirectionNormalized, toDirectionNormalized);
+
+		if (dot > static_cast<T>(1) - EPSILON)
+		{
+			return Quaternion<T>();
+		}
+
+		if (dot < static_cast<T>(-1) + EPSILON)
+		{
+			Vec3F rotationAxis = Vec3F::Cross(Vec3F::Right(), fromDirectionNormalized);
+			if (rotationAxis.SquareMagnitude() < EPSILON)
+			{
+				rotationAxis = Vec3F::Cross(Vec3F::Up(), fromDirectionNormalized);
+			}
+
+			rotationAxis.Normalize();
+
+			return Quaternion<T>(rotationAxis.x, rotationAxis.y, rotationAxis.z, static_cast<T>(0));
+		}
+
+		Vec3F rotationAxis = Vec3F::Cross(fromDirectionNormalized, toDirectionNormalized).Normalize();
+		float angle = std::acos(dot);
+
+		return Quaternion<T>(rotationAxis, RadToDegrees(angle));
 	}
 
 	template <typename T>
@@ -376,7 +485,7 @@ namespace NightOwl
 			newRightQuaternion = rightQuaternion * static_cast<T>(-1);
 		}
 
-		if (dot > DOT_THRESHOLD)
+		if (dot > SLERP_DOT_THRESHOLD)
 		{
 			return Nlerp(leftQuaternion, newRightQuaternion, t);
 		}
@@ -387,6 +496,40 @@ namespace NightOwl
 		newQuaternion.Normalize();
 		
 		return leftQuaternion * std::cos(theta) + newQuaternion * std::sin(theta);
+	}
+
+	template <typename T>
+	void Quaternion<T>::Decompose(const Quaternion<T>& quaternion, const Vec3<T>& twistAxis, Quaternion<T>& outSwing, Quaternion<T>& outTwist)
+	{
+		Vec3<T> r = quaternion.vector;
+
+		// singularity: rotation by 180 degree
+		if (r.SquareMagnitude() < EPSILON)
+		{
+			Vec3<T> rotatedTwistAxis = quaternion * twistAxis;
+			Vec3<T> swingAxis = Vec3<T>::Cross(twistAxis, rotatedTwistAxis);
+
+			if (swingAxis.SquareMagnitude() > EPSILON)
+			{
+				float swingAngle = Vec3<T>::Angle(twistAxis, rotatedTwistAxis);
+				outSwing = Quaternion<T>(swingAxis, swingAngle);
+			}
+			else
+			{
+				// more singularity:
+				// rotation axis parallel to twist axis
+				outSwing = Quaternion<T>(); // no swing
+			}
+
+			// always twist 180 degree on singularity
+			outTwist = Quaternion<T>(twistAxis, 180.0f);
+			return;
+		}
+
+		Vec3<T> p = Vec3<T>::Project(r, twistAxis);
+		outTwist = Quaternion<T>(p.x, p.y, p.z, quaternion.w);
+		outTwist.Normalize();
+		outSwing = quaternion * outTwist.GetInverse();
 	}
 
 	template <typename T>
