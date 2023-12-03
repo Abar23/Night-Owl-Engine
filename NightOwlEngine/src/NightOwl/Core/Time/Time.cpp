@@ -33,12 +33,13 @@ namespace NightOwl
 	void Time::Reset()
 	{
 		timeInstance->startingTime = std::chrono::high_resolution_clock::now();
-		timeInstance->frameCount = 0;
-		timeInstance->frameTime = 0;
-		timeInstance->totalFixedTime = 0;
-		timeInstance->totalTime = 0;
+		timeInstance->previousTime = timeInstance->startingTime;
+		timeInstance->frameCount = 0.0f;
+		timeInstance->totalFixedTime = 0.0f;
+		timeInstance->totalTime = 0.0f;
 		timeInstance->shouldRender = true;
 		timeInstance->timeScale = 1.0f;
+		timeInstance->frameTimeCounter = 0.0f;
 	}
 
 	void Time::Update()

@@ -149,7 +149,7 @@ namespace NightOwl
 	void Scene::ReleaseResources()
 	{
 		// Remove resources loaded in asset manager
-		auto* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
 		assetManager->ClearSceneAll();
 
 		// Destroy all game objects in the scene
@@ -158,6 +158,8 @@ namespace NightOwl
 		{
 			rootGameObject->DestroyGameObject();
 		}
+
+		OwlBehaviorManagerLocator::GetOwlBehaviorManager()->Reset();
 
 		rootGameObjects.clear();
 	}

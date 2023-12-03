@@ -141,9 +141,15 @@ namespace NightOwl
 
 	void GameObject::DestroyGameObject()
 	{
-		for (auto& component : componentList)
+		for (const auto& component : componentList)
 		{
 			component->Remove();
+		}
+
+		OwlBehaviorManager* owlBehaviorManager = OwlBehaviorManagerLocator::GetOwlBehaviorManager();
+		for (const auto& owlBehavior : owlBehaviorList)
+		{
+			owlBehaviorManager->RemoveOwlBehavior(owlBehavior);
 		}
 
 		for (int childIndex = 0; childIndex < transform.GetNumberOfChildren(); ++childIndex)

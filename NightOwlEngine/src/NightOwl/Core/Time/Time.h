@@ -75,8 +75,6 @@ namespace NightOwl
 
 		float calculatedFps;
 
-		float frameTime;
-
 		float unscaledFixedDeltaTime;
 
 		float totalTime;
