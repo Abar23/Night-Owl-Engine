@@ -7,6 +7,7 @@
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Locator/ClothSimSystemLocator.h"
 #include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
@@ -48,6 +49,7 @@ namespace NightOwl
 		AssetManagerLocator::Provide(&assetManger);
 		AudioSystemLocator::Provide(&audioSystem);
 		DebugSystemLocator::Provide(&debugSystem);
+		ClothSimSystemLocator::Provide(&clothSimSystem);
 
 		assetManger.LoadEngineAssets();
 
@@ -80,6 +82,8 @@ namespace NightOwl
 				owlBehaviorManager.FixedUpdate();
 			
 				physicsEngine2D.Update();
+
+				clothSimSystem.Update();
 
 				animatorSystem.FixedUpdate();
 

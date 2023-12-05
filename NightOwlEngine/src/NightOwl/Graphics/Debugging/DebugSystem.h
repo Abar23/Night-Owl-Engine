@@ -19,7 +19,7 @@ namespace NightOwl
 
 		void Update();
 
-		void DrawLine(const Vec3F& start, const Vec3F& end);
+		void DrawLine(const Vec3F& start, const Vec3F& end, const Vec3F& color = { 0.0f, 1.0f, 0.0 });
 
 		void DrawPoint(const Vec3F& point, const Vec3F& color = { 0.0f, 1.0f, 0.0 }); // default color is green, TODO: make color constants
 
@@ -28,8 +28,7 @@ namespace NightOwl
 
 		std::shared_ptr<Material> debugPointMaterial;
 
-		// change pair to line debug struct with start, end, and color
-		std::vector<std::pair<Vec3F, Vec3F>> lineSegments;
+		std::vector<DebugPointVertex> lineSegments;
 
 		std::shared_ptr<IVertexArrayObject> lineVertexArrayObject;
 

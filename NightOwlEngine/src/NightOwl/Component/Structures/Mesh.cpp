@@ -77,6 +77,11 @@ namespace NightOwl
 	void Mesh::SetNormals(const std::vector<Vec3F>& normals)
 	{
 		this->normals = normals;
+
+		if (isValid)
+		{
+			UploadNormals();
+		}
 	}
 
 	std::vector<Vec3F> Mesh::GetTangents()

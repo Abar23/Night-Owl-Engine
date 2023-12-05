@@ -25,9 +25,10 @@ namespace NightOwl
 		DrawPoints(renderContext);
 	}
 
-	void DebugSystem::DrawLine(const Vec3F& start, const Vec3F& end)
+	void DebugSystem::DrawLine(const Vec3F& start, const Vec3F& end, const Vec3F& color /* = { 0.0f, 1.0f, 0.0 }) */)
 	{
-		lineSegments.emplace_back(start, end);
+		lineSegments.emplace_back(start, color);
+		lineSegments.emplace_back(end, color);
 	}
 
 	void DebugSystem::DrawPoint(const Vec3F& point, const Vec3F& color /* = { 0.0f, 1.0f, 0.0 } */)
@@ -47,10 +48,12 @@ namespace NightOwl
 		// Define data to line segments vertex buffer
 		lineVertexBuffer = Graphics::CreateVertexBuffer();
 
-		VertexBufferData lineVertexData("Line Vertices", VertexDataType::VectorFloat3, 0);
+		VertexBufferData lineVertexData("Position", VertexDataType::VectorFloat3, 0);
+		VertexBufferData colorData("Color", VertexDataType::VectorFloat3, 1);
 
 		VertexBufferLayout vertexDataLayout;
 		vertexDataLayout.AddVertexBufferDataDefinition(lineVertexData);
+		vertexDataLayout.AddVertexBufferDataDefinition(colorData);
 
 		lineVertexBuffer->SetVertexBufferLayout(vertexDataLayout);
 
@@ -102,7 +105,7 @@ namespace NightOwl
 
 		// Populate vertex buffer with lines
 		const VertexBufferLayout vertexBufferLayout = lineVertexBuffer->GetVertexBufferLayout();
-		lineVertexBuffer->SetSize(vertexBufferLayout.GetDataPerVertex() * lineSegments.size() * 2);
+		lineVertexBuffer->SetSize(vertexBufferLayout.GetDataPerVertex() * lineSegments.size());
 		lineVertexBuffer->SetData(lineSegments.data());
 
 		// Draw Lines
@@ -110,7 +113,7 @@ namespace NightOwl
 		debugLineMaterial->GetShader()->Bind();
 		debugLineMaterial->Bind();
 
-		renderContext->DrawArrays(DrawType::Lines, lineSegments.size() * 2, 0);
+		renderContext->DrawArrays(DrawType::Lines, lineSegments.size(), 0);
 
 		debugLineMaterial->Unbind();
 		debugLineMaterial->GetShader()->Unbind();

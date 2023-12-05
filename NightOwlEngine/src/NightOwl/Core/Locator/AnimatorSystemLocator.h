@@ -21,5 +21,3 @@ namespace NightOwl
 		inline static AnimatorSystem* animatorSystem{ nullptr };
 	};
 }
-
-

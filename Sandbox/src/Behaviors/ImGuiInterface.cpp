@@ -1,12 +1,10 @@
 #include "ImGuiInterface.h"
 
-#include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Window/WindowApi.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include <ImGui/backends/imgui_impl_glfw.h>
 #include <ImGui/backends/imgui_impl_opengl3.h>
 
-#include "NightOwl/Component/Concrete/ChainIK.h"
 #include "NightOwl/Core/Application/Scene.h"
 
 ImGuiInterface::~ImGuiInterface()
@@ -21,11 +19,11 @@ void ImGuiInterface::Awake()
 
 void ImGuiInterface::Start()
 {
-	characterAnimator = gameObject->GetComponent<NightOwl::Animator>();
-	characterRenderer = gameObject->GetComponent<NightOwl::MeshRenderer>();
-	splineAnimator = gameObject->GetComponent<SplineAnimator>();
-	chainIk = gameObject->GetComponent<NightOwl::ChainIK>();
-	ikTargetController = gameObject->GetScene()->FindWithName("Target")->GetComponent<IkTargetController>();
+	planarCloth = gameObject->GetComponent<NightOwl::PlanarCloth>();
+	planeRenderer = gameObject->GetComponent<NightOwl::MeshRenderer>();
+	targetController = gameObject->GetScene()->FindWithName("Target")->GetComponent<IkTargetController>();
+
+	GetClothPropertyValues();
 }
 
 void ImGuiInterface::Update()
@@ -43,25 +41,83 @@ void ImGuiInterface::Update()
 
 	ImGui::SetWindowSize(ImVec2(300, 400));
 
-	if (ImGui::CollapsingHeader("Animator Controls"))
+	if (ImGui::CollapsingHeader("Cloth Sim Controls"))
 	{
+		ImGui::Text("Controls");
 		if (ImGui::Button("Reset"))
 		{
-			splineAnimator->Reset();
-			ikTargetController->Reset();
+			Reset();
+			targetController->Reset();
 		}
 
-		static bool shouldRenderMesh = characterRenderer->IsVisible();
-		ImGui::Checkbox("Render Mesh", &shouldRenderMesh);
-		characterRenderer->SetVisible(shouldRenderMesh);
+		ImGui::Checkbox("Debug Render", &debugRender);
+		if (debugRender)
+		{
+			planeRenderer->SetVisible(false);
+			planarCloth->DebugRender();
+		}
+		else
+		{
+			planeRenderer->SetVisible(true);
+		}
 
-		static bool areConstraintsEnabled = chainIk->AreConstraintsEnabled();
-		ImGui::Checkbox("Enable Constraints", &areConstraintsEnabled);
-		chainIk->EnableConstraints(areConstraintsEnabled);
+		ImGui::Separator();
+		ImGui::Text("Fix Corners");
+		ImGui::Checkbox("Corner 1", &fixCornerData[0]);
+		ImGui::Checkbox("Corner 2", &fixCornerData[1]);
+		ImGui::Checkbox("Corner 3", &fixCornerData[2]);
+		ImGui::Checkbox("Corner 4", &fixCornerData[3]);
+
+		if (ImGui::Button("Unpin All"))
+		{
+			UnpinAllCorners();
+		}
+
+		if (ImGui::Button("Pin All"))
+		{
+			PinAllCorners();
+		}
+
+		ImGui::Separator();
+		ImGui::Text("Physical Properties");
+		ImGui::SliderFloat("Gravity", &gravity, -40.1f, 0.0f, "%.3f");
+		ImGui::SliderFloat("Cloth Mass", &clothMass, 0.1f, 100.0f, "%.3f");
+		ImGui::SliderFloat("Stretch Tolerance", &springStretchTolerance, 0.1f, 4.0f, "%.3f");
+
+		ImGui::Separator();
+		ImGui::Text("Spring Constants");
+		ImGui::SliderFloat("Structural  ", &structuralSpringConstant, 0.0f, 10000.0f, "%.3f");
+		ImGui::SliderFloat("Shear  ", &shearSpringConstant, 0.0f, 10000.0f, "%.3f");
+		ImGui::SliderFloat("Flexion  ", &flexionSpringConstant, 0.0f, 10000.0f, "%.3f");
+
+		ImGui::Separator();
+		ImGui::Text("Damp Constants");
+		ImGui::SliderFloat("Structural ", &structuralDampConstant, 0.0f, 1000.0f, "%.3f");
+		ImGui::SliderFloat("Shear ", &shearDampConstant, 0.0f, 1000.0f, "%.3f");
+		ImGui::SliderFloat("Flexion ", &flexionDampConstant, 0.0f, 1000.0f, "%.3f");
 	}
 
 	ImGui::End();
 	EndFrame();
+
+	planarCloth->SetSpringStretchTolerance(springStretchTolerance);
+
+	planarCloth->SetStructuralSpringConstant(structuralSpringConstant);
+	planarCloth->SetShearSpringConstant(shearSpringConstant);
+	planarCloth->SetFlexionSpringConstant(flexionSpringConstant);
+
+	planarCloth->SetStructuralDampConstant(structuralDampConstant);
+	planarCloth->SetShearDampConstant(shearDampConstant);
+	planarCloth->SetFlexionDampConstant(flexionDampConstant);
+
+	planarCloth->SetMass(clothMass);
+
+	planarCloth->SetGravity(gravity);
+
+	for (int cornerIndex = 0; cornerIndex < fixCornerData.size(); ++cornerIndex)
+	{
+		planarCloth->EnableFixedCorner(cornerIndex, fixCornerData[cornerIndex]);
+	}
 }
 
 void ImGuiInterface::InitImGui()
@@ -99,4 +155,40 @@ void ImGuiInterface::EndFrame()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ImGuiInterface::Reset()
+{
+	planarCloth->Reset();
+
+	GetClothPropertyValues();
+}
+
+void ImGuiInterface::GetClothPropertyValues()
+{
+	structuralSpringConstant = planarCloth->GetStructuralSpringConstant();
+	shearSpringConstant = planarCloth->GetShearSpringConstant();
+	flexionSpringConstant = planarCloth->GetFlexionSpringConstant();
+
+	springStretchTolerance = planarCloth->GetSpringStretchTolerance();
+
+	structuralDampConstant = planarCloth->GetStructuralDampConstant();
+	shearDampConstant = planarCloth->GetShearDampConstant();
+	flexionDampConstant = planarCloth->GetFlexionDampConstant();
+
+	clothMass = planarCloth->GetMass();
+
+	gravity = planarCloth->GetGravity();
+
+	PinAllCorners();
+}
+
+void ImGuiInterface::UnpinAllCorners()
+{
+	std::ranges::fill(fixCornerData, false);
+}
+
+void ImGuiInterface::PinAllCorners()
+{
+	std::ranges::fill(fixCornerData, true);
 }
