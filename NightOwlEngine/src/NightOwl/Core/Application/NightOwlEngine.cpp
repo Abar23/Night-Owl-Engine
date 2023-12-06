@@ -29,7 +29,7 @@ namespace NightOwl
 		ENGINE_ASSERT(application != nullptr, "Night Owl Engine application can't be null");
 
 		// Standup necessary systems
-		WindowApi::CreateWindow("Animation Project 1", 900, 1600);
+		WindowApi::CreateWindow("Animation Project 4", 900, 1600);
 		
 		#ifdef DEBUG
 		Utility::LoggerManager::Init();
