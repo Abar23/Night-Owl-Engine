@@ -9,15 +9,9 @@ namespace NightOwl
 	public:
 		Vec3F totalForce;
 
-		int row;
-
-		int column;
-
-		Vec3F position;
+		Vec3F* position;
 
 		Vec3F previousPosition;
-
-		bool isCorner;
 
 		bool isFixed;
 	};

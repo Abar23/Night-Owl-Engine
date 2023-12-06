@@ -9,6 +9,8 @@ namespace NightOwl
 	class ClothSimSystem
 	{
 	public:
+		void FixedUpdate();
+
 		void Update();
 
 		void AddClothSimComponent(PlanarCloth* planarCloth);

@@ -49,8 +49,8 @@ void TestScene::Init()
 	clothPlaneGameObject.AddComponent<NightOwl::MeshRenderer>();
 	clothPlaneGameObject.AddComponent<ImGuiInterface>();
 	auto* planarClothComponent = clothPlaneGameObject.AddComponent<NightOwl::PlanarCloth>();
-	planarClothComponent->ConstructClothWithDimension(50);
-	planarClothComponent->SetSphereCollider(sphereGameObject.GetTransform(), 0.515f);
+	planarClothComponent->ConstructClothWithDimension(33);
+	planarClothComponent->SetSphereCollider(sphereGameObject.GetTransform(), 0.52f);
 
 	// Camera
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");

@@ -5,6 +5,14 @@
 
 namespace NightOwl
 {
+	void ClothSimSystem::FixedUpdate()
+	{
+		for (const auto & clothSimComponent : clothSimComponents)
+		{
+			clothSimComponent->FixedUpdate();
+		}
+	}
+
 	void ClothSimSystem::Update()
 	{
 		for (const auto & clothSimComponent : clothSimComponents)

@@ -1,6 +1,9 @@
 #include "NightOwlPch.h"
 
 #include "PlanarCloth.h"
+
+#include <execution>
+
 #include "MeshRenderer.h"
 #include "NightOwl/Component/Structures/ClothParticle.h"
 #include "NightOwl/Component/Structures/ClothSpring.h"
@@ -25,6 +28,7 @@ namespace NightOwl
 		  shearDampConstant(1.0f),
 		  flexionDampConstant(1.0f),
 		  mass(1.0f),
+		  planeDimension(0),
 		  sphereCollider(nullptr, -1.0f)
 	{
 		ClothSimSystemLocator::GetClothSimSystem()->AddClothSimComponent(this);
@@ -35,10 +39,8 @@ namespace NightOwl
 		planeMesh = gameObject->GetComponent<MeshRenderer>()->GetMesh();
 	}
 
-	void PlanarCloth::Update()
+	void PlanarCloth::FixedUpdate()
 	{
-		ClearForces();
-
 		ApplyForces();
 
 		VerletIntegration();
@@ -46,7 +48,10 @@ namespace NightOwl
 		ApplyConstraints();
 
 		SolveCollision();
+	}
 
+	void PlanarCloth::Update()
+	{
 		UpdateVertexData();
 	}
 
@@ -56,35 +61,38 @@ namespace NightOwl
 		for (const auto& clothSpring : springs)
 		{
 			Vec3F color = { 1.0f, 0.0f, 1.0f };
-			if (clothSpring->type == SpringType::Shear)
+			if (clothSpring.type == SpringType::Shear)
 			{
 				color = { 1.0f, 0.64f, 0.0f };
 			}
-			else if (clothSpring->type == SpringType::Flexion)
+			else if (clothSpring.type == SpringType::Flexion)
 			{
 				color = { 0.0f, 1.0f, 1.0f };
 			}
 
-			debugSystem->DrawLine(clothSpring->particle->position, clothSpring->otherParticle->position, color);
+			debugSystem->DrawLine(*clothSpring.particle->position, *clothSpring.otherParticle->position, color);
 		}
 
 		for (const auto& corner : corners)
 		{
-			debugSystem->DrawPoint(corner->position, { 1.0f, 1.0f, 1.0f });
+			if (corner->isFixed)
+			{
+				debugSystem->DrawPoint(*corner->position, { 1.0f, 1.0f, 1.0f });
+			}
 		}
 	}
 
 	void PlanarCloth::Reset()
 	{
-		std::vector<Vec3F> vertices(particles.size());
-		InitializeVertices(vertices);
-		planeMesh->SetVertices(vertices);
+		planeVertices.resize(planeDimension * planeDimension);
+		InitializeVertices(planeVertices);
+		planeMesh->SetVertices(planeVertices);
 
 		for (int particleIndex = 0; particleIndex < particles.size(); ++particleIndex)
 		{
 			ClothParticle* clothParticle = particles[particleIndex];
-			clothParticle->position = vertices[particleIndex];
-			clothParticle->previousPosition = clothParticle->position;
+			clothParticle->position = &planeVertices[particleIndex];
+			clothParticle->previousPosition = *clothParticle->position;
 		}
 
 		// Reset default values
@@ -106,26 +114,29 @@ namespace NightOwl
 
 	void PlanarCloth::ConstructClothWithDimension(int dimension)
 	{
-		std::vector<Vec3F> vertices(dimension * dimension);
-		InitializeVertices(vertices);
+		planeDimension = dimension; 
+		const int numberOfVertices = planeDimension * planeDimension;
+		planeNormals.resize(numberOfVertices);
+		planeVertices.resize(numberOfVertices);
+		InitializeVertices(planeVertices);
 
-		std::vector<Vec3UI> triangles((dimension - 1) * (dimension - 1) * 2);
+		std::vector<Vec3UI> triangles((planeDimension - 1) * (planeDimension - 1) * 2);
 		int triangleIndex = 0;
-		for (int zIndex = 0; zIndex < dimension - 1; ++zIndex)
+		for (int zIndex = 0; zIndex < planeDimension - 1; ++zIndex)
 		{
-			for (int xIndex = 0; xIndex < dimension - 1; ++xIndex)
+			for (int xIndex = 0; xIndex < planeDimension - 1; ++xIndex)
 			{
 				// upper triangle
 				Vec3UI upperTriangle;
-				upperTriangle.x = xIndex + zIndex * dimension;
-				upperTriangle.y = xIndex + (zIndex + 1) * dimension;
-				upperTriangle.z = (xIndex + 1) + zIndex * dimension;
+				upperTriangle.x = xIndex + zIndex * planeDimension;
+				upperTriangle.y = xIndex + (zIndex + 1) * planeDimension;
+				upperTriangle.z = (xIndex + 1) + zIndex * planeDimension;
 
 				// lower triangle
 				Vec3UI lowerTriangle;
-				lowerTriangle.x = (xIndex + 1) + zIndex * dimension;
-				lowerTriangle.y = xIndex + (zIndex + 1) * dimension;
-				lowerTriangle.z = (xIndex + 1) + (zIndex + 1) * dimension;
+				lowerTriangle.x = (xIndex + 1) + zIndex * planeDimension;
+				lowerTriangle.y = xIndex + (zIndex + 1) * planeDimension;
+				lowerTriangle.z = (xIndex + 1) + (zIndex + 1) * planeDimension;
 
 				triangles[triangleIndex] = upperTriangle;
 				triangles[triangleIndex + 1] = lowerTriangle;
@@ -134,112 +145,145 @@ namespace NightOwl
 		}
 
 		int indexCount = triangles.size() * 3;
-		int vertexCount = vertices.size();
+		int vertexCount = planeVertices.size();
 		std::vector<SubMeshData> subMeshData = {
 			{ 0, indexCount, 0, vertexCount, 0}
 		};
 
-		planeMesh->SetVertices(vertices);
+		planeMesh->SetVertices(planeVertices);
 		planeMesh->SetTriangles(triangles);
 		planeMesh->SetSubMeshes(subMeshData);
 		planeMesh->UploadMeshData();
 
-		grid.resize(dimension, std::vector<std::shared_ptr<ClothParticle>>(dimension));
-		for (int zIndex = 0; zIndex < dimension; ++zIndex)
+		grid.resize(numberOfVertices);
+		for (int zIndex = 0; zIndex < planeDimension; ++zIndex)
 		{
-			for (int xIndex = 0; xIndex < dimension; ++xIndex)
+			for (int xIndex = 0; xIndex < planeDimension; ++xIndex)
 			{
-				std::shared_ptr<ClothParticle> particle = std::make_shared<ClothParticle>();
-				particle->row = zIndex;
-				particle->column = xIndex;
-				particle->isCorner = false;
-				grid[zIndex][xIndex] = particle;
+				int gridIndex = zIndex * planeDimension + xIndex;
 
-				particles.push_back(particle.get());
+				grid[gridIndex] = ClothParticle();
+
+				particles.push_back(&grid[gridIndex]);
 			}
 		}
 
-		const float structuralEdgeLength = 2.0f / static_cast<float>(dimension - 1);
+		springs.clear();
+		constrainedSprings.clear();
+		const float structuralEdgeLength = 2.0f / static_cast<float>(planeDimension - 1);
 		const float flexionEdgeLength = 2.0f * structuralEdgeLength;
 		const float shearEdgeLength = std::sqrtf(structuralEdgeLength * structuralEdgeLength * 2);
-		for (int zIndex = 0; zIndex < dimension; ++zIndex)
+		for (int zIndex = 0; zIndex < planeDimension; ++zIndex)
 		{
-			for (int xIndex = 0; xIndex < dimension; ++xIndex)
+			for (int xIndex = 0; xIndex < planeDimension; ++xIndex)
 			{
+				// Indices of the vertices in the quad
+				const int particleIndex = zIndex * planeDimension + xIndex;
+
 				// direct neighbors (up, down, left, right) - forms structural springs
-				if (zIndex - 1 >= 0) { // up
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex - 1][xIndex].get(), structuralEdgeLength, SpringType::Structural);
-					springs.emplace_back(spring);
+				if (zIndex - 1 >= 0)
+				{
+					// up
+					const int up = (zIndex - 1) * planeDimension + xIndex;
+					springs.emplace_back(&grid[particleIndex], &grid[up], structuralEdgeLength, SpringType::Structural);
 				}
-				if (zIndex + 1 < dimension) { // down
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex + 1][xIndex].get(), structuralEdgeLength, SpringType::Structural);
-					springs.emplace_back(spring);
+				if (zIndex + 1 < planeDimension) 
+				{
+					// down
+					const int down = (zIndex + 1) * planeDimension + xIndex;
+					springs.emplace_back(&grid[particleIndex], &grid[down], structuralEdgeLength, SpringType::Structural);
 				}
-				if (xIndex - 1 >= 0) { // left
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex][xIndex - 1].get(), structuralEdgeLength, SpringType::Structural);
-					springs.emplace_back(spring);
+				if (xIndex - 1 >= 0) 
+				{
+					// left
+					const int left = zIndex * planeDimension + (xIndex - 1);
+					springs.emplace_back(&grid[particleIndex], &grid[left], structuralEdgeLength, SpringType::Structural);
 				}
-				if (xIndex + 1 < dimension) { // right
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex][xIndex + 1].get(), structuralEdgeLength, SpringType::Structural);
-					springs.push_back(spring);
+				if (xIndex + 1 < planeDimension) 
+				{
+					// right
+					const int right = zIndex * planeDimension + (xIndex + 1);
+					springs.emplace_back(&grid[particleIndex], &grid[right], structuralEdgeLength, SpringType::Structural);
 				}
 
 				// diagonal neighbors - forms shear springs
-				if (zIndex - 1 >= 0 && xIndex - 1 >= 0) { // top-left
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex - 1][xIndex - 1].get(), shearEdgeLength, SpringType::Shear);
-					springs.push_back(spring);
+				if (zIndex - 1 >= 0 && xIndex - 1 >= 0) 
+				{
+					// top-left
+					const int topLeft = (zIndex - 1) * planeDimension + (xIndex - 1);
+					springs.emplace_back(&grid[particleIndex], &grid[topLeft], shearEdgeLength, SpringType::Shear);
 				}
-				if (zIndex - 1 >= 0 && xIndex + 1 < dimension) { // top-right
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex - 1][xIndex + 1].get(), shearEdgeLength, SpringType::Shear);
-					springs.push_back(spring);
+				if (zIndex - 1 >= 0 && xIndex + 1 < planeDimension) 
+				{
+					// top-right
+					const int topRight = (zIndex - 1) * planeDimension + (xIndex + 1);
+					springs.emplace_back(&grid[particleIndex], &grid[topRight], shearEdgeLength, SpringType::Shear);
 				}
-				if (zIndex + 1 < dimension && xIndex - 1 >= 0) { // bottom-left
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex + 1][xIndex - 1].get(), shearEdgeLength, SpringType::Shear);
-					springs.push_back(spring);
+				if (zIndex + 1 < planeDimension && xIndex - 1 >= 0) 
+				{
+					// bottom-left
+					const int bottomLeft = (zIndex + 1) * planeDimension + (xIndex - 1);
+					springs.emplace_back(&grid[particleIndex], &grid[bottomLeft], shearEdgeLength, SpringType::Shear);
 				}
-				if (zIndex + 1 < dimension && xIndex + 1 < dimension) { // bottom-right
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex + 1][xIndex + 1].get(), shearEdgeLength, SpringType::Shear);
-					springs.push_back(spring);
+				if (zIndex + 1 < planeDimension && xIndex + 1 < planeDimension) 
+				{
+					// bottom-right
+					const int bottomRight = (zIndex + 1) * planeDimension + (xIndex + 1);
+					springs.emplace_back(&grid[particleIndex], &grid[bottomRight], shearEdgeLength, SpringType::Shear);
 				}
 
 				// flexion neighbors (up+1, down+1, left+1, right+1) - forms flexion springs
-				if (zIndex - 2 >= 0) { // up+1
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex - 2][xIndex].get(), flexionEdgeLength, SpringType::Flexion);
-					springs.push_back(spring);
+				if (zIndex - 2 >= 0) 
+				{
+					// up+1
+					const int up = (zIndex - 2) * planeDimension + xIndex;
+					springs.emplace_back(&grid[particleIndex], &grid[up], flexionEdgeLength, SpringType::Flexion);
 				}
-				if (zIndex + 2 < dimension) { // down+1
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex + 2][xIndex].get(), flexionEdgeLength, SpringType::Flexion);
-					springs.push_back(spring);
+				if (zIndex + 2 < planeDimension) 
+				{ 
+					// down+1
+					const int down = (zIndex + 2) * planeDimension + xIndex;
+					springs.emplace_back(&grid[particleIndex], &grid[down], flexionEdgeLength, SpringType::Flexion);
 				}
-				if (xIndex - 2 >= 0) { // left+1
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex][xIndex - 2].get(), flexionEdgeLength, SpringType::Flexion);
-					springs.push_back(spring);
+				if (xIndex - 2 >= 0) 
+				{ 
+					// left+1
+					const int left = zIndex * planeDimension + (xIndex - 2);
+					springs.emplace_back(&grid[particleIndex], &grid[left], flexionEdgeLength, SpringType::Flexion);
 				}
-				if (xIndex + 2 < dimension) { // right+1
-					auto spring = std::make_shared<ClothSpring>(grid[zIndex][xIndex].get(), grid[zIndex][xIndex + 2].get(), flexionEdgeLength, SpringType::Flexion);
-					springs.push_back(spring);
+				if (xIndex + 2 < planeDimension) 
+				{ 
+					// right+1
+					const int right = zIndex * planeDimension + (xIndex + 2);
+					springs.emplace_back(&grid[particleIndex], &grid[right], flexionEdgeLength, SpringType::Flexion);
 				}
 
-				Vec3F position = vertices[zIndex * dimension + xIndex];
-				grid[zIndex][xIndex]->position = position;
-				grid[zIndex][xIndex]->previousPosition = position;
+				Vec3F& position = planeVertices.at(zIndex * planeDimension + xIndex);
+				grid[zIndex * planeDimension + xIndex].position = &position;
+				grid[zIndex * planeDimension + xIndex].previousPosition = position;
 			}
+		}
+
+		for (auto& clothSpring : springs)
+		{
+			if (clothSpring.type == SpringType::Flexion)
+			{
+				continue;
+			}
+
+			constrainedSprings.push_back(&clothSpring);
 		}
 
 		// get corners
 		corners.resize(4);
-		corners[0] = grid[0][0].get();
-		corners[1] = grid[0][dimension - 1].get();
-		corners[2] = grid[dimension - 1][0].get();
-		corners[3] = grid[dimension - 1][dimension - 1].get();
+		corners[0] = &grid.front();
+		corners[1] = &grid[planeDimension - 1];
+		corners[2] = &grid[(planeDimension - 1) * planeDimension];
+		corners[3] = &grid.back();
 
-		corners[0]->isCorner = true;
 		corners[0]->isFixed = true;
-		corners[1]->isCorner = true;
 		corners[1]->isFixed = true;
-		corners[2]->isCorner = true;
 		corners[2]->isFixed = true;
-		corners[3]->isCorner = true;
 		corners[3]->isFixed = true;
 	}
 
@@ -330,7 +374,7 @@ namespace NightOwl
 
 	void PlanarCloth::EnableFixedCorner(int cornerIndex, bool enable) const
 	{
-		ENGINE_ASSERT(cornerIndex < 4 && cornerIndex >- 0, "Invalid corner index used for unpinning corner.")
+		ENGINE_ASSERT(cornerIndex < 4 && cornerIndex >= 0, "Invalid corner index used for unpinning corner.");
 
 		corners[cornerIndex]->isFixed = enable;
 	}
@@ -351,56 +395,46 @@ namespace NightOwl
 		this->mass = mass;
 	}
 
-	void PlanarCloth::ClearForces()
-	{
-		for (auto& zIndex : grid)
-		{
-			for (int xIndex = 0; xIndex < grid.size(); ++xIndex)
-			{
-				zIndex[xIndex]->totalForce = 0.0f;
-			}
-		}
-	}
-
-	void PlanarCloth::ApplyForces()
+	void PlanarCloth::ApplyForces() const
 	{
 		// Apply gravity
+		const Vec3F gravityAcceleration = Vec3F(0.0f, gravity, 0.0f) * mass;
 		for (const auto& clothParticle : particles)
 		{
-			clothParticle->totalForce += Vec3F(0.0f, gravity, 0.0f) * mass;
+			clothParticle->totalForce = gravityAcceleration;
 		}
 
 		// Apply spring forces
 		for (const auto& clothSpring : springs)
 		{
-			Vec3F particlePositionDifference = clothSpring->otherParticle->position - clothSpring->particle->position;
-
+			Vec3F particlePositionDifference = *clothSpring.otherParticle->position - *clothSpring.particle->position;
+		
 			float springLength = particlePositionDifference.Magnitude();
-
+		
 			Vec3F springDirection = particlePositionDifference.GetNormalize();
-
+		
 			float springConstant = structuralSpringConstant;
 			float dampConstant = structuralDampConstant;
-			if (clothSpring->type == SpringType::Shear)
+			if (clothSpring.type == SpringType::Shear)
 			{
 				springConstant = shearSpringConstant;
 				dampConstant = shearDampConstant;
 			}
-			else if (clothSpring->type == SpringType::Flexion)
+			else if (clothSpring.type == SpringType::Flexion)
 			{
 				springConstant = flexionSpringConstant;
 				dampConstant = flexionDampConstant;
 			}
-
-			const float springStiffnessTerm = springConstant * (springLength - clothSpring->restLength);
-			const float springDampTerm = dampConstant * Vec3F::Dot(clothSpring->otherParticle->position - clothSpring->particle->position, springDirection);
+		
+			const float springStiffnessTerm = springConstant * (springLength - clothSpring.restLength);
+			const float springDampTerm = dampConstant * Vec3F::Dot(particlePositionDifference, springDirection);
 			const Vec3F springForce = springDirection * (springStiffnessTerm - springDampTerm);
-
-			clothSpring->particle->totalForce += springForce;
-			clothSpring->otherParticle->totalForce -= springForce;
+		
+			clothSpring.particle->totalForce += springForce;
+			clothSpring.otherParticle->totalForce -= springForce;
 		}
 
-		// Remove force from pinned corners
+		// Remove force from fixed corners
 		for (const auto& corner : corners)
 		{
 			if (corner->isFixed)
@@ -412,7 +446,7 @@ namespace NightOwl
 
 	void PlanarCloth::VerletIntegration()
 	{
-		const float fixedTimeStep = Time::GetFixedDeltaTime();
+		const float fixedTimeStepSquared = Time::GetFixedDeltaTime() * Time::GetFixedDeltaTime();
 		for (const auto & clothParticle : particles)
 		{
 			if (clothParticle->isFixed)
@@ -421,87 +455,78 @@ namespace NightOwl
 			}
 
 			// Verlet
-			const Vec3F velocity = (clothParticle->position - clothParticle->previousPosition);
-			clothParticle->previousPosition = clothParticle->position;
-			clothParticle->position = clothParticle->position + velocity + (clothParticle->totalForce / mass) * fixedTimeStep * fixedTimeStep;
+			const Vec3F velocity = (*clothParticle->position - clothParticle->previousPosition);
+			clothParticle->previousPosition = *clothParticle->position;
+			*clothParticle->position = *clothParticle->position + velocity + (clothParticle->totalForce / mass) * fixedTimeStepSquared;
 		}
 	}
 
 	void PlanarCloth::UpdateVertexData()
 	{
-		std::vector<Vec3F> vertices = planeMesh->GetVertices();
-		for (const auto& clothParticle : particles)
+		std::ranges::fill(planeNormals.begin(), planeNormals.end(), Vec3F::Zero());
+		for (int zIndex = 0; zIndex < planeDimension - 1; zIndex++)
 		{
-			vertices[clothParticle->row * grid.size() + clothParticle->column] = clothParticle->position;
-		}
-
-		std::vector<Vec3F> normals(vertices.size());
-		for (int zIndex = 0; zIndex < grid.size() - 1; zIndex++)
-		{
-			for (int xIndex = 0; xIndex < grid.size() - 1; xIndex++)
+			for (int xIndex = 0; xIndex < planeDimension - 1; xIndex++)
 			{
 				// Indices of the vertices in the quad
-				const int index1 = zIndex * grid.size() + xIndex;
+				const int index1 = zIndex * planeDimension + xIndex;
 				const int index2 = index1 + 1;
-				const int index3 = (zIndex + 1) * grid.size() + xIndex;
+				const int index3 = (zIndex + 1) * planeDimension + xIndex;
 				const int index4 = index3 + 1;
 
-				const Vec3F normal1 = Vec3F::Cross(grid[zIndex][xIndex + 1]->position - grid[zIndex][xIndex]->position, grid[zIndex + 1][xIndex]->position - grid[zIndex][xIndex]->position);
-				const Vec3F normal2 = Vec3F::Cross(grid[zIndex + 1][xIndex + 1]->position - grid[zIndex + 1][xIndex]->position, grid[zIndex + 1][xIndex]->position - grid[zIndex][xIndex + 1]->position);
+				const Vec3F normal1 = Vec3F::Cross(*grid[index2].position - *grid[index1].position, 
+										 *grid[index3].position - *grid[index1].position);
+				const Vec3F normal2 = Vec3F::Cross(*grid[index4].position - *grid[index3].position,
+										 *grid[index3].position - *grid[index2].position);
 
 				// Add face normals to the vertex normals
-				normals[index1] += normal1;
-				normals[index2] += normal1 + normal2;
-				normals[index3] += normal1 + normal2;
-				normals[index4] += normal2;
+				planeNormals[index1] += normal1;
+				planeNormals[index2] += normal1 + normal2;
+				planeNormals[index3] += normal1 + normal2;
+				planeNormals[index4] += normal2;
 			}
 		}
 
-		for (Vec3F& normal : normals)
+		for (Vec3F& normal : planeNormals)
 		{
 			normal.Normalize().Negate();
 		}
 
-		planeMesh->SetVertices(vertices);
-		planeMesh->SetNormals(normals);
+		planeMesh->SetVertices(planeVertices);
+		planeMesh->SetNormals(planeNormals);
 	}
 
-	void PlanarCloth::ApplyConstraints()
+	void PlanarCloth::ApplyConstraints() const
 	{
 		for (int i = 0; i < 10; ++i)
 		{
-			for (const auto& clothSpring : springs)
+			for (const auto& clothSpring : constrainedSprings)
 			{
-				Vec3F directionBetweenParticles = clothSpring->otherParticle->position - clothSpring->particle->position;
-				const float distanceApart = directionBetweenParticles.Magnitude();
-
-				float maxSpringLength = springStretchTolerance * clothSpring->restLength;
-
-				if (clothSpring->type == SpringType::Flexion ||
-					distanceApart < maxSpringLength)
+				Vec3F directionBetweenParticles = *clothSpring->otherParticle->position - *clothSpring->particle->position;
+				const float distanceApartSquared = directionBetweenParticles.SquareMagnitude();
+				const float maxSpringLength = springStretchTolerance * clothSpring->restLength;
+				if (distanceApartSquared < maxSpringLength * maxSpringLength)
 				{
 					continue;
 				}
-
-				const float difference = distanceApart - maxSpringLength;
+		
+				const float difference = std::sqrtf(distanceApartSquared) - maxSpringLength;
 				const Vec3F correction = directionBetweenParticles.Normalize() * 0.5f * difference;
-
-				if (clothSpring->particle->isCorner && 
-					clothSpring->particle->isFixed)
+		
+				if (clothSpring->particle->isFixed)
 				{
-					clothSpring->otherParticle->position -= correction * 2.0f;
+					*clothSpring->otherParticle->position -= correction * 2.0f;
 					continue;
 				}
-
-				if (clothSpring->otherParticle->isCorner && 
-					clothSpring->otherParticle->isFixed)
+		
+				if (clothSpring->otherParticle->isFixed)
 				{
-					clothSpring->particle->position += correction * 2.0f;
+					*clothSpring->particle->position += correction * 2.0f;
 					continue;
 				}
-
-				clothSpring->particle->position += correction;
-				clothSpring->otherParticle->position -= correction;
+		
+				*clothSpring->particle->position += correction;
+				*clothSpring->otherParticle->position -= correction;
 			}
 		}
 	}
@@ -516,32 +541,32 @@ namespace NightOwl
 		const float squareRadius = sphereCollider.second * sphereCollider.second;
 		for (const auto& clothParticle : particles)
 		{
-			Vec3F sphereCenterToParticle = clothParticle->position - sphereCollider.first->GetPosition();
+			const Vec3F sphereCenterToParticle = *clothParticle->position - sphereCollider.first->GetPosition();
 			if (sphereCenterToParticle.SquareMagnitude() < squareRadius)
 			{
-				clothParticle->position += sphereCenterToParticle.GetNormalize() * (sphereCollider.second - sphereCenterToParticle.Magnitude());
+				*clothParticle->position += sphereCenterToParticle.GetNormalize() * (sphereCollider.second - sphereCenterToParticle.Magnitude());
 			}
 		}
 	}
 
 	void PlanarCloth::InitializeVertices(std::vector<Vec3F>& outVertices)
 	{
-		const float dimension = std::sqrtf(outVertices.size());
-		const float spaceBetweenVertices = 2.0f / (std::sqrtf(outVertices.size()) - 1);
+		const float spaceBetweenVertices = 2.0f / (planeDimension - 1);
 		constexpr float startingXPosition = -1.0f;
 		constexpr float startingZPosition = -1.0f;
-		for (int zIndex = 0; zIndex < dimension; ++zIndex)
+		for (int zIndex = 0; zIndex < planeDimension; ++zIndex)
 		{
 			float zPos = startingZPosition + spaceBetweenVertices * zIndex;
-			for (int xIndex = 0; xIndex < dimension; ++xIndex)
+			for (int xIndex = 0; xIndex < planeDimension; ++xIndex)
 			{
 				float xPos = startingXPosition + spaceBetweenVertices * xIndex;
-				outVertices[xIndex + zIndex * dimension] = { xPos, 3.0f, zPos };
+				outVertices[zIndex * planeDimension + xIndex] = { xPos, 3.0f, zPos };
 			}
 		}
 	}
 
 	void PlanarCloth::Remove()
 	{
+		ClothSimSystemLocator::GetClothSimSystem()->RemoveClothSimComponent(this);
 	}
 }

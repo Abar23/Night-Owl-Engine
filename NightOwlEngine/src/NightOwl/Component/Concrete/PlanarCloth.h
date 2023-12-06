@@ -1,15 +1,13 @@
 #pragma once
 
 #include "NightOwl/Component/Component.h"
+#include "NightOwl/Component/Structures/ClothSpring.h"
+#include "NightOwl/Component/Structures/ClothParticle.h"
 #include "NightOwl/Math/Vec3.h"
 #include <vector>
 
 namespace NightOwl
 {
-	class ClothParticle;
-
-	class ClothSpring;
-
 	class Mesh;
 
 	class Transform;
@@ -17,12 +15,11 @@ namespace NightOwl
 	class PlanarCloth : public Component
 	{
 	public:
-		float GetMass() const;
-		void SetMass(float mass);
-
 		PlanarCloth();
 
 		void Start() override;
+
+		void FixedUpdate();
 
 		void Update();
 
@@ -33,10 +30,6 @@ namespace NightOwl
 		void ConstructClothWithDimension(int dimension);
 
 		std::shared_ptr<Component> Clone() override;
-
-		bool AreCornersFixed() const;
-
-		void SetFixedCorners(const bool fixCorners);
 
 		float GetGravity() const;
 
@@ -70,6 +63,10 @@ namespace NightOwl
 
 		void SetFlexionDampConstant(float flexionDampConstant);
 
+		float GetMass() const;
+
+		void SetMass(float mass);
+
 		void EnableFixedCorner(int cornerIndex, bool enable) const;
 
 		void SetSphereCollider(Transform* colliderTransform, float radius);
@@ -93,29 +90,33 @@ namespace NightOwl
 
 		float mass;
 
+		int planeDimension;
+
 		std::pair<Transform*, float> sphereCollider;
 
 		std::shared_ptr<Mesh> planeMesh;
 
-		std::vector<std::vector<std::shared_ptr<ClothParticle>>> grid;
-
-		std::vector<std::vector<ClothParticle*>> quads;
+		std::vector<ClothParticle> grid;
 
 		std::vector<ClothParticle*> particles;
 
 		std::vector<ClothParticle*> corners;
 
-		std::vector<std::shared_ptr<ClothSpring>> springs;
+		std::vector<ClothSpring> springs;
 
-		void ClearForces();
+		std::vector<ClothSpring*> constrainedSprings;
 
-		void ApplyForces();
+		std::vector<Vec3F> planeVertices;
+
+		std::vector<Vec3F> planeNormals;
+
+		void ApplyForces() const;
 
 		void VerletIntegration();
 
 		void UpdateVertexData();
 
-		void ApplyConstraints();
+		void ApplyConstraints() const;
 
 		void SolveCollision();
 

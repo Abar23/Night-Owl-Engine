@@ -83,7 +83,7 @@ namespace NightOwl
 			
 				physicsEngine2D.Update();
 
-				clothSimSystem.Update();
+				clothSimSystem.FixedUpdate();
 
 				animatorSystem.FixedUpdate();
 
@@ -104,6 +104,8 @@ namespace NightOwl
 				owlBehaviorManager.LateUpdate();
 
 				sceneManager.Update();
+
+				clothSimSystem.Update();
 
 				meshRendererSystem.Update();
 
