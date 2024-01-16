@@ -1,10 +1,9 @@
 #pragma once
 
 #include "IkTargetController.h"
-#include "SplineAnimator.h"
 #include "NightOwl/Behavior/OwlBehavior.h"
-#include "NightOwl/Component/Abstrtact/Renderer.h"
-#include "NightOwl/Component/Concrete/Animator.h"
+#include "NightOwl/Component/Concrete/MeshRenderer.h"
+#include "NightOwl/Component/Concrete/PlanarCloth.h"
 
 class ImGuiInterface : public NightOwl::OwlBehavior
 {
@@ -20,15 +19,33 @@ public:
 private:
 	bool showWindow = true;
 
-	NightOwl::Animator* characterAnimator;
+	bool debugRender = false;
 
-	NightOwl::Renderer* characterRenderer;
+	std::array<bool, 4> fixCornerData;
 
-	NightOwl::ChainIK* chainIk;
+	float structuralSpringConstant;
 
-	SplineAnimator* splineAnimator;
+	float shearSpringConstant;
 
-	IkTargetController* ikTargetController;
+	float flexionSpringConstant;
+
+	float springStretchTolerance;
+
+	float structuralDampConstant;
+
+	float shearDampConstant;
+
+	float flexionDampConstant;
+
+	float clothMass;
+
+	float gravity;
+
+	NightOwl::PlanarCloth* planarCloth;
+
+	NightOwl::MeshRenderer* planeRenderer;
+
+	IkTargetController* targetController;
 
 	void InitImGui();
 
@@ -37,4 +54,12 @@ private:
 	void BeginFrame();
 
 	void EndFrame();
+
+	void Reset();
+
+	void GetClothPropertyValues();
+
+	void UnpinAllCorners();
+
+	void PinAllCorners();
 };

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "NightOwl/Math/Vec3.h"
 
 namespace NightOwl

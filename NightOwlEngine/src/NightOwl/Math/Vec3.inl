@@ -49,7 +49,7 @@ namespace NightOwl
 	{
 		if (NearEquals(Magnitude(), static_cast<T>(0)))
 		{
-			return Vec3F();
+			return Vec3<T>();
 		}
 
 		T inverseMagnitude = static_cast<T>(1) / Magnitude();

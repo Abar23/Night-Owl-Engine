@@ -18,7 +18,8 @@ namespace NightOwl
 		OwlBehavior,
 		Animator,
 		CatmullRomSpline,
-		ChainIK
+		ChainIK,
+		PlanarCloth
 	};
 
 	inline std::string ComponentTypeToString(ComponentType type)
@@ -54,6 +55,9 @@ namespace NightOwl
 
 		case ComponentType::ChainIK:
 			return std::string{ "ChainIK" };
+
+		case ComponentType::PlanarCloth:
+			return std::string{ "PlanarCloth" };
 
 		default:
 			return std::string{ "Unknown Component" };

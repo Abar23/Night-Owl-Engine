@@ -7,6 +7,7 @@
 #include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Locator/ClothSimSystemLocator.h"
 #include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
 #include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
@@ -28,7 +29,7 @@ namespace NightOwl
 		ENGINE_ASSERT(application != nullptr, "Night Owl Engine application can't be null");
 
 		// Standup necessary systems
-		WindowApi::CreateWindow("Animation Project 1", 900, 1600);
+		WindowApi::CreateWindow("Animation Project 4", 900, 1600);
 		
 		#ifdef DEBUG
 		Utility::LoggerManager::Init();
@@ -48,6 +49,7 @@ namespace NightOwl
 		AssetManagerLocator::Provide(&assetManger);
 		AudioSystemLocator::Provide(&audioSystem);
 		DebugSystemLocator::Provide(&debugSystem);
+		ClothSimSystemLocator::Provide(&clothSimSystem);
 
 		assetManger.LoadEngineAssets();
 
@@ -81,6 +83,8 @@ namespace NightOwl
 			
 				physicsEngine2D.Update();
 
+				clothSimSystem.FixedUpdate();
+
 				animatorSystem.FixedUpdate();
 
 				sceneManager.Update();
@@ -100,6 +104,8 @@ namespace NightOwl
 				owlBehaviorManager.LateUpdate();
 
 				sceneManager.Update();
+
+				clothSimSystem.Update();
 
 				meshRendererSystem.Update();
 

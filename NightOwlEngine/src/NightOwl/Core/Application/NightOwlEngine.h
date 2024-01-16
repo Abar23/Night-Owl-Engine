@@ -7,6 +7,7 @@
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/Graphics/System/MeshRendererSystem.h"
+#include "NightOwl/Physics/ClothSimSystem.h"
 #include "NightOwl/Physics/2D/PhysicsEngine2D.h"
 
 namespace NightOwl
@@ -40,6 +41,8 @@ namespace NightOwl
 		MeshRendererSystem meshRendererSystem;
 
 		AnimatorSystem animatorSystem;
+
+		ClothSimSystem clothSimSystem;
 
 		//std::shared_ptr<ArchetypeSystem> archetypeSystem;
 

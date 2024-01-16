@@ -16,7 +16,7 @@ private:
 
 	NightOwl::Transform* mainCameraTransform = nullptr;
 
-	inline static NightOwl::Vec3F defaultPosition = { 0.0f, 3.0f, 18.0f };
+	inline static NightOwl::Vec3F defaultPosition = { 0.0f, 2.0f, 5.0f };
 
 	inline static float defaultZoom = 70.0f;
 
