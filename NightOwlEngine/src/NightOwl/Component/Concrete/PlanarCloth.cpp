@@ -1,9 +1,6 @@
 #include "NightOwlPch.h"
 
 #include "PlanarCloth.h"
-
-#include <execution>
-
 #include "MeshRenderer.h"
 #include "NightOwl/Component/Structures/ClothParticle.h"
 #include "NightOwl/Component/Structures/ClothSpring.h"
@@ -14,6 +11,8 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/Physics/ClothSimSystem.h"
+#include <execution>
+
 
 namespace NightOwl
 {
