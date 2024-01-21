@@ -78,9 +78,6 @@ namespace NightOwl
 		case VertexDataType::Bitangent:
 			return GL_FLOAT;
 
-		case VertexDataType::BoneWeights:
-			return GL_INT;
-
 		default:
 			return 0;
 		}

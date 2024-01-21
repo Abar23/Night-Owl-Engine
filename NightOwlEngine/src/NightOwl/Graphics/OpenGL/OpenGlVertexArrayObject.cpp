@@ -71,10 +71,19 @@ namespace NightOwl
 			// Special Handling of BoneWeights
 			if (data.GetVertexDataType() == VertexDataType::BoneWeights)
 			{
-				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, data.GetAttributeLocation(), 4, GL_FLOAT, GL_FALSE, accumulativeOffset);
-				GL_CALL(glVertexArrayAttribIFormat, vertexArrayObjectId, data.GetAttributeLocation() + 1, 4, GL_INT, accumulativeOffset);
+				const unsigned int boneWeightIndex = data.GetAttributeLocation();
+				const unsigned int boneIdIndex = boneWeightIndex + 1;
 
-				accumulativeOffset += data.GetSizeofData();
+				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, boneWeightIndex, 0);
+				GL_CALL(glVertexArrayAttribFormat, vertexArrayObjectId, boneWeightIndex, 4, GL_FLOAT, GL_FALSE, accumulativeOffset);
+				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, boneWeightIndex);
+				accumulativeOffset += offsetof(BoneWeight, boneIds);
+
+				GL_CALL(glVertexArrayAttribBinding, vertexArrayObjectId, boneIdIndex, 0);
+				GL_CALL(glVertexArrayAttribIFormat, vertexArrayObjectId, boneIdIndex, 4, GL_INT, accumulativeOffset);
+				GL_CALL(glEnableVertexArrayAttrib, vertexArrayObjectId, boneIdIndex);
+				accumulativeOffset += offsetof(BoneWeight, weights);
+
 				continue;
 			}
 
