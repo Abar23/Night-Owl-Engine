@@ -1,31 +1,43 @@
 #pragma once
 
+#include "glad/glad.h"
+#include "NightOwl/Animation/3D/Structures/BoneWeight.h"
+#include "NightOwl/Math/Vec2.h"
+#include "NightOwl/Math/Vec3.h"
+#include "NightOwl/Math/Vec4.h"
+
 namespace NightOwl
 {
 	enum class VertexDataType
 	{
-		None,
-		VectorFloat2,
-		VectorInt2,
-		VectorInt4,
-		VectorFloat3,
-		VectorFloat4
+		Position,
+		Normal,
+		Tangent,
+		Bitangent,
+		Color,
+		Uv0,
+		BoneWeights,
+		None
 	};
 
 	inline unsigned int VertexDataTypeToNumberOfComponents(VertexDataType type)
 	{
 		switch (type)
 		{
-		case VertexDataType::VectorInt2:
-		case VertexDataType::VectorFloat2:
+		case VertexDataType::Uv0:
 			return 2;
 
-		case VertexDataType::VectorFloat3:
+		case VertexDataType::Position:
+		case VertexDataType::Normal:
+		case VertexDataType::Color:
 			return 3;
 
-		case VertexDataType::VectorInt4:
-		case VertexDataType::VectorFloat4:
+		case VertexDataType::Tangent:
+		case VertexDataType::Bitangent:
 			return 4;
+
+		case VertexDataType::BoneWeights:
+			return 8;
 
 		default:
 			return 0;
@@ -36,20 +48,38 @@ namespace NightOwl
 	{
 		switch (type)
 		{
-		case VertexDataType::VectorInt2:
-			return 2 * sizeof(int);
+		case VertexDataType::Uv0:
+			return sizeof(Vec2F);
 
-		case VertexDataType::VectorInt4:
-			return 4 * sizeof(int);
+		case VertexDataType::Position:
+		case VertexDataType::Normal:
+		case VertexDataType::Color:
+		case VertexDataType::Tangent:
+		case VertexDataType::Bitangent:
+			return sizeof(Vec3F);
 
-		case VertexDataType::VectorFloat2:
-			return 2 * sizeof(float);
+		case VertexDataType::BoneWeights:
+			return sizeof(BoneWeight);
 
-		case VertexDataType::VectorFloat3:
-			return 3 * sizeof(float);
+		default:
+			return 0;
+		}
+	}
 
-		case VertexDataType::VectorFloat4:
-			return 4 * sizeof(float);
+	inline unsigned int VertexDataTypeToOpenGlComponentType(VertexDataType type)
+	{
+		switch (type)
+		{
+		case VertexDataType::Uv0:
+		case VertexDataType::Position:
+		case VertexDataType::Normal:
+		case VertexDataType::Color:
+		case VertexDataType::Tangent:
+		case VertexDataType::Bitangent:
+			return GL_FLOAT;
+
+		case VertexDataType::BoneWeights:
+			return GL_INT;
 
 		default:
 			return 0;

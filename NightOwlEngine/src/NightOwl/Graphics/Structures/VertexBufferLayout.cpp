@@ -11,6 +11,7 @@ namespace NightOwl
 
 	VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& bufferDataDefs)
 	{
+		dataPerVertex = 0;
 		bufferDataDefinitions = bufferDataDefs.bufferDataDefinitions;
 		for(const VertexBufferData& data : bufferDataDefinitions)
 		{
@@ -51,12 +52,12 @@ namespace NightOwl
 		return dataPerVertex;
 	}
 
-	int VertexBufferLayout::GetIndexOfShaderAttribute(const std::string& name) const
+	int VertexBufferLayout::GetIndexOfVertexAttribute(VertexDataType vertexDataType) const
 	{
 		int indexOfShaderAttribute = 0;
-		for (const auto & bufferDataDefinition : bufferDataDefinitions)
+		for (const auto& bufferDataDefinition : bufferDataDefinitions)
 		{
-			if(bufferDataDefinition.GetShaderAttributeName() == name)
+			if (bufferDataDefinition.GetVertexDataType() == vertexDataType)
 			{
 				return indexOfShaderAttribute;
 			}
@@ -64,6 +65,19 @@ namespace NightOwl
 		}
 
 		return -1;
+	}
+
+	const VertexBufferData* VertexBufferLayout::GetVertexBufferDataForVertexDataType(VertexDataType vertexDataType) const
+	{
+		for (const auto& bufferDataDefinition : bufferDataDefinitions)
+		{
+			if (bufferDataDefinition.GetVertexDataType() == vertexDataType)
+			{
+				return &bufferDataDefinition;
+			}
+		}
+
+		return nullptr;
 	}
 }
 

@@ -33,6 +33,8 @@ void InfinitePlane::Start()
 
 	renderer->GetMesh()->SetVertices(VERTICES);
 	renderer->GetMesh()->SetTriangles(INDICES);
+	renderer->GetMesh()->UploadMeshData(true);
+
 	renderer->GetMesh()->SetSubMeshes(SUB_MESH);
 	renderer->GetMaterial()->SetShader(shader);
 	renderer->GetMaterial()->SetVec4F(NightOwl::Vec4F(1.0f, 0.0f, 0.0f, 1.0f), "diffuseColor");

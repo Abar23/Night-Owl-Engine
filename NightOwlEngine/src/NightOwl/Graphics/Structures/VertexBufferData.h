@@ -1,28 +1,19 @@
 #pragma once
 
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
-#include <string>
-
 namespace NightOwl
 {
+	enum class VertexDataType;
+
 	class VertexBufferData
 	{
 	public:
 		VertexBufferData();
 
-		VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, unsigned int attributeLocation, bool normalize = false);
-
-		const std::string& GetShaderAttributeName() const;
-
-		void SetShaderAttributeName(const std::string& shaderAttributeName);
+		VertexBufferData(VertexDataType type, unsigned int attributeLocation);
 
 		VertexDataType GetVertexDataType() const;
 
 		void SetVertexDataType(VertexDataType type);
-
-		bool GetNormalize() const;
-
-		void SetNormalize(bool normalize);
 
 		unsigned int GetNumberOfComponents() const;
 
@@ -37,11 +28,7 @@ namespace NightOwl
 		void SetOffset(unsigned int offset);
 
 	private:
-		std::string shaderAttributeName;
-
 		VertexDataType type;
-
-		bool normalize;
 
 		unsigned int numberOfComponents;
 

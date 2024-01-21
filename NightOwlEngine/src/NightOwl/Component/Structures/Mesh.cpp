@@ -4,15 +4,16 @@
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
+#include "NightOwl/Graphics/Types/VertexDataTypes.h"
 
 namespace NightOwl
 {
-	Mesh::Mesh()
-		: isValid(false)
+	Mesh::Mesh(bool isReadable /* = true */)
+		: isValid(false),
+		  isReadable(isReadable)
 	{
-		vertexBuffer = Graphics::CreateVertexBuffer();
-
-		indexBuffer = Graphics::CreateIndexBuffer();
+		vertexBuffer = Graphics::CreateGraphicsBuffer(BufferType::Vertex);
+		indexBuffer = Graphics::CreateGraphicsBuffer(BufferType::Index);
 
 		vertexArrayObject = Graphics::CreateVertexArrayObject();
 		vertexArrayObject->SetIndexBuffer(indexBuffer);
@@ -39,11 +40,6 @@ namespace NightOwl
 	void Mesh::SetVertices(const std::vector<Vec3F>& vertices)
 	{
 		this->vertices = vertices;
-
-		if (isValid)
-		{
-			UploadVertices();
-		}
 	}
 
 	std::vector<Vec3F> Mesh::GetColors()
@@ -54,11 +50,6 @@ namespace NightOwl
 	void Mesh::SetColors(const std::vector<Vec3F>& colors)
 	{
 		this->colors = colors;
-
-		if (isValid)
-		{
-			UploadColor();
-		}
 	}
 
 	// TODO: Don't like the divide by 255
@@ -77,11 +68,6 @@ namespace NightOwl
 	void Mesh::SetNormals(const std::vector<Vec3F>& normals)
 	{
 		this->normals = normals;
-
-		if (isValid)
-		{
-			UploadNormals();
-		}
 	}
 
 	std::vector<Vec3F> Mesh::GetTangents()
@@ -129,10 +115,6 @@ namespace NightOwl
 		ENGINE_ASSERT(!triangles.empty(), "Must call clear data before reassigning triangles of mesh.");
 
 		this->triangles = triangles;
-
-		ValidateMesh();
-
-		UploadMeshData();
 	}
 
 	std::vector<Vec2F> Mesh::GetUVs()
@@ -143,11 +125,6 @@ namespace NightOwl
 	void Mesh::SetUVs(const std::vector<Vec2F>& uvs)
 	{
 		this->uvs = uvs;
-
-		if (isValid)
-		{
-			UploadUvData();
-		}
 	}
 
 	const std::vector<SubMeshData>& Mesh::GetSubMeshes()
@@ -180,199 +157,149 @@ namespace NightOwl
 		bitangents.clear();
 		colors.clear();
 		boneWeights.clear();
-
-		isValid = false;
 	}
 
-	void Mesh::UploadMeshData()
+	void Mesh::UploadMeshData(bool markNoLongerReadable)
 	{
+		ValidateMesh();
 		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");
 
-		indexBuffer->SetSize(triangles.size() * sizeof(Vec3UI));
+		indexBuffer->SetSize(triangles.size(), sizeof(triangles[0]));
 		indexBuffer->SetData(triangles.data());
-
+		
 		VertexBufferLayout layout;
 
-		VertexBufferData data = VertexBufferData("Position", VertexDataType::VectorFloat3, 0);
+		VertexBufferData data = VertexBufferData(VertexDataType::Position, 0);
 		layout.AddVertexBufferDataDefinition(data);
 
 		if (!colors.empty())
 		{
-			data = VertexBufferData("Color", VertexDataType::VectorFloat3, 1);
+			data = VertexBufferData(VertexDataType::Color, 1);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
 		if (!uvs.empty())
 		{
-			data = VertexBufferData("UV", VertexDataType::VectorFloat2, 2);
+			data = VertexBufferData(VertexDataType::Uv0, 2);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
 		if (!normals.empty())
 		{
-			data = VertexBufferData("Normals", VertexDataType::VectorFloat3, 3);
+			data = VertexBufferData(VertexDataType::Normal, 3);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
-		if (!normals.empty())
+		if (!tangents.empty())
 		{
-			data = VertexBufferData("Tangents", VertexDataType::VectorFloat3, 4);
+			data = VertexBufferData(VertexDataType::Tangent, 4);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
-		if (!normals.empty())
+		if (!bitangents.empty())
 		{
-			data = VertexBufferData("Bitangents", VertexDataType::VectorFloat3, 5);
+			data = VertexBufferData(VertexDataType::Bitangent, 5);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
 		if (!boneWeights.empty())
 		{
-			data = VertexBufferData("BoneIds", VertexDataType::VectorInt4, 6);
-			layout.AddVertexBufferDataDefinition(data);
-		
-			data = VertexBufferData("BoneWeights", VertexDataType::VectorFloat4, 7);
+			data = VertexBufferData(VertexDataType::BoneWeights, 6);
 			layout.AddVertexBufferDataDefinition(data);
 		}
 
-		vertexBuffer->SetVertexBufferLayout(layout);
-		vertexBuffer->SetSize(layout.GetDataPerVertex() * triangles.size() * 3);
+		vertexBufferLayout = layout;
+		vertexBuffer->SetSize(vertices.size(), layout.GetDataPerVertex());
 
-		int indexOfVertexBufferData = 0;
-
-		vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, vertices.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * vertices.size());
-		indexOfVertexBufferData++;
+		const VertexBufferData* vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Position);
+		vertexBuffer->SetSubData(vertices.data(), 0, vertices.size(), vertexBufferData->GetSizeofData());
 
 		if (!colors.empty())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, colors.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * colors.size());
-			indexOfVertexBufferData++;
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Color);
+			vertexBuffer->SetSubData(colors.data(), vertexBufferData->GetOffset(), colors.size(), vertexBufferData->GetSizeofData());
 		}
 		if (!uvs.empty())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
-			indexOfVertexBufferData++;
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Uv0);
+			vertexBuffer->SetSubData(uvs.data(), vertexBufferData->GetOffset(), uvs.size(), vertexBufferData->GetSizeofData());
 		}
 		if (!normals.empty())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, normals.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * normals.size());
-			indexOfVertexBufferData++;
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Normal);
+			vertexBuffer->SetSubData(normals.data(), vertexBufferData->GetOffset(), normals.size(), vertexBufferData->GetSizeofData());
 		}
 		if (!tangents.empty())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, tangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * tangents.size());
-			indexOfVertexBufferData++;
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Tangent);
+			vertexBuffer->SetSubData(tangents.data(), vertexBufferData->GetOffset(), tangents.size(), vertexBufferData->GetSizeofData());
 		}
 		if (!bitangents.empty())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, bitangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * bitangents.size());
-			indexOfVertexBufferData++;
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::Bitangent);
+			vertexBuffer->SetSubData(bitangents.data(), vertexBufferData->GetOffset(), bitangents.size(), vertexBufferData->GetSizeofData());
 		}
-
-		// TODO: Does work, but should be cleaner
 		if (!boneWeights.empty())
 		{
-			unsigned int boneWeightsVertexDataSize = VertexDataTypeToDataTypeSize(VertexDataType::VectorInt4) + VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat4);
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(indexOfVertexBufferData, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size(), boneWeightsVertexDataSize);
+			vertexBufferData = layout.GetVertexBufferDataForVertexDataType(VertexDataType::BoneWeights);
+			vertexBuffer->SetSubData(boneWeights.data(), vertexBufferData->GetOffset(), boneWeights.size(), vertexBufferData->GetSizeofData());
 		}
 
-		vertexArrayObject->SetupVertexBufferAttributes();
+		vertexArrayObject->SetupVertexBufferAttributes(vertexBufferLayout);
+
+		if (markNoLongerReadable)
+		{
+			Clear();
+		}
 	}
 
 	void Mesh::ValidateMesh()
 	{
-		isValid = false;
-
-		if (triangles.empty() == false && vertices.empty() == false)
+		// Find greatest index in the triangles array
+		unsigned int maxIndexInsideTriangles = 0;
+		for (const Vec3UI& triangle : triangles)
 		{
-			isValid = true;
-		}
-	}
-
-	void Mesh::UploadVertices()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Position");
-		if (index >= 0)
-		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, vertices.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * vertices.size());
-			return;
+			maxIndexInsideTriangles = std::max(maxIndexInsideTriangles, triangle.x);
+			maxIndexInsideTriangles = std::max(maxIndexInsideTriangles, triangle.y);
+			maxIndexInsideTriangles = std::max(maxIndexInsideTriangles, triangle.z);
 		}
 
-		UploadMeshData();
-	}
-
-	void Mesh::UploadColor()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Color");
-		if (index >= 0)
+		isValid = true;
+		if (vertices.empty() && vertices.size() < maxIndexInsideTriangles)
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, colors.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * colors.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied vertex array has less vertices than referenced in the triangles array.");
+			isValid = false;
 		}
 
-		UploadMeshData();
-	}
-
-	void Mesh::UploadNormals()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Normals");
-		if (index >= 0)
+		if (normals.empty() == false && normals.size() != vertices.size())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, normals.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * normals.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied normals array has to be the same size as the vertices array");
+			isValid = false;
 		}
 
-		UploadMeshData();
-	}
-
-	void Mesh::UploadTangents()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Tangents");
-		if (index >= 0)
+		if (tangents.empty() == false && tangents.size() != vertices.size())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, tangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * tangents.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied tangents array has to be the same size as the vertices array");
+			isValid = false;
 		}
 
-		UploadMeshData();
-	}
-
-	void Mesh::UploadBitangents()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("Bitangents");
-		if (index >= 0)
+		if (bitangents.empty() == false && bitangents.size() != vertices.size())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, bitangents.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat3) * bitangents.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied bitangents array has to be the same size as the vertices array");
+			isValid = false;
 		}
 
-		UploadMeshData();
-	}
-
-	void Mesh::UploadBoneWeights()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("BoneIds");
-		if (index >= 0)
+		if (uvs.empty() == false && uvs.size() != vertices.size())
 		{
-			unsigned int boneWeightsVertexDataSize = VertexDataTypeToDataTypeSize(VertexDataType::VectorInt4) + VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat4);
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, boneWeights.data(), boneWeightsVertexDataSize * boneWeights.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied uvs array has to be the same size as the vertices array");
+			isValid = false;
 		}
 
-		UploadMeshData();
-	}
-
-
-	void Mesh::UploadUvData()
-	{
-		const int index = vertexBuffer->GetVertexBufferLayout().GetIndexOfShaderAttribute("UV");
-		if (index >= 0)
+		if (boneWeights.empty() == false && boneWeights.size() != vertices.size())
 		{
-			vertexBuffer->OverwriteVertexBufferDataAtIndex(index, uvs.data(), VertexDataTypeToDataTypeSize(VertexDataType::VectorFloat2) * uvs.size());
-			return;
+			ENGINE_LOG_ASSERT("The supplied boneWeights array has to be the same size as the vertices array");
+			isValid = false;
 		}
-
-		UploadMeshData();
 	}
 
 	START_REFLECTION(Mesh)

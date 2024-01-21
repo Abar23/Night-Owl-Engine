@@ -6,6 +6,7 @@
 #include "NightOwl/Core/Locator/AssetManagerLocator.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
+#include "NightOwl/Graphics/Types/VertexDataTypes.h"
 
 namespace NightOwl
 {
@@ -46,21 +47,19 @@ namespace NightOwl
 		debugLineMaterial->SetShader(debugShader);
 
 		// Define data to line segments vertex buffer
-		lineVertexBuffer = Graphics::CreateVertexBuffer();
+		lineVertexBuffer = Graphics::CreateGraphicsBuffer(BufferType::Vertex);
 
-		VertexBufferData lineVertexData("Position", VertexDataType::VectorFloat3, 0);
-		VertexBufferData colorData("Color", VertexDataType::VectorFloat3, 1);
+		VertexBufferData lineVertexData(VertexDataType::Position, 0);
+		VertexBufferData colorData(VertexDataType::Color, 1);
 
 		VertexBufferLayout vertexDataLayout;
 		vertexDataLayout.AddVertexBufferDataDefinition(lineVertexData);
 		vertexDataLayout.AddVertexBufferDataDefinition(colorData);
 
-		lineVertexBuffer->SetVertexBufferLayout(vertexDataLayout);
-
 		// Setup inputs to shader, in this case it is line vertices only
 		lineVertexArrayObject = Graphics::CreateVertexArrayObject();
 		lineVertexArrayObject->SetVertexBuffer(lineVertexBuffer);
-		lineVertexArrayObject->SetupVertexBufferAttributes();
+		lineVertexArrayObject->SetupVertexBufferAttributes(vertexDataLayout);
 	}
 
 	void DebugSystem::SetupPointGraphics()
@@ -73,21 +72,19 @@ namespace NightOwl
 		debugPointMaterial->SetShader(debugShader);
 
 		// Define data to line segments vertex buffer
-		pointVertexBuffer = Graphics::CreateVertexBuffer();
+		pointVertexBuffer = Graphics::CreateGraphicsBuffer(BufferType::Vertex);
 
-		VertexBufferData positionData("Position", VertexDataType::VectorFloat3, 0);
-		VertexBufferData colorData("Color", VertexDataType::VectorFloat3, 1);
+		VertexBufferData positionData(VertexDataType::Position, 0);
+		VertexBufferData colorData(VertexDataType::Color, 1);
 
 		VertexBufferLayout vertexDataLayout;
 		vertexDataLayout.AddVertexBufferDataDefinition(positionData);
 		vertexDataLayout.AddVertexBufferDataDefinition(colorData);
 
-		pointVertexBuffer->SetVertexBufferLayout(vertexDataLayout);
-
 		// Setup inputs to shader, in this case it is line vertices only
 		pointVertexArrayObject = Graphics::CreateVertexArrayObject();
 		pointVertexArrayObject->SetVertexBuffer(pointVertexBuffer);
-		pointVertexArrayObject->SetupVertexBufferAttributes();
+		pointVertexArrayObject->SetupVertexBufferAttributes(vertexDataLayout);
 	}
 
 	void DebugSystem::DrawLines(IContext* renderContext)
@@ -104,8 +101,8 @@ namespace NightOwl
 
 
 		// Populate vertex buffer with lines
-		const VertexBufferLayout vertexBufferLayout = lineVertexBuffer->GetVertexBufferLayout();
-		lineVertexBuffer->SetSize(vertexBufferLayout.GetDataPerVertex() * lineSegments.size());
+		const VertexBufferLayout* vertexBufferLayout = lineVertexArrayObject->GetVertexBufferLayout();
+		lineVertexBuffer->SetSize(lineSegments.size(), vertexBufferLayout->GetDataPerVertex());
 		lineVertexBuffer->SetData(lineSegments.data());
 
 		// Draw Lines
@@ -135,8 +132,8 @@ namespace NightOwl
 		debugPointMaterial->SetMat4F(viewProjectionMatrix, "viewProjectionMatrix");
 
 		// Populate vertex buffer with lines
-		const VertexBufferLayout vertexBufferLayout = pointVertexBuffer->GetVertexBufferLayout();
-		pointVertexBuffer->SetSize(vertexBufferLayout.GetDataPerVertex() * points.size());
+		const VertexBufferLayout* vertexBufferLayout = pointVertexArrayObject->GetVertexBufferLayout();
+		pointVertexBuffer->SetSize(points.size(), vertexBufferLayout->GetDataPerVertex());
 		pointVertexBuffer->SetData(points.data());
 
 		// Draw Lines

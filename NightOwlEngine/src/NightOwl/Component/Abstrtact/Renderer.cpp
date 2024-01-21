@@ -155,16 +155,17 @@ namespace NightOwl
 
 	void Renderer::CloneRenderer(const std::shared_ptr<Renderer>& clone)
 	{
-		mesh->SetUVs(clone->mesh->GetUVs());
-		mesh->SetVertices(clone->mesh->GetVertices());
-		mesh->SetColors(clone->mesh->GetColors());
-		mesh->SetBitangents(clone->mesh->GetBitangents());
-		mesh->SetTangents(clone->mesh->GetTangents());
-		mesh->SetNormals(clone->mesh->GetNormals());
-		mesh->SetBoneWeights(clone->mesh->GetBoneWeights());
-		mesh->SetTriangles(clone->mesh->GetTriangles());
-		mesh->SetSubMeshes(clone->mesh->GetSubMeshes());
-		mesh->SetBoneInfoMap(clone->mesh->GetBoneInfoMap());
+		mesh = clone->mesh;
+		// mesh->SetUVs(clone->mesh->GetUVs());
+		// mesh->SetVertices(clone->mesh->GetVertices());
+		// mesh->SetColors(clone->mesh->GetColors());
+		// mesh->SetBitangents(clone->mesh->GetBitangents());
+		// mesh->SetTangents(clone->mesh->GetTangents());
+		// mesh->SetNormals(clone->mesh->GetNormals());
+		// mesh->SetBoneWeights(clone->mesh->GetBoneWeights());
+		// mesh->SetTriangles(clone->mesh->GetTriangles());
+		// mesh->SetSubMeshes(clone->mesh->GetSubMeshes());
+		// mesh->SetBoneInfoMap(clone->mesh->GetBoneInfoMap());
 		isVisible = clone->isVisible;
 
 		materials.resize(clone->materials.size());

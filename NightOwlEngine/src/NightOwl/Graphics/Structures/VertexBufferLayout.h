@@ -22,7 +22,9 @@ namespace NightOwl
 
 		int GetDataPerVertex() const;
 
-		int GetIndexOfShaderAttribute(const std::string& name) const;
+		int GetIndexOfVertexAttribute(VertexDataType vertexDataType) const;
+
+		const VertexBufferData* GetVertexBufferDataForVertexDataType(VertexDataType vertexDataType) const;
 
 	private:
 		std::vector<VertexBufferData> bufferDataDefinitions;

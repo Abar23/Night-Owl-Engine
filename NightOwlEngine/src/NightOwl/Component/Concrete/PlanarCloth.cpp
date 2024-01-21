@@ -85,7 +85,9 @@ namespace NightOwl
 	{
 		planeVertices.resize(planeDimension * planeDimension);
 		InitializeVertices(planeVertices);
+
 		planeMesh->SetVertices(planeVertices);
+		planeMesh->UploadMeshData(false);
 
 		for (int particleIndex = 0; particleIndex < particles.size(); ++particleIndex)
 		{
@@ -152,7 +154,7 @@ namespace NightOwl
 		planeMesh->SetVertices(planeVertices);
 		planeMesh->SetTriangles(triangles);
 		planeMesh->SetSubMeshes(subMeshData);
-		planeMesh->UploadMeshData();
+		planeMesh->UploadMeshData(false);
 
 		grid.resize(numberOfVertices);
 		for (int zIndex = 0; zIndex < planeDimension; ++zIndex)
@@ -493,6 +495,7 @@ namespace NightOwl
 
 		planeMesh->SetVertices(planeVertices);
 		planeMesh->SetNormals(planeNormals);
+		planeMesh->UploadMeshData(false);
 	}
 
 	void PlanarCloth::ApplyConstraints() const
