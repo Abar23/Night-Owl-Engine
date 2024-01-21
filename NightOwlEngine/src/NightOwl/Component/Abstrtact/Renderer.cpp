@@ -165,7 +165,8 @@ namespace NightOwl
 		mesh->SetTriangles(clone->mesh->GetTriangles());
 		mesh->SetSubMeshes(clone->mesh->GetSubMeshes());
 		mesh->SetBoneInfoMap(clone->mesh->GetBoneInfoMap());
-		isVisible = clone->isVisible;
+		mesh->isReadable = clone->mesh->isReadable;
+		mesh->UploadMeshData(mesh->isReadable);
 
 		materials.resize(clone->materials.size());
 		for (int materialIndex = 0; materialIndex < clone->materials.size(); ++materialIndex)

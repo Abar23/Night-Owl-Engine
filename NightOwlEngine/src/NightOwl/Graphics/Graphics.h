@@ -4,15 +4,12 @@
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
 #include "NightOwl/Graphics/Interfaces/IContext.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
-#include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
-#include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
-#include "NightOwl/Graphics/OpenGL/OpenGlShader.h"
-#include "NightOwl/Graphics/OpenGL/OpenGlTexture2D.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlContext.h"
-#include "NightOwl/Graphics/OpenGL/OpenGlVertexBuffer.h"
-#include "NightOwl/Graphics/OpenGL/OpenGlIndexBuffer.h"
-#include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlGraphicsBuffer.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlShader.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlShaderStage.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlTexture2D.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Window/Interfaces/IWindow.h"
 #include <memory>
@@ -63,19 +60,10 @@ namespace NightOwl
 			return graphicsContext;
 		}
 
-		template<typename... Args>
-		static std::shared_ptr<IVertexBuffer> CreateVertexBuffer(Args&&... args)
+		static std::shared_ptr<IGraphicsBuffer> CreateGraphicsBuffer(BufferType bufferType)
 		{
 			#ifdef OPEN_GL
-			return std::make_shared<OpenGlVertexBuffer>(std::forward<Args>(args)...);
-			#endif
-		}
-
-		template<typename... Args>
-		static std::shared_ptr<IIndexBuffer> CreateIndexBuffer(Args&&... args)
-		{
-			#ifdef OPEN_GL
-			return std::make_shared<OpenGlIndexBuffer>(std::forward<Args>(args)...);
+			return std::make_shared<OpenGlGraphicsBuffer>(bufferType);
 			#endif
 		}
 

@@ -118,8 +118,7 @@ namespace NightOwl
 			ProcessMaterials(modelLoadingInfo, scene->mMaterials[materialIndex], materialIndex);
 		}
 
-		model->renderer->mesh->ValidateMesh();
-		model->renderer->mesh->UploadMeshData();
+		model->renderer->mesh->UploadMeshData(false);
 		assetManager->GetModelRepository().AddAsset(modelLoadingInfo.name, model);
 	}
 

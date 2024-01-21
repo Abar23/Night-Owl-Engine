@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glad/glad.h>
 
 namespace NightOwl
@@ -9,7 +10,8 @@ namespace NightOwl
 		Vertex,
 		Index,
 		Uniform,
-		Storage
+		Storage,
+		None
 	};
 
 	inline int BufferTypeToOpenGlBufferType(BufferType bufferType)
@@ -28,5 +30,25 @@ namespace NightOwl
 		case BufferType::Storage:
 			return GL_SHADER_STORAGE_BUFFER;
 		}
+	}
+
+	inline std::string BufferTypeToString(BufferType type)
+	{
+		switch (type)
+		{
+		case BufferType::Vertex:
+			return std::string{ "Vertex" };
+
+		case BufferType::Index:
+			return std::string{ "Index" };
+
+		case BufferType::Uniform:
+			return std::string{ "Uniform" };
+
+		case BufferType::Storage:
+			return std::string{ "Storage" };
+		}
+
+		return std::string{ "None" };
 	}
 }

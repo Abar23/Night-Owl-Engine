@@ -2,7 +2,6 @@
 
 #include "NightOwl/Component/Structures/DebugPointVertex.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
-#include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
 #include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Math/Vec3.h"
 #include <vector>
@@ -32,13 +31,13 @@ namespace NightOwl
 
 		std::shared_ptr<IVertexArrayObject> lineVertexArrayObject;
 
-		std::shared_ptr<IVertexBuffer> lineVertexBuffer;
+		std::shared_ptr<IGraphicsBuffer> lineVertexBuffer;
 
 		std::vector<DebugPointVertex> points;
 
 		std::shared_ptr<IVertexArrayObject> pointVertexArrayObject;
 
-		std::shared_ptr<IVertexBuffer> pointVertexBuffer;
+		std::shared_ptr<IGraphicsBuffer> pointVertexBuffer;
 
 		void SetupLineGraphics();
 

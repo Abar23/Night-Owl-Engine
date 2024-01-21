@@ -46,12 +46,8 @@ project "Sandbox"
 		
 		postbuildcommands 
 		{ 
-			"rmdir /s /q \"$(ProjectDir)$(OutDir)\\..\\NightOwlEngine\\assets\"",
-			"rmdir /s /q \"$(ProjectDir)$(OutDir)\\assets\"",
 			"copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-			"xcopy /E /I /Y \".\\assets\" \"$(ProjectDir)$(OutDir)\\assets\"",
-			"xcopy /E /I /Y \"..\\NightOwlEngine\\assets\" \"$(ProjectDir)$(OutDir)\\..\\NightOwlEngine\\assets\""
+			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""		
 		}
 
 	filter "configurations:Debug"

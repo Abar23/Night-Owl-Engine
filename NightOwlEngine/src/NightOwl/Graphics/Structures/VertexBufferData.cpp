@@ -7,30 +7,17 @@ namespace NightOwl
 {
 	VertexBufferData::VertexBufferData()
 		:	type(VertexDataType::None),
-			normalize(false),
 			numberOfComponents(0),
 			sizeOfData(0),
 			attributeLocation(0)
 	{
 	}
 
-	VertexBufferData::VertexBufferData(const std::string& shaderAttributeName, VertexDataType type, unsigned int attributeLocation, bool normalize)
-		:	shaderAttributeName{ shaderAttributeName },
-			type(type),
-			normalize(normalize),
+	VertexBufferData::VertexBufferData(VertexDataType type, unsigned int attributeLocation)
+		:	type(type),
 			attributeLocation(attributeLocation)
 	{
 		SetDataSizeAndNumberOfComponents();
-	}
-
-	const std::string& VertexBufferData::GetShaderAttributeName() const
-	{
-		return shaderAttributeName;
-	}
-
-	void VertexBufferData::SetShaderAttributeName(const std::string& shaderAttributeName)
-	{
-		this->shaderAttributeName = shaderAttributeName;
 	}
 
 	VertexDataType VertexBufferData::GetVertexDataType() const
@@ -42,16 +29,6 @@ namespace NightOwl
 	{
 		this->type = type;
 		SetDataSizeAndNumberOfComponents();
-	}
-
-	bool VertexBufferData::GetNormalize() const
-	{
-		return normalize;
-	}
-
-	void VertexBufferData::SetNormalize(bool normalize)
-	{
-		this->normalize = normalize;
 	}
 
 	unsigned VertexBufferData::GetNumberOfComponents() const

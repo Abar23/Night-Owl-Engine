@@ -5,18 +5,20 @@
 #include "NightOwl/Animation/3D/Structures/BoneInfo.h"
 #include "NightOwl/Core/Reflection/Reflection.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
-#include "NightOwl/Graphics/Interfaces/IVertexBuffer.h"
-#include "NightOwl/Graphics/Interfaces/IIndexBuffer.h"
+#include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Math/Math.h"
 #include <map>
 #include <vector>
 
+
 namespace NightOwl
 {
+	class IGraphicsBuffer;
+
 	class Mesh
 	{
 	public:
-		Mesh();
+		Mesh(bool isReadable = true);
 
 		void Bind() const;
 
@@ -68,7 +70,7 @@ namespace NightOwl
 
 		void Clear();
 
-		void UploadMeshData();
+		void UploadMeshData(bool markNoLongerReadable);
 
 		REFLECT()
 
@@ -91,31 +93,23 @@ namespace NightOwl
 
 		std::shared_ptr<IVertexArrayObject> vertexArrayObject;
 
-		std::shared_ptr<IVertexBuffer> vertexBuffer;
+		std::shared_ptr<IGraphicsBuffer> vertexBuffer;
 
-		std::shared_ptr<IIndexBuffer> indexBuffer;
+		std::shared_ptr<IGraphicsBuffer> indexBuffer;
 
 		std::vector<SubMeshData> subMeshes;
 
 		std::map<std::string, BoneInfo> boneInfoMap;
 
+		VertexBufferLayout vertexBufferLayout;
+
 		bool isValid;
+
+		bool isReadable;
 
 		void ValidateMesh();
 
-		void UploadVertices();
-
-		void UploadColor();
-
-		void UploadNormals();
-
-		void UploadTangents();
-
-		void UploadBitangents();
-
-		void UploadBoneWeights();
-
-		void UploadUvData();
+		friend class Renderer;
 
 		friend class AssimpModelLoader;
 	};

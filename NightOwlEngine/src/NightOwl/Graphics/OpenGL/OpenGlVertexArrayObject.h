@@ -15,23 +15,23 @@ namespace NightOwl
 
 		void Unbind() override;
 
-		void SetVertexBuffer(const std::shared_ptr<IVertexBuffer>& vertexBuffer) override;
+		void SetVertexBuffer(const std::shared_ptr<IGraphicsBuffer>& graphicsBuffer) override;
 
-		std::shared_ptr<IVertexBuffer>& GetVertexBuffer() override;
+		std::shared_ptr<IGraphicsBuffer>& GetVertexBuffer() override;
 
-		void SetIndexBuffer(const std::shared_ptr<IIndexBuffer>& indexBuffer) override;
+		void SetIndexBuffer(const std::shared_ptr<IGraphicsBuffer>& graphicsBuffer) override;
 
-		std::shared_ptr<IIndexBuffer>& GetIndexBuffer() override;
+		std::shared_ptr<IGraphicsBuffer>& GetIndexBuffer() override;
 
 		unsigned GetVertexArrayObjectId() override;
 
-		void SetupVertexBufferAttributes() override;
+		void SetupVertexBufferAttributes(const VertexBufferLayout& vertexBufferLayout) override;
 
 	private:
 		unsigned int vertexArrayObjectId;
 
-		std::shared_ptr<IVertexBuffer> vertexBuffer;
+		std::shared_ptr<IGraphicsBuffer> vertexBuffer;
 
-		std::shared_ptr<IIndexBuffer> indexBuffer;
+		std::shared_ptr<IGraphicsBuffer> indexBuffer;
 	};
 }
