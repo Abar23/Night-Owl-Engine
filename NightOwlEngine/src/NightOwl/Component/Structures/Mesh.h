@@ -109,6 +109,8 @@ namespace NightOwl
 
 		void ValidateMesh();
 
+		friend class Renderer;
+
 		friend class AssimpModelLoader;
 	};
 }
