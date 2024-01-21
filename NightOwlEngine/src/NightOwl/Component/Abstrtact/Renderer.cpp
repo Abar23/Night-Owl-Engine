@@ -155,7 +155,6 @@ namespace NightOwl
 
 	void Renderer::CloneRenderer(const std::shared_ptr<Renderer>& clone)
 	{
-		mesh = clone->mesh;
 		mesh->SetUVs(clone->mesh->GetUVs());
 		mesh->SetVertices(clone->mesh->GetVertices());
 		mesh->SetColors(clone->mesh->GetColors());
@@ -166,9 +165,8 @@ namespace NightOwl
 		mesh->SetTriangles(clone->mesh->GetTriangles());
 		mesh->SetSubMeshes(clone->mesh->GetSubMeshes());
 		mesh->SetBoneInfoMap(clone->mesh->GetBoneInfoMap());
-		mesh->vertexBufferLayout = clone->mesh->vertexBufferLayout;
-		mesh->isValid = clone->mesh->isValid;
 		mesh->isReadable = clone->mesh->isReadable;
+		mesh->UploadMeshData(mesh->isReadable);
 
 		materials.resize(clone->materials.size());
 		for (int materialIndex = 0; materialIndex < clone->materials.size(); ++materialIndex)
