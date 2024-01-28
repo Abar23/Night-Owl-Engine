@@ -2,33 +2,41 @@
 
 #include "OpenGlTexture2D.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Graphics/Types/GraphicsFormat.h"
+#include "NightOwl/Graphics/Types/TextureFormat.h"
 
 namespace NightOwl
 {
 	OpenGlTexture2D::OpenGlTexture2D()
-		: textureHandle(0),
-		  textureId(0), 
+		: textureId(-1), 
 		  height(0), 
-		  width(0), 
-		  numberOfChannels(0)
+		  width(0),
+		  graphicsFormat(GraphicsFormat::None),
+		  textureFormat(TextureFormat::None),
+		  wrapModeU(TextureWrapMode::ClampToEdge),
+		  wrapModeV(TextureWrapMode::MirrorClampToEdge),
+		  textureFilterMode(TextureFilterMode::Point)
 	{
 	}
 
-	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, int numberOfChannels)
-		:	height(height),
-			width(width),
-			numberOfChannels(numberOfChannels)
+	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, GraphicsFormat format, TextureWrapMode wrapModeU /* = TextureWrapMode::ClampToEdge */, TextureWrapMode wrapModeV /* = TextureWrapMode::ClampToEdge  */, TextureFilterMode filterMode /* = TextureFilterMode::Nearest */)
+		: height(height),
+		  width(width),
+		  graphicsFormat(format),
+		  textureFormat(GraphicsFormatToTextureFormat(format)),
+		  wrapModeU(wrapModeU),
+		  wrapModeV(wrapModeV),
+		  textureFilterMode(filterMode)
 	{
 		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
-		GL_CALL(glTextureStorage2D, textureId, 1, GL_RGBA8, width, height);
+		GL_CALL(glTextureStorage2D, textureId, 1, GraphicsFormatToOpenGlFormat(graphicsFormat), width, height);
 
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		SetFilterMode(textureFilterMode);
 
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		SetWrapModeU(wrapModeU);
+		SetWrapModeV(wrapModeV);
 
-		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+		SetData(pixelData, height, width, format);
 	}
 
 	OpenGlTexture2D::~OpenGlTexture2D()
@@ -47,17 +55,53 @@ namespace NightOwl
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
 	}
 
-	int OpenGlTexture2D::GetWidth()
+	void OpenGlTexture2D::SetData(const void* pixelData, int height, int width, GraphicsFormat format)
+	{
+		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, TextureFormatToOpenGlFormat(textureFormat), GraphicsFormatToOpenGlDataFormat(format), pixelData);
+	}
+
+	void OpenGlTexture2D::SetWrapModeU(TextureWrapMode wrapMode)
+	{
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, TextureWrapModeToOpenglWrapMode(wrapModeU));
+	}
+
+	TextureWrapMode OpenGlTexture2D::GetWrapModeU() const
+	{
+		return wrapModeU;
+	}
+
+	void OpenGlTexture2D::SetWrapModeV(TextureWrapMode wrapMode)
+	{
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, TextureWrapModeToOpenglWrapMode(wrapModeU));
+	}
+
+	TextureWrapMode OpenGlTexture2D::GetWrapModeV() const
+	{
+		return wrapModeV;
+	}
+
+	void OpenGlTexture2D::SetFilterMode(TextureFilterMode filterMode)
+	{
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, TextureFilterModeToOpenGlMinFilter(textureFilterMode));
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, TextureFilterModeToOpenGlMagFilter(textureFilterMode));
+	}
+
+	TextureFilterMode OpenGlTexture2D::GetFilterMode() const
+	{
+		return textureFilterMode;
+	}
+
+	int OpenGlTexture2D::GetWidth() const
 	{
 		return width;
 	}
 
-	int OpenGlTexture2D::GetHeight()
+	int OpenGlTexture2D::GetHeight() const
 	{
 		return height;
 	}
 
-	unsigned int OpenGlTexture2D::GetTextureId()
+	unsigned int OpenGlTexture2D::GetTextureId() const
 	{
 		return textureId;
 	}
