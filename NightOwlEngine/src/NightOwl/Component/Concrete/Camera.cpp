@@ -9,14 +9,15 @@ namespace NightOwl
 	Camera* Camera::mainCamera{ nullptr };
 
 	Camera::Camera()
-		:	Component(ComponentType::Camera),
-			fieldOfView(90.0f),
-			clippingPlanes(0.01f, 1000.0f),
-			aspectRatio(WindowApi::GetWindow()->GetAspectRatio()),
-			orthographicSize(WindowApi::GetWindow()->GetHeight() / 2.0f),
-			isPerspectiveProjection(true),
-			wasAspectRatioSet(false),
-			isProjectionDirty(true)
+		: Component(ComponentType::Camera),
+		  fieldOfView(90.0f),
+		  clippingPlanes(0.01f, 1000.0f),
+		  aspectRatio(WindowApi::GetWindow()->GetAspectRatio()),
+		  orthographicSize(WindowApi::GetWindow()->GetHeight() / 2.0f),
+		  isPerspectiveProjection(true),
+		  wasAspectRatioSet(false),
+		  isProjectionDirty(true),
+		  targetTexture(nullptr)
 	{
 		this->gameObject = gameObject;
 		mainCamera = this;
