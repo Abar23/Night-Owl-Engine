@@ -5,9 +5,9 @@
 
 namespace NightOwl::Utility
 {
-	bool CheckOpenGlError(const std::string& filename, const std::uint32_t line)
+	bool CheckOpenGlError(const std::string& filename, std::uint32_t line)
 	{
-		GLenum glErrorCode = glGetError();
+		const GLenum glErrorCode = glGetError();
 		if (glErrorCode != GL_NO_ERROR)
 		{
 			std::string errorMessage;
@@ -160,7 +160,7 @@ User Params: {4})",
 			sourceMessage, typeMessage, severityMessage, message, userParam);
 	}
 
-	void CheckOpenGlShaderCompilerErrors(const unsigned int shaderId)
+	void CheckOpenGlShaderCompilerErrors(unsigned int shaderId)
 	{
 		int compilationSuccessful;
 		GL_CALL(glGetShaderiv, shaderId, GL_COMPILE_STATUS, &compilationSuccessful);
@@ -179,7 +179,7 @@ User Params: {4})",
 		ENGINE_LOG_ERROR(errorBuffer.data());
 	}
 
-	void CheckOpenGlShaderProgramLinkerErrors(const unsigned int shaderId)
+	void CheckOpenGlShaderProgramLinkerErrors(unsigned int shaderId)
 	{
 		int compilationSuccessful;
 		GL_CALL(glGetProgramiv, shaderId, GL_LINK_STATUS, &compilationSuccessful);
@@ -199,5 +199,46 @@ User Params: {4})",
 		{
 			ENGINE_LOG_ERROR(errorBuffer.data());
 		}
+	}
+
+	void CheckFrameBufferCompleteness(unsigned frameBufferId)
+	{
+		const GLenum status = GL_CALL(glCheckNamedFramebufferStatus, frameBufferId, GL_FRAMEBUFFER);
+
+		if (status == GL_FRAMEBUFFER_COMPLETE) 
+		{
+			return;
+		}
+
+		std::string errorMessage;
+
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_UNDEFINED:
+			errorMessage = "GL_FRAMEBUFFER_UNDEFINED: Default framebuffer does not exist.";
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			errorMessage = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: Incomplete attachment.";
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			errorMessage = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: No image attachments.";
+			break;
+
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			errorMessage = "GL_FRAMEBUFFER_UNSUPPORTED: Combination of internal formats is not supported.";
+			break;
+
+		case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+			errorMessage = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: Incomplete multisample configuration.";
+			break;
+
+		default:
+			errorMessage = "Unknown framebuffer completeness error.";
+			break;
+		}
+
+		ENGINE_LOG_ERROR(errorMessage);
 	}
 }

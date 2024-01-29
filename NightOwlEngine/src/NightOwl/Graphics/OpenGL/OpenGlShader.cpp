@@ -8,7 +8,7 @@ namespace NightOwl
 {
 	OpenGlShader::OpenGlShader(const std::string& name)
 		: name{ name },
-		  programId(0)
+		  programId(std::numeric_limits<unsigned int>::max())
 	{
 		programId = GL_CALL(glCreateProgram);
 	}

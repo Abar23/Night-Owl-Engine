@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
-#include "glad/glad.h"
+#include <glad/glad.h>
+#include <string>
 
 #ifdef DEBUG
 
@@ -16,6 +16,9 @@
 #define CHECK_PROGRAM_LINKER_ERRORS(programId) \
     NightOwl::Utility::CheckOpenGlShaderProgramLinkerErrors(programId)
 
+#define CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId) \
+    NightOwl::Utility::CheckFrameBufferCompleteness(frameBufferId)
+
 #else
 
 #define GL_CALL(func, ...) func(__VA_ARGS__)
@@ -24,11 +27,13 @@
 
 #define CHECK_PROGRAM_LINKER_ERRORS(programId)
 
+#define CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId)
+
 #endif
 
 namespace NightOwl::Utility
 {
-    bool CheckOpenGlError(const std::string& filename, const std::uint32_t line);
+    bool CheckOpenGlError(const std::string& filename, std::uint32_t line);
 
     void APIENTRY GlDebugOutput(GLenum source,
         GLenum type,
@@ -39,7 +44,9 @@ namespace NightOwl::Utility
         const char* message,
         const void* userParam);
 
-    void CheckOpenGlShaderCompilerErrors(const unsigned int shaderId);
+    void CheckOpenGlShaderCompilerErrors(unsigned int shaderId);
 
-    void CheckOpenGlShaderProgramLinkerErrors(const unsigned int shaderId);
+    void CheckOpenGlShaderProgramLinkerErrors(unsigned int shaderId);
+
+    void CheckFrameBufferCompleteness(unsigned int frameBufferId);
 }

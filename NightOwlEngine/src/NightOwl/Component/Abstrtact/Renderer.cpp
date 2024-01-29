@@ -119,7 +119,7 @@ namespace NightOwl
 		this->isVisible = isVisible;
 	}
 
-	bool Renderer::IsVisible()
+	bool Renderer::IsVisible() const
 	{
 		return isVisible;
 	}

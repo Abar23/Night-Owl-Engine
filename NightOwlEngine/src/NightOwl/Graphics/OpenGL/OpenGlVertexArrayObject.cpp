@@ -1,6 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "OpenGlVertexArrayObject.h"
+#include "NightOwl/Animation/3D/Structures/BoneWeight.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Graphics/Interfaces/IGraphicsBuffer.h"

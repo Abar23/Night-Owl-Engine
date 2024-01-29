@@ -9,14 +9,15 @@ namespace NightOwl
 	Camera* Camera::mainCamera{ nullptr };
 
 	Camera::Camera()
-		:	Component(ComponentType::Camera),
-			fieldOfView(90.0f),
-			clippingPlanes(0.01f, 1000.0f),
-			aspectRatio(WindowApi::GetWindow()->GetAspectRatio()),
-			orthographicSize(WindowApi::GetWindow()->GetHeight() / 2.0f),
-			isPerspectiveProjection(true),
-			wasAspectRatioSet(false),
-			isProjectionDirty(true)
+		: Component(ComponentType::Camera),
+		  fieldOfView(90.0f),
+		  clippingPlanes(0.01f, 1000.0f),
+		  aspectRatio(WindowApi::GetWindow()->GetAspectRatio()),
+		  orthographicSize(WindowApi::GetWindow()->GetHeight() / 2.0f),
+		  isPerspectiveProjection(true),
+		  wasAspectRatioSet(false),
+		  isProjectionDirty(true),
+		  targetTexture(nullptr)
 	{
 		this->gameObject = gameObject;
 		mainCamera = this;
@@ -32,6 +33,8 @@ namespace NightOwl
 		clone->isPerspectiveProjection = isPerspectiveProjection;
 		clone->orthographicSize = orthographicSize;
 		clone->isProjectionDirty = isProjectionDirty;
+
+		// TODO: create copy and = operator for render texture
 
 		return clone;
 	}
@@ -56,14 +59,14 @@ namespace NightOwl
 		}
 		else
 		{
-			float virtualHeight = 2.0f * orthographicSize;
-			float virtualWidth = virtualHeight * aspect;
+			const float virtualHeight = 2.0f * orthographicSize;
+			const float virtualWidth = virtualHeight * aspect;
 
-			float windowAspectRatio = window->GetAspectRatio();
+			const float windowAspectRatio = window->GetAspectRatio();
 
 			// Have to map physical screen space to the virtual space of the orthographic camera using the window aspect ratio
-			float height = std::max(virtualWidth / windowAspectRatio, virtualHeight);
-			float width = std::max(windowAspectRatio * virtualHeight, virtualWidth);
+			const float height = std::max(virtualWidth / windowAspectRatio, virtualHeight);
+			const float width = std::max(windowAspectRatio * virtualHeight, virtualWidth);
 
 			const float halfHeight = height / 2.0f;
 			const float halfWidth = width / 2.0f;
@@ -76,12 +79,12 @@ namespace NightOwl
 		return projectionMatrix * GetViewMatrix();
 	}
 
-	Mat4F Camera::GetViewMatrix()
+	Mat4F Camera::GetViewMatrix() const
 	{
 		return gameObject->GetTransform()->GetWorldMatrix().GetInverse();
 	}
 
-	float Camera::GetNearClippingPlane()
+	float Camera::GetNearClippingPlane() const
 	{
 		return clippingPlanes.near;
 	}
@@ -92,7 +95,7 @@ namespace NightOwl
 		SetProjectionDirtyFlag();
 	}
 
-	float Camera::GetFarClippingPlane()
+	float Camera::GetFarClippingPlane() const
 	{
 		return clippingPlanes.far;
 	}
@@ -174,6 +177,16 @@ namespace NightOwl
 	void Camera::SetMainCamera(Camera& camera)
 	{
 		mainCamera = &camera;
+	}
+
+	std::shared_ptr<IRenderTexture> Camera::GetTargetTexture() const
+	{
+		return targetTexture;
+	}
+
+	void Camera::SetTargetTexture(const std::shared_ptr<IRenderTexture>& targetTexture)
+	{
+		this->targetTexture = targetTexture;
 	}
 
 	void Camera::Remove()

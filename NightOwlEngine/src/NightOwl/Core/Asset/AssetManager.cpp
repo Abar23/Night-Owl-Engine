@@ -13,9 +13,11 @@
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
+#include "NightOwl/Graphics/Types/GraphicsFormat.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include <filesystem>
 #include <stb/stb_image.h>
+
 
 namespace NightOwl
 {
@@ -95,10 +97,27 @@ namespace NightOwl
 		int width;
 		int height;
 		int numberOfChannels;
-
 		stbi_uc* data = ReadTexture2D(filePath, width, height, numberOfChannels);
 
-		std::shared_ptr<ITexture2D> texture = Graphics::CreateTexture2D(data, height, width, numberOfChannels);
+		GraphicsFormat textureGraphicsFormat;
+		if (numberOfChannels == 1)
+		{
+			textureGraphicsFormat = GraphicsFormat::R8;
+		}
+		else if (numberOfChannels == 2)
+		{
+			textureGraphicsFormat = GraphicsFormat::RG8;
+		}
+		else if (numberOfChannels == 3)
+		{
+			textureGraphicsFormat = GraphicsFormat::RGB8;
+		}
+		else if (numberOfChannels == 4)
+		{
+			textureGraphicsFormat = GraphicsFormat::RGBA8;
+		}
+
+		const std::shared_ptr<ITexture2D> texture = Graphics::CreateTexture2D(data, height, width, textureGraphicsFormat);
 
 		textureRepository.AddAsset(textureName, texture, isEngineAsset);
 

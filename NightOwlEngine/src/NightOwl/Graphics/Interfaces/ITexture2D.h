@@ -2,6 +2,14 @@
 
 namespace NightOwl
 {
+	enum class GraphicsFormat;
+
+	enum class TextureFilterMode;
+
+	enum class TextureFormat;
+
+	enum class TextureWrapMode;
+
 	class ITexture2D
 	{
 	public:
@@ -11,10 +19,37 @@ namespace NightOwl
 
 		virtual void Unbind() const = 0;
 
-		virtual int GetWidth() = 0;
+		virtual void SetData(const void* pixelData) = 0;
 
-		virtual int GetHeight() = 0;
+		virtual void Resize(int height, int width, GraphicsFormat format) = 0;
+		
+		virtual void SetWrapModeU(TextureWrapMode wrapMode) = 0;
+		
+		virtual TextureWrapMode GetWrapModeU() const = 0;
+		
+		virtual void SetWrapModeV(TextureWrapMode wrapMode) = 0;
+		
+		virtual TextureWrapMode GetWrapModeV() const = 0;
+		
+		virtual void SetFilterMode(TextureFilterMode filterMode) = 0;
+		
+		virtual TextureFilterMode GetFilterMode() const = 0;
 
-		virtual unsigned int GetTextureId() = 0;
+		virtual int GetWidth() const = 0;
+
+		virtual int GetHeight() const = 0;
+
+		virtual GraphicsFormat GetGraphicsFormat() = 0;
+
+		virtual TextureFormat GetTextureFormat() = 0;
+
+		virtual unsigned int GetTextureId() const = 0;
+
+	protected:
+		virtual void CreateTexture() = 0;
+
+		virtual void ReleaseTexture() = 0;
+
+		virtual void AllocateTexture() = 0;
 	};
 }
