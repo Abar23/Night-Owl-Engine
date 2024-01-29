@@ -25,7 +25,7 @@ namespace NightOwl
 
 		void SetVisible(bool isVisible);
 
-		bool IsVisible();
+		bool IsVisible() const;
 
 		const std::shared_ptr<Material> GetMaterial();
 

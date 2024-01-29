@@ -63,7 +63,7 @@ namespace NightOwl
 	{
 		return shaderExtensionToShaderTypeMap.at(extension);
 	}
-
+	
 	unsigned int ShaderTypeToOpenGlShaderType(ShaderType type)
 	{
 		switch (type)

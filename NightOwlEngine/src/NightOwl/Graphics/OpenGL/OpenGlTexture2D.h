@@ -21,7 +21,9 @@ namespace NightOwl
 
 		void Unbind() const override;
 
-		void SetData(const void* pixelData, int height, int width, GraphicsFormat format) override;
+		void SetData(const void* pixelData) override;
+
+		void Resize(int height, int width, GraphicsFormat format) override;
 
 		void SetWrapModeU(TextureWrapMode wrapMode) override;
 
@@ -39,7 +41,18 @@ namespace NightOwl
 
 		int GetHeight() const override;
 
+		GraphicsFormat GetGraphicsFormat() override;
+
+		TextureFormat GetTextureFormat() override;
+
 		unsigned int GetTextureId() const override;
+
+	protected:
+		void CreateTexture() override;
+
+		void ReleaseTexture() override;
+
+		void AllocateTexture() override;
 
 	private:
 		unsigned int textureId;

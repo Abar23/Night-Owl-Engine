@@ -19,7 +19,9 @@ namespace NightOwl
 
 		virtual void Unbind() const = 0;
 
-		virtual void SetData(const void* pixelData, int height, int width, GraphicsFormat format) = 0;
+		virtual void SetData(const void* pixelData) = 0;
+
+		virtual void Resize(int height, int width, GraphicsFormat format) = 0;
 		
 		virtual void SetWrapModeU(TextureWrapMode wrapMode) = 0;
 		
@@ -37,6 +39,17 @@ namespace NightOwl
 
 		virtual int GetHeight() const = 0;
 
+		virtual GraphicsFormat GetGraphicsFormat() = 0;
+
+		virtual TextureFormat GetTextureFormat() = 0;
+
 		virtual unsigned int GetTextureId() const = 0;
+
+	protected:
+		virtual void CreateTexture() = 0;
+
+		virtual void ReleaseTexture() = 0;
+
+		virtual void AllocateTexture() = 0;
 	};
 }

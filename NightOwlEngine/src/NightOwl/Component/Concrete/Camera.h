@@ -7,6 +7,8 @@
 
 namespace NightOwl
 {
+	class IRenderTexture;
+
 	class Camera : public Component
 	{
 	public:
@@ -16,13 +18,13 @@ namespace NightOwl
 
 		Mat4F GetViewProjectionMatrix();
 
-		Mat4F GetViewMatrix();
+		Mat4F GetViewMatrix() const;
 
-		float GetNearClippingPlane();
+		float GetNearClippingPlane() const;
 
 		void SetNearClippingPlane(float nearPlaneDistance);
 
-		float GetFarClippingPlane();
+		float GetFarClippingPlane() const;
 
 		void SetFarClippingPlane(float farPlaneDistance);
 
@@ -52,6 +54,10 @@ namespace NightOwl
 
 		static void SetMainCamera(Camera& camera);
 
+		std::shared_ptr<IRenderTexture> GetTargetTexture() const;
+
+		void SetTargetTexture(const std::shared_ptr<IRenderTexture>& targetTexture);
+
 		void Remove() override;
 
 		REFLECT()
@@ -74,6 +80,8 @@ namespace NightOwl
 		bool wasAspectRatioSet;
 
 		bool isProjectionDirty;
+
+		std::shared_ptr<IRenderTexture> targetTexture;
 
 		void SetProjectionDirtyFlag();
 

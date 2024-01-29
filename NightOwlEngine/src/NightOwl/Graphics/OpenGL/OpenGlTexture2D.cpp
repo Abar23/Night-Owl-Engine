@@ -8,7 +8,7 @@
 namespace NightOwl
 {
 	OpenGlTexture2D::OpenGlTexture2D()
-		: textureId(-1), 
+		: textureId(std::numeric_limits<unsigned int>::max()), 
 		  height(0), 
 		  width(0),
 		  graphicsFormat(GraphicsFormat::None),
@@ -28,15 +28,18 @@ namespace NightOwl
 		  wrapModeV(wrapModeV),
 		  textureFilterMode(filterMode)
 	{
-		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
-		GL_CALL(glTextureStorage2D, textureId, 1, GraphicsFormatToOpenGlFormat(graphicsFormat), width, height);
+		CreateTexture();
+		AllocateTexture();
 
 		SetFilterMode(textureFilterMode);
 
 		SetWrapModeU(wrapModeU);
 		SetWrapModeV(wrapModeV);
 
-		SetData(pixelData, height, width, format);
+		if (pixelData != nullptr)
+		{
+			SetData(pixelData);
+		}
 	}
 
 	OpenGlTexture2D::~OpenGlTexture2D()
@@ -55,9 +58,21 @@ namespace NightOwl
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
 	}
 
-	void OpenGlTexture2D::SetData(const void* pixelData, int height, int width, GraphicsFormat format)
+	void OpenGlTexture2D::SetData(const void* pixelData)
 	{
-		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, TextureFormatToOpenGlFormat(textureFormat), GraphicsFormatToOpenGlDataFormat(format), pixelData);
+		GL_CALL(glTextureSubImage2D, textureId, 0, 0, 0, width, height, TextureFormatToOpenGlFormat(textureFormat), GraphicsFormatToOpenGlDataFormat(graphicsFormat), pixelData);
+	}
+
+	void OpenGlTexture2D::Resize(int height, int width, GraphicsFormat format)
+	{
+		ReleaseTexture();
+		CreateTexture();
+		AllocateTexture();
+
+		SetFilterMode(textureFilterMode);
+
+		SetWrapModeU(wrapModeU);
+		SetWrapModeV(wrapModeV);
 	}
 
 	void OpenGlTexture2D::SetWrapModeU(TextureWrapMode wrapMode)
@@ -101,8 +116,33 @@ namespace NightOwl
 		return height;
 	}
 
+	GraphicsFormat OpenGlTexture2D::GetGraphicsFormat()
+	{
+		return graphicsFormat;
+	}
+
+	TextureFormat OpenGlTexture2D::GetTextureFormat()
+	{
+		return textureFormat;
+	}
+
 	unsigned int OpenGlTexture2D::GetTextureId() const
 	{
 		return textureId;
+	}
+
+	void OpenGlTexture2D::CreateTexture()
+	{
+		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
+	}
+
+	void OpenGlTexture2D::ReleaseTexture()
+	{
+		GL_CALL(glDeleteTextures, 1, &textureId);
+	}
+
+	void OpenGlTexture2D::AllocateTexture()
+	{
+		GL_CALL(glTextureStorage2D, textureId, 1, GraphicsFormatToOpenGlFormat(graphicsFormat), width, height);
 	}
 }

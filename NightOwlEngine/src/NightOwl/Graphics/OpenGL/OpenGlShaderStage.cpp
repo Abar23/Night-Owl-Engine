@@ -12,7 +12,7 @@
 namespace NightOwl
 {
 	OpenGlShaderStage::OpenGlShaderStage()
-		: shaderId(0),
+		: shaderId(std::numeric_limits<unsigned int>::max()),
 		  shaderType(ShaderType::None)
 	{
 	}
