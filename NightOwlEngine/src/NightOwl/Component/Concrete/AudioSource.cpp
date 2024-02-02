@@ -3,7 +3,7 @@
 #include "AudioSource.h"
 #include "NightOwl/Audio/AudioClip.h"
 #include "NightOwl/Audio/AudioSystem.h"
-#include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include <algorithm>
 
 namespace NightOwl
@@ -19,7 +19,7 @@ namespace NightOwl
 			isMuted(false),
 			enableVolumeRamp(false)
 	{
-		AudioSystemLocator::GetAudioSystem()->AddAudioSource(this);
+		AudioSystemLocator::Get()->AddAudioSource(this);
 	}
 
 	std::shared_ptr<Component> AudioSource::Clone()
@@ -44,7 +44,7 @@ namespace NightOwl
 		{
 			Stop();
 
-			AudioSystem* audioSystem = AudioSystemLocator::GetAudioSystem();
+			AudioSystem* audioSystem = AudioSystemLocator::Get();
 
 			const float audioListenerVolume = audioSystem->GetAudioListenerVolume();
 
@@ -152,7 +152,7 @@ namespace NightOwl
 
 		if(IsPlaying())
 		{
-			const float audioListenerVolume = AudioSystemLocator::GetAudioSystem()->GetAudioListenerVolume();
+			const float audioListenerVolume = AudioSystemLocator::Get()->GetAudioListenerVolume();
 
 			//FMOD_CALL(channel->setVolume, this->volume * audioListenerVolume);
 		}
@@ -232,6 +232,6 @@ namespace NightOwl
 
 	void AudioSource::Remove()
 	{
-		AudioSystemLocator::GetAudioSystem()->RemoveAudioSource(this);
+		AudioSystemLocator::Get()->RemoveAudioSource(this);
 	}
 }

@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "NightOwl/Component/Concrete/Transform.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/GameObject/GameObject.h"
 
 namespace NightOwl
@@ -149,7 +149,7 @@ namespace NightOwl
 	void Scene::ReleaseResources()
 	{
 		// Remove resources loaded in asset manager
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 		assetManager->ClearSceneAll();
 
 		// Destroy all game objects in the scene
@@ -159,7 +159,7 @@ namespace NightOwl
 			rootGameObject->DestroyGameObject();
 		}
 
-		OwlBehaviorManagerLocator::GetOwlBehaviorManager()->Reset();
+		OwlBehaviorManagerLocator::Get()->Reset();
 
 		rootGameObjects.clear();
 	}

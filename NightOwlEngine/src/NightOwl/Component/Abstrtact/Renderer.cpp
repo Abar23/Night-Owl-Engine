@@ -12,6 +12,8 @@
 #include "NightOwl/Graphics/Graphics.h"
 #include <stack>
 
+#include "NightOwl/Graphics/System/LightSystem.h"
+
 namespace NightOwl
 {
 	Renderer::Renderer()
@@ -94,6 +96,9 @@ namespace NightOwl
 			{
 				currentMaterial->SetInteger(0, "hasBones");
 			}
+
+			LightSystemLocator::Get()->SetupLightBuffer();
+			currentMaterial->SetBuffer(LightSystemLocator::Get()->GetLightBuffer().get(), "lightStorageBlock");
 
 			currentMaterial->Bind();
 			Graphics::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);

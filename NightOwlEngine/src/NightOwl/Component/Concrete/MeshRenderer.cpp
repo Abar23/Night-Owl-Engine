@@ -2,7 +2,7 @@
 
 #include "MeshRenderer.h"
 #include "NightOwl/Graphics/Materials/Material.h"
-#include "NightOwl/Core/Locator/MeshRenderSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Graphics/System/MeshRendererSystem.h"
 
 namespace NightOwl
@@ -11,7 +11,7 @@ namespace NightOwl
 	{
 		type = ComponentType::MeshRenderer;
 		materials.push_back(std::make_shared<Material>());
-		MeshRendererSystemLocator::GetMeshRendererSystem()->AddMeshRenderer(this);
+		MeshRendererSystemLocator::Get()->AddMeshRenderer(this);
 	}
 
 	std::shared_ptr<Component> MeshRenderer::Clone()
@@ -25,6 +25,6 @@ namespace NightOwl
 
 	void MeshRenderer::Remove()
 	{
-		MeshRendererSystemLocator::GetMeshRendererSystem()->RemoveMeshRenderer(this);
+		MeshRendererSystemLocator::Get()->RemoveMeshRenderer(this);
 	}
 }

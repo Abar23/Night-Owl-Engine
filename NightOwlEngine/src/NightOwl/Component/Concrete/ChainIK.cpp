@@ -5,7 +5,7 @@
 #include "NightOwl/Animation/3D/Constants.h"
 #include "NightOwl/Animation/3D/System/AnimatorSystem.h"
 #include "NightOwl/Component/Structures/Mesh.h"
-#include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
@@ -21,7 +21,7 @@ namespace NightOwl
 		  shouldApplyJointConstraints(false),
 		  target(nullptr)
 	{
-		AnimatorSystemLocator::GetAnimatorSystem()->AddChainIk(this);
+		AnimatorSystemLocator::Get()->AddChainIk(this);
 	}
 
 	void ChainIK::Start()
@@ -459,6 +459,6 @@ namespace NightOwl
 
 	void ChainIK::Remove()
 	{
-		AnimatorSystemLocator::GetAnimatorSystem()->RemoveChainIk(this);
+		AnimatorSystemLocator::Get()->RemoveChainIk(this);
 	}
 }

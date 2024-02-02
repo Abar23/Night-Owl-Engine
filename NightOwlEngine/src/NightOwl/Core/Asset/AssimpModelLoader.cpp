@@ -8,7 +8,7 @@
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/Component/Structures/Mesh.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Utitlity/Utils.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Materials/Material.h"
@@ -58,7 +58,7 @@ namespace NightOwl
 
 	void AssimpModelLoader::ProcessNodes(ModelLoadingInfo& modelLoadingInfo)
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		modelLoadingInfo.model = std::make_shared<Model>();
 
@@ -305,7 +305,7 @@ namespace NightOwl
 
 	void AssimpModelLoader::LoadTextureFromMaterial(const ModelLoadingInfo& modelLoadingInfo, const std::shared_ptr<Material>& rendererMaterial, const aiMaterial* assimpMaterial, aiTextureType textureType, const std::string& uniformName)
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		if (assimpMaterial->GetTextureCount(textureType) > 0)
 		{
@@ -331,7 +331,7 @@ namespace NightOwl
 		}
 		else
 		{
-			const ITexture2D* invalidTexture = assetManager->LoadTexture2D("./assets/Textures/Invalid.png");
+			ITexture2D* invalidTexture = assetManager->LoadTexture2D("./assets/Textures/Invalid.png");
 			rendererMaterial->SetTexture(invalidTexture, uniformName);
 		}
 	}
@@ -413,7 +413,7 @@ namespace NightOwl
 			animation->GetKeyFrames().emplace(animationChannel->mNodeName.data, KeyFrames(animationChannel));
 		}
 
-		AssetManagerLocator::GetAssetManager()->GetAnimationRepository().AddAsset(animationName, animation);
+		AssetManagerLocator::Get()->GetAnimationRepository().AddAsset(animationName, animation);
 	}
 
 	bool AssimpModelLoader::HasBones(const ModelLoadingInfo& modelLoadingInfo)

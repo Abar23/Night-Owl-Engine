@@ -3,6 +3,7 @@
 #include "NightOwl/Component/Abstrtact/Renderer.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
+#include "NightOwl/Graphics/Interfaces/IGraphicsBuffer.h"
 #include <map>
 
 namespace NightOwl
@@ -36,9 +37,13 @@ namespace NightOwl
 
 		float GetFloat(const std::string& uniformName);
 
-		void SetTexture(const ITexture2D* texture, const std::string& uniformName);
+		void SetTexture(ITexture2D* texture, const std::string& uniformName);
 
 		const ITexture2D* GetTexture(const std::string& uniformName);
+
+		void SetBuffer(IGraphicsBuffer* buffer, const std::string& uniformName);
+
+		const IGraphicsBuffer* GetBuffer(const std::string& uniformName);
 
 		const IShader* GetShader() const;
 
@@ -47,7 +52,7 @@ namespace NightOwl
 	private:
 		IShader* shader;
 
-		std::map<std::string, std::pair<int, const ITexture2D*>> textureUniformMap;
+		std::map<std::string, std::pair<int, ITexture2D*>> textureUniformMap;
 
 		std::map<std::string, std::pair<int, float>> floatUniformMap;
 
@@ -56,6 +61,8 @@ namespace NightOwl
 		std::map<std::string, std::pair<int, Vec4F>> vectorUniformMap;
 
 		std::map<std::string, std::pair<int, Mat4F>> matrixUniformMap;
+
+		std::map<std::string, std::pair<int, IGraphicsBuffer*>> bufferUniforms;
 
 		void ProcessShaderUniforms();
 

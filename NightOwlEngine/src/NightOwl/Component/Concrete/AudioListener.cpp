@@ -2,7 +2,7 @@
 
 #include "AudioListener.h"
 #include "NightOwl/Audio/AudioSystem.h"
-#include "NightOwl/Core/Locator/AudioSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include <algorithm>
 
 namespace NightOwl
@@ -14,7 +14,7 @@ namespace NightOwl
 			isVolumeDirty(false),
 			isPauseDirty(false)
 	{
-		AudioSystemLocator::GetAudioSystem()->SetAudioListener(this);
+		AudioSystemLocator::Get()->SetAudioListener(this);
 	}
 
 	std::shared_ptr<Component> AudioListener::Clone()
@@ -54,6 +54,6 @@ namespace NightOwl
 
 	void AudioListener::Remove()
 	{
-		AudioSystemLocator::GetAudioSystem()->RemoveAudioListener();
+		AudioSystemLocator::Get()->RemoveAudioListener();
 	}
 }

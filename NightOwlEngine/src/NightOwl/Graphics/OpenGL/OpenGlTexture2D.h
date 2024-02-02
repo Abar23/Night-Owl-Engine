@@ -17,9 +17,9 @@ namespace NightOwl
 
 		~OpenGlTexture2D() override;
 
-		void Bind(unsigned int textureUnit) const override;
+		void Bind(unsigned int textureUnit) override;
 
-		void Unbind() const override;
+		void Unbind() override;
 
 		void SetData(const void* pixelData) override;
 
@@ -70,6 +70,8 @@ namespace NightOwl
 		TextureWrapMode wrapModeV;
 
 		TextureFilterMode textureFilterMode;
+
+		unsigned int boundTextureUnit;
 	};
 }
 

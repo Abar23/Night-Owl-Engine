@@ -1,6 +1,6 @@
 #include "SplineDebugger.h"
 
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
 
@@ -12,7 +12,7 @@ void SplineDebugger::Awake()
 
 void SplineDebugger::Update()
 {
-	NightOwl::DebugSystem* debug = NightOwl::DebugSystemLocator::GetDebugSystem();
+	NightOwl::DebugSystem* debug = NightOwl::DebugSystemLocator::Get();
 
 	NightOwl::Vec3F	previousPoint = splineComponent->EvaluateUsingParameter(0.0f);
 

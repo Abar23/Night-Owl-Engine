@@ -2,7 +2,7 @@
 
 #include "SceneManager.h"
 #include "NightOwl/Behavior/OwlBehaviorManager.h"
-#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 
 namespace NightOwl
@@ -92,7 +92,7 @@ namespace NightOwl
 
 		activeScene->Update();
 
-		OwlBehaviorManagerLocator::GetOwlBehaviorManager()->InitBehaviors();
+		OwlBehaviorManagerLocator::Get()->InitBehaviors();
 
 		nextSceneToLoad = -1;
 	}

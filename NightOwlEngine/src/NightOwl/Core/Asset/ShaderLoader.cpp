@@ -2,7 +2,7 @@
 
 #include "ShaderLoader.h"
 #include "AssetManager.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include <filesystem>
@@ -25,7 +25,7 @@ namespace NightOwl
 			return;
 		}
 
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		auto& shaderIncludeRepo = assetManager->GetShaderIncludeRepository();
 
@@ -60,7 +60,7 @@ namespace NightOwl
 			return;
 		}
 
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		for (const auto& shaderProgramDirectory : std::filesystem::directory_iterator(shaderDirectory))
 		{

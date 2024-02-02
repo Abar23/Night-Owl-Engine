@@ -21,4 +21,3 @@ namespace NightOwl
 		static bool Comparator(MeshRenderer* lhs, MeshRenderer* rhs);
 	};
 }
-

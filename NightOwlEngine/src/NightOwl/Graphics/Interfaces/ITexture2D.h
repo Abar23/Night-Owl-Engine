@@ -15,9 +15,9 @@ namespace NightOwl
 	public:
 		virtual ~ITexture2D() = default;
 
-		virtual void Bind(unsigned int textureUnit) const = 0;
+		virtual void Bind(unsigned int textureUnit) = 0;
 
-		virtual void Unbind() const = 0;
+		virtual void Unbind() = 0;
 
 		virtual void SetData(const void* pixelData) = 0;
 

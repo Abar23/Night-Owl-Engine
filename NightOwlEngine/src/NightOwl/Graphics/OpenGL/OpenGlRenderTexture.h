@@ -27,6 +27,9 @@ namespace NightOwl
 
 		void SetFilterMode(TextureFilterMode textureFilterMode) override;
 
+	protected:
+		void ValidateFrameBuffer() override;
+
 	private:
 		std::vector<unsigned int> glColorAttachmentValues;
 	};

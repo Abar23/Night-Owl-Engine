@@ -7,8 +7,9 @@
 
 namespace NightOwl
 {
-	OpenGlGraphicsBuffer::OpenGlGraphicsBuffer(BufferType bufferType):
-		IGraphicsBuffer(bufferType)
+	OpenGlGraphicsBuffer::OpenGlGraphicsBuffer(BufferType bufferType)
+		: IGraphicsBuffer(bufferType),
+		  bufferBindingPoint(std::numeric_limits<unsigned int>::max())
 	{
 		openGlBufferType = BufferTypeToOpenGlBufferType(bufferType);
 		GL_CALL(glCreateBuffers, 1, &bufferHandle);
@@ -27,8 +28,22 @@ namespace NightOwl
 		GL_CALL(glBindBuffer, openGlBufferType, bufferHandle);
 	}
 
+	void OpenGlGraphicsBuffer::Bind(unsigned int bindingPoint)
+	{
+		ENGINE_ASSERT(bufferType == BufferType::Storage || bufferType == BufferType::Uniform, "Trying to bind invalid buffer type to a buffer binding point.");
+
+		GL_CALL(glBindBufferBase, openGlBufferType, bindingPoint, bufferHandle);
+		bufferBindingPoint = bindingPoint;
+	}
+
 	void OpenGlGraphicsBuffer::Unbind()
 	{
+		if (bufferType == BufferType::Storage || bufferType == BufferType::Uniform)
+		{
+			GL_CALL(glBindBufferBase, openGlBufferType, bufferBindingPoint, 0);
+			return;
+		}
+
 		GL_CALL(glBindBuffer, openGlBufferType, 0);
 	}
 

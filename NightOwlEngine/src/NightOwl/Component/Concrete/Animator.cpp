@@ -2,16 +2,12 @@
 
 #include "Animator.h"
 #include "NightOwl/Animation/3D/Animation.h"
-#include "NightOwl/Animation/3D/Structures/KeyFrames.h"
 #include "NightOwl/Animation/3D/System/AnimatorSystem.h"
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
-#include "NightOwl/Core/Locator/AnimatorSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include <stack>
-
-#include "NightOwl/Core/Application/Scene.h"
 
 namespace NightOwl
 {
@@ -22,7 +18,7 @@ namespace NightOwl
 		  currentMotion(nullptr),
 		  skeleton(nullptr)
 	{
-		AnimatorSystemLocator::GetAnimatorSystem()->AddAnimator(this);
+		AnimatorSystemLocator::Get()->AddAnimator(this);
 	}
 
 	std::shared_ptr<Component> Animator::Clone()
@@ -45,7 +41,7 @@ namespace NightOwl
 		// TODO: remove debug lines after project 1
 		// Draw debug lines for bones
 		std::stack<Transform*> skeletonTransforms;
-		DebugSystem* debugSystem = DebugSystemLocator::GetDebugSystem();
+		DebugSystem* debugSystem = DebugSystemLocator::Get();
 		skeletonTransforms.push(skeleton);
 		while (skeletonTransforms.empty() == false)
 		{
@@ -169,6 +165,6 @@ namespace NightOwl
 
 	void Animator::Remove()
 	{
-		AnimatorSystemLocator::GetAnimatorSystem()->RemoveAnimator(this);
+		AnimatorSystemLocator::Get()->RemoveAnimator(this);
 	}
 }
