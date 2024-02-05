@@ -9,8 +9,8 @@ void IkTargetController::Start()
 	speed = 1.0f;
 
 	transform = gameObject->GetTransform();
-	transform->Translate({ 0.0f, 1.5f, 0.0f }, NightOwl::Space::World);
-	transform->Scale(0.5f, NightOwl::Space::World);
+	// transform->Translate({ 0.0f, 1.5f, 0.0f }, NightOwl::Space::World);
+	transform->Scale(32.0f, NightOwl::Space::World);
 	originalLocation = transform->GetPosition();
 }
 

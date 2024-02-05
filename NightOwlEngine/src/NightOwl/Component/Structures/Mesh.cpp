@@ -159,7 +159,7 @@ namespace NightOwl
 		boneWeights.clear();
 	}
 
-	void Mesh::UploadMeshData(bool markNoLongerReadable)
+	void Mesh::UploadMeshData(bool markNoLongerReadable /* = false */)
 	{
 		ValidateMesh();
 		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");

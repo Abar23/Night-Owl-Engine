@@ -1,4 +1,5 @@
 #include "FragInputs.glsl"
+#include "LightFragData.glsl"
 
 void main()
 {
@@ -17,5 +18,5 @@ void main()
         color = mix(color, lights[lightIndex].color, 0.5);
     }
 
-	FragColor = vec4(inVertexData.materialNormals, 1.0) * vec4(color, 1.0);
+	fragColor = vec4(inVertexData.materialNormals, 1.0) * vec4(color, 1.0);
 } 

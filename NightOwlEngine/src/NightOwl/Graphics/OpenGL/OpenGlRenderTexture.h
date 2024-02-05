@@ -23,6 +23,8 @@ namespace NightOwl
 
 		void AttachDepthBufferWithFormat(GraphicsFormat graphicsFormat) override;
 
+		ITexture2D* GetColorAttachment(unsigned int attachmentIndex) override;
+
 		void RemoveDepthAttachment() override;
 
 		void SetFilterMode(TextureFilterMode textureFilterMode) override;

@@ -37,6 +37,14 @@ namespace NightOwl
 		points.push_back({ point, color });
 	}
 
+	void DebugSystem::Shutdown()
+	{
+		pointVertexArrayObject.reset();
+		lineVertexArrayObject.reset();
+		lineVertexBuffer.reset();
+		pointVertexBuffer.reset();
+	}
+
 	void DebugSystem::SetupLineGraphics()
 	{
 		AssetManager* assetManager = AssetManagerLocator::Get();

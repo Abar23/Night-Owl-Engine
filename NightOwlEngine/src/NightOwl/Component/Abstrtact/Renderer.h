@@ -47,5 +47,7 @@ namespace NightOwl
 		std::vector<Mat4F> finalBoneMatrices;
 
 		friend class AssimpModelLoader;
+
+		friend class Graphics;
 	};
 }

@@ -98,6 +98,13 @@ namespace NightOwl
 		ValidateFrameBuffer();
 	}
 
+	ITexture2D* OpenGlRenderTexture::GetColorAttachment(unsigned attachmentIndex)
+	{
+		ENGINE_ASSERT(attachmentIndex >= 0 && attachmentIndex < colorAttachments.size(), "Trying to get color attachment from invalid index in frame buffer");
+
+		return colorAttachments[attachmentIndex].get();
+	}
+
 	void OpenGlRenderTexture::RemoveDepthAttachment()
 	{
 		const unsigned int depthAttachmentType = depthBuffer->GetTextureFormat() == TextureFormat::Depth ? GL_DEPTH_ATTACHMENT : GL_DEPTH_STENCIL_ATTACHMENT;

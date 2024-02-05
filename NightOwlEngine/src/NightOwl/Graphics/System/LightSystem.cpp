@@ -25,6 +25,7 @@ namespace NightOwl
 		{
 			return;
 		}
+		isDirty = false;
 
 		lightData.resize(lights.size());
 
@@ -51,6 +52,11 @@ namespace NightOwl
 		lights.push_back(light);
 	}
 
+	const std::vector<Light*>& LightSystem::GetLights()
+	{
+		return lights;
+	}
+
 	void LightSystem::RemoveLight(const Light* light)
 	{
 		isDirty = true;
@@ -72,5 +78,10 @@ namespace NightOwl
 
 		std::iter_swap(lights.begin() + lightIndex, lights.end() - 1);
 		lights.erase(lights.end() - 1);
+	}
+
+	void LightSystem::ShutDown()
+	{
+		lightGraphicsBuffer.reset();
 	}
 }

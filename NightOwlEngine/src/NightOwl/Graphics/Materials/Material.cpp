@@ -76,6 +76,11 @@ namespace NightOwl
 
 		for (const auto& [bindingPoint, buffer] : bufferUniforms | std::views::values)
 		{
+			if (buffer == nullptr)
+			{
+				continue;
+			}
+
 			if (buffer->GetBufferType() == BufferType::Storage || 
 				buffer->GetBufferType() == BufferType::Uniform)
 			{

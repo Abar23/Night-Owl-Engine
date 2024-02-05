@@ -23,7 +23,11 @@ namespace NightOwl
 
 		void AddLight(Light* light);
 
+		const std::vector<Light*>& GetLights();
+
 		void RemoveLight(const Light* light);
+
+		void ShutDown();
 
 	private:
 		std::vector<Light*> lights;

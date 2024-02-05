@@ -3,7 +3,6 @@
 #include "NightOwlEngine.h"
 #include "IApplication.h"
 #include "NightOwlEngineConstants.h"
-#include "NightOwl/Component/Concrete/Light.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Time/Time.h"
@@ -80,13 +79,13 @@ namespace NightOwl
 				owlBehaviorManager.FixedUpdate();
 			
 				physicsEngine2D.Update();
-
+			
 				clothSimSystem.FixedUpdate();
-
+			
 				animatorSystem.FixedUpdate();
-
+			
 				sceneManager.Update();
-
+			
 				audioSystem.Update();
 			}
 
@@ -105,7 +104,7 @@ namespace NightOwl
 
 				clothSimSystem.Update();
 
-				meshRendererSystem.Update();
+				Graphics::Render();
 
 				debugSystem.Update();
 
@@ -128,6 +127,10 @@ namespace NightOwl
 
 		// clears engine and scene assets
 		assetManger.ClearAll();
+
+		lightSystem.ShutDown();
+
+		debugSystem.Shutdown();
 
 		Graphics::Shutdown();
 

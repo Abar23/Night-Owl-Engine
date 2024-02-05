@@ -160,6 +160,11 @@ namespace NightOwl
 			}
 
 			UniformDataTypes uniformDataType = OpenGlUniformToUniformDataType(type);
+			if (uniformDataType == UniformDataTypes::None)
+			{
+				continue;
+			}
+
 			std::pair nameToLocationPair = std::make_pair(bufferName, uniformLocation);
 
 			uniformTypeToDataMap[static_cast<int>(uniformDataType)].emplace_back(nameToLocationPair);

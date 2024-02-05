@@ -15,6 +15,8 @@ namespace NightOwl
 
 		void RemoveMeshRenderer(const MeshRenderer* meshRenderer);
 
+		const std::vector<MeshRenderer*>& GetMeshRenderers();
+
 	private:
 		std::vector<MeshRenderer*> meshRenderers;
 

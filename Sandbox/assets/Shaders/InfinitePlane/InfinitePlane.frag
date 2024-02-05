@@ -60,10 +60,10 @@ void main() {
     float linearDepth = CalculateLinearDepth(fragPos3D);
     float fading = max(0, (0.5 - linearDepth));
 
-    FragColor = (GetGridColor(fragPos3D, 1, true) + GetGridColor(fragPos3D, 5, true))* float(t > 0);
-    FragColor.a *= fading;
+    fragColor = (GetGridColor(fragPos3D, 1, true) + GetGridColor(fragPos3D, 5, true))* float(t > 0);
+    fragColor.a *= fading;
 
-    if (FragColor.a < 0.1)
+    if (fragColor.a < 0.1)
     {
         discard;
     }

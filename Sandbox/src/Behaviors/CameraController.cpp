@@ -87,7 +87,7 @@ void CameraController::HandleViewResetInput() const
 
 void CameraController::SetCameraToDefaults() const
 {
-	mainCameraTransform->SetPosition(defaultPosition);
+	//mainCameraTransform->SetPosition(defaultPosition);
 	mainCameraTransform->SetRotation(NightOwl::QuatF());
 	mainCamera->SetFieldOfView(defaultZoom);
 }

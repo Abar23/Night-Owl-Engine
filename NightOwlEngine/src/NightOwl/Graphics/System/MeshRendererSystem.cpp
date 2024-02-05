@@ -43,8 +43,13 @@ namespace NightOwl
 		}
 	}
 
+	const std::vector<MeshRenderer*>& MeshRendererSystem::GetMeshRenderers()
+	{
+		return meshRenderers;
+	}
+
 	bool MeshRendererSystem::Comparator(MeshRenderer* lhs,
-										MeshRenderer* rhs)
+	                                    MeshRenderer* rhs)
 	{
 		const Vec3F cameraPosition = Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition();
 

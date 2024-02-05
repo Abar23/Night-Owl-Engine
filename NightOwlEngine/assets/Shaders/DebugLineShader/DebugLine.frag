@@ -1,4 +1,4 @@
-out vec4 FragColor;
+out vec4 fragColor;
 
 in vertexData
 {
@@ -7,5 +7,5 @@ in vertexData
 
 void main()
 {
-    FragColor = vec4(inVertexData.materialColor, 1.0);
+    fragColor = vec4(inVertexData.materialColor, 1.0);
 }

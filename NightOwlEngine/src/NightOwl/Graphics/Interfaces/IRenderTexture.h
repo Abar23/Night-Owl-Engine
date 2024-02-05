@@ -32,6 +32,8 @@ namespace NightOwl
 
 		virtual void AddColorAttachment(GraphicsFormat format) = 0;
 
+		virtual ITexture2D* GetColorAttachment(unsigned int attachmentIndex) = 0;
+
 		virtual void RemoveColorAttachment(unsigned int attachmentIndex) = 0;
 
 		virtual void AttachDepthBufferWithFormat(GraphicsFormat format) = 0;
@@ -39,6 +41,11 @@ namespace NightOwl
 		virtual void RemoveDepthAttachment() = 0;
 
 		virtual void SetFilterMode(TextureFilterMode textureFilterMode) = 0;
+
+		int GetFrameBufferHandle() const
+		{
+			return frameBufferId;
+		}
 
 		int GetHeight() const
 		{

@@ -22,6 +22,8 @@ namespace NightOwl
 
 		void DrawPoint(const Vec3F& point, const Vec3F& color = { 0.0f, 1.0f, 0.0 }); // default color is green, TODO: make color constants
 
+		void Shutdown();
+
 	private:
 		std::shared_ptr<Material> debugLineMaterial;
 

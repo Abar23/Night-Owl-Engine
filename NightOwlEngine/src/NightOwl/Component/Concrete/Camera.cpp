@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "NightOwl/GameObject/GameObject.h"
+#include "NightOwl/Graphics/Interfaces/IRenderTexture.h"
 #include "NightOwl/Window/WindowApi.h"
 
 namespace NightOwl
@@ -179,12 +180,12 @@ namespace NightOwl
 		mainCamera = &camera;
 	}
 
-	std::shared_ptr<IRenderTexture> Camera::GetTargetTexture() const
+	IRenderTexture* Camera::GetTargetTexture() const
 	{
 		return targetTexture;
 	}
 
-	void Camera::SetTargetTexture(const std::shared_ptr<IRenderTexture>& targetTexture)
+	void Camera::SetTargetTexture(IRenderTexture* targetTexture)
 	{
 		this->targetTexture = targetTexture;
 	}

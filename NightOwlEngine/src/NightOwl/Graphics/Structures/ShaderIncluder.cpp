@@ -16,7 +16,7 @@ namespace NightOwl
 
 		ENGINE_ASSERT(shaderIncludeRepo.HasAsset(requested_source) == true, "Invalid include {0} requested in {1}", requested_source, requesting_source);
 
-		std::string* shaderIncludeContent = shaderIncludeRepo.GetAsset(requested_source);
+		const std::string* shaderIncludeContent = shaderIncludeRepo.GetAsset(requested_source);
 
 		shaderc_include_result* shadercIncludeResult = new shaderc_include_result();
 

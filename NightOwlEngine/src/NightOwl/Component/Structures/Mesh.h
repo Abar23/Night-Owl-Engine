@@ -70,7 +70,7 @@ namespace NightOwl
 
 		void Clear();
 
-		void UploadMeshData(bool markNoLongerReadable);
+		void UploadMeshData(bool markNoLongerReadable = false);
 
 		REFLECT()
 

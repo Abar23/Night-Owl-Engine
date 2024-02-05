@@ -15,6 +15,8 @@
 #include "NightOwl/Window/Interfaces/IWindow.h"
 #include <memory>
 
+#include "NightOwl/Component/Structures/Mesh.h"
+
 
 namespace NightOwl
 {
@@ -96,5 +98,7 @@ namespace NightOwl
 		inline static std::unique_ptr<IContext> graphicsContext{ nullptr };
 
 		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
+
+		inline static std::unique_ptr<Mesh> quadMesh;
 	};
 }
