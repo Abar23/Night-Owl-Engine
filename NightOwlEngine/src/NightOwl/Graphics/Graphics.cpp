@@ -75,7 +75,7 @@ namespace NightOwl
 		
 		gBufferShader->Bind();
 		
-		gBufferShader->SetUniformVec4F({ 0.2, 0.5, 0.5, 1.0 }, "diffuseColor");
+		gBufferShader->SetUniformVec4F({ 0.5, 0.5, 0.5, 1.0 }, "diffuseColor");
 
 		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
 		for (const auto& meshRenderer : meshRenderers)
@@ -93,8 +93,7 @@ namespace NightOwl
 		
 		deferredGBuffer->Unbind();
 
-
-		// ********* Lighting Pass ********* //
+		// ********* Global Lighting Pass ********* //
 		const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLighting");
 		
 		LightSystem* lightSystem = LightSystemLocator::Get();
@@ -102,11 +101,10 @@ namespace NightOwl
 		ITexture2D* positionAttachment = deferredGBuffer->GetColorAttachment(0);
 		ITexture2D* normalAttachment = deferredGBuffer->GetColorAttachment(1);
 		ITexture2D* colorAttachment = deferredGBuffer->GetColorAttachment(2);
-		
+
 		gBufferLightingShader->Bind();
 
-
-		gBufferLightingShader->SetUniformFloat(0.2f, "roughness");
+		gBufferLightingShader->SetUniformFloat(0.5f, "roughness");
 		gBufferLightingShader->SetUniformFloat(0.0f, "metallic");
 		gBufferLightingShader->SetUniformFloat(0.0f, "ambientOcclusion");
 
@@ -138,9 +136,9 @@ namespace NightOwl
 		// the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
 		// depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
 		GL_CALL(glBlitNamedFramebuffer, deferredGBuffer->GetFrameBufferHandle(), 0, 0, 0, window->GetWidth(), window->GetHeight(), 0, 0, window->GetWidth(), window->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
-		// ********* Lighting Geometry Pass ********* //
-		Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
+		
+		// ********* Local Lighting Pass ********* //
+		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
 		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("DebugLightShader");
 		
 		debugLightShader->Bind();

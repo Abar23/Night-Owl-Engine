@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NightOwl/Math/Vec3.h"
-#include "NightOwl/Math/Vec4.h"
 
 namespace NightOwl
 {
@@ -12,6 +11,6 @@ namespace NightOwl
 		int padding;
 
 		Vec3F color;
-		float padding0;
+		float range;
 	};
 }

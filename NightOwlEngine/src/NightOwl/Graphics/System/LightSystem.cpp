@@ -34,6 +34,7 @@ namespace NightOwl
 		{
 			lightData[lightIndex].position = lights[lightIndex]->GetGameObject().GetTransform()->GetPosition();
 			lightData[lightIndex].color = lights[lightIndex]->GetColor();
+			lightData[lightIndex].range = lights[lightIndex]->GetRange();
 		}
 
 		lightGraphicsBuffer->SetSize(lightData.size(), sizeof(LightGraphicsStruct));
