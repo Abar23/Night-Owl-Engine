@@ -63,7 +63,7 @@ void TestScene::Init()
 			auto& lightTestObject = AddGameObject("Light");
 			auto* lightComponent = lightTestObject.AddComponent<NightOwl::Light>();
 			lightComponent->SetColor({ distribution(generator), distribution(generator), distribution(generator) });
-			lightTestObject.GetTransform()->Scale({ 0.0f, 0.1f, 0.1f }, NightOwl::Space::World);
+			lightTestObject.GetTransform()->Scale({ 0.1f, 0.1f, 0.1f }, NightOwl::Space::World);
 			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.0f, zStartingPosition + lightSpacing * lightIndex });
 		}
 	}
