@@ -53,7 +53,7 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr int numberOfLights = 20;
+	constexpr int numberOfLights = 40;
 	constexpr float xStartingPosition = -10.0f;
 	constexpr float zStartingPosition = -10.0f;
 	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
