@@ -40,6 +40,8 @@ namespace NightOwl
 		GL_CALL(glEnable, GL_DEPTH_TEST);
 		GL_CALL(glEnable, GL_LINE_SMOOTH);
 		GL_CALL(glEnable, GL_VERTEX_PROGRAM_POINT_SIZE);
+
+		GL_CALL(glEnable, GL_CULL_FACE);
 	}
 
 	void OpenGlContext::AttachContext()

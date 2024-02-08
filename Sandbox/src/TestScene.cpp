@@ -4,18 +4,16 @@
 
 #include "Behaviors/CameraController.h"
 #include "Behaviors/IkTargetController.h"
-#include "Behaviors/ImGuiInterface.h"
-#include "Behaviors/InfinitePlane.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Component/Concrete/Light.h"
 #include "NightOwl/Component/Concrete/MeshRenderer.h"
-#include "NightOwl/Component/Concrete/PlanarCloth.h"
 #include "NightOwl/Component/Concrete/SkinnedMeshRenderer.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
 #include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Graphics.h"
+#include "NightOwl/Graphics/Materials/Material.h"
 
 class InfinitePlane;
 
@@ -35,12 +33,14 @@ void TestScene::Init()
 
 	// Get models
 	NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
+	NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
 
 	// Sphere IK control object
-	auto& sphereGameObject = AddGameObject("Target");
-	sphereGameObject.AddComponent<IkTargetController>();
-	auto* sphereRenderer = sphereGameObject.AddComponent<NightOwl::MeshRenderer>();
-	sphereRenderer->CloneRenderer(plane->renderer);
+	auto& planeGameObject = AddGameObject("Target");
+	planeGameObject.AddComponent<IkTargetController>();
+	auto* rendererComponent = planeGameObject.AddComponent<NightOwl::MeshRenderer>();
+	rendererComponent->CloneRenderer(plane->renderer);
+	rendererComponent->GetMaterial()->SetVec4F({ 0.5, 0.5, 0.5, 1.0 }, "diffuseColor");
 
 	// Camera
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
@@ -53,18 +53,26 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr float xStartingPosition = -20.0f;
-	constexpr float zStartingPosition = -20.0f;
-	for (int i = 0; i < 50; ++i)
+	constexpr int numberOfLights = 20;
+	constexpr float xStartingPosition = -10.0f;
+	constexpr float zStartingPosition = -10.0f;
+	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
+	for (int i = 0; i < numberOfLights; ++i)
 	{
-		for (int lightIndex = 0; lightIndex < 50; ++lightIndex)
+		for (int lightIndex = 0; lightIndex < numberOfLights; ++lightIndex)
 		{
-			constexpr float lightSpacing = 0.5f;
 			auto& lightTestObject = AddGameObject("Light");
 			auto* lightComponent = lightTestObject.AddComponent<NightOwl::Light>();
 			lightComponent->SetColor({ distribution(generator), distribution(generator), distribution(generator) });
-			lightTestObject.GetTransform()->Scale({ 0.1f, 0.1f, 0.1f }, NightOwl::Space::World);
-			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.0f, zStartingPosition + lightSpacing * lightIndex });
+			lightComponent->SetRange(1.0f);
+			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.0f, zStartingPosition + lightSpacing * lightIndex});
+
+			auto& lightSphereGameObject = AddGameObject("Target");
+			rendererComponent = lightSphereGameObject.AddComponent<NightOwl::MeshRenderer>();
+			rendererComponent->CloneRenderer(sphere->renderer);
+			lightSphereGameObject.GetTransform()->SetLocalScale(0.05f);
+			lightSphereGameObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, -0.15f, zStartingPosition + lightSpacing * lightIndex });
+			rendererComponent->GetMaterial()->SetVec4F(NightOwl::Vec4F(lightComponent->GetColor().x, lightComponent->GetColor().y, lightComponent->GetColor().z, 0.0f), "diffuseColor");
 		}
 	}
 }
