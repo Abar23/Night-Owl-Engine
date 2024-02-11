@@ -99,7 +99,7 @@ namespace NightOwl
 		deferredGBuffer->Unbind();
 
 		// // ********* Global Lighting Pass ********* //
-		const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLighting");
+		const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
 		
 		LightSystem* lightSystem = LightSystemLocator::Get();
 		
@@ -142,7 +142,7 @@ namespace NightOwl
 
 		// ********* Local Lighting Pass ********* //
 		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
-		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("DebugLightShader");
+		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
 
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
 		graphicsContext->CullFaceMode(FaceType::Front);

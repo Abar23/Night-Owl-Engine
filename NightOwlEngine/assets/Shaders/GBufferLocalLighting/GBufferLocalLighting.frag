@@ -1,5 +1,11 @@
 #include "FragInputs.glsl"
+#include "LightFragData.glsl"
 #include "Constants.glsl"
+
+uniform int lightIndex;
+
+uniform float width;
+uniform float height;
 
 uniform vec3 cameraPosition;
 
@@ -42,27 +48,30 @@ vec3 FresnelSchilckRoughness(vec3 V, vec3 H, vec3 F0, float roughness)
 void main()
 {
     // retrieve data from G-buffer
-    vec3 fragPos = texture(gPosition, inVertexData.materialUvs).rgb;
-    vec3 normal = texture(gNormal, inVertexData.materialUvs).rgb;
-    vec3 albedo = texture(gAlbedoSpec, inVertexData.materialUvs).rgb;
-    //float specular = texture(gAlbedoSpec, inVertexData.materialUvs).a;
+    vec3 fragPos = texture(gPosition, gl_FragCoord.xy/vec2(width,height)).rgb;
+    vec3 normal = texture(gNormal, gl_FragCoord.xy/vec2(width,height)).rgb;
+    vec3 albedo = texture(gAlbedoSpec, gl_FragCoord.xy/vec2(width,height)).rgb;
+
+    float distance = length(lights[lightIndex].position - fragPos);
+    if (distance > lights[lightIndex].range)
+    {
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
 
     vec3 N = normal;
     vec3 V = normalize(cameraPosition - fragPos);
 
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+    // calculate reflectance at normal incidence   
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
-    // reflectance equation
-    vec3 accumulatedRadiance = vec3(0.0);
-
     // calculate per-light radiance
-    vec3 L = normalize(vec3(0.0, 2.0, 0.0));
+    vec3 L = normalize(lights[lightIndex].position - fragPos);
     vec3 H = normalize(V + L);
-    
-    vec3 radiance = vec3(6.0);
+
+    float attenuation = (1.0 / (distance * distance) - 1.0 / (lights[lightIndex].range * lights[lightIndex].range));
+    vec3 radiance = lights[lightIndex].color * attenuation;
 
     // Cook-Torrance BRDF
     float NDF = TrowbridgeReitzNormalDistribution(N, H, roughness);   
@@ -75,27 +84,17 @@ void main()
     
     // kS is equal to Fresnel
     vec3 kS = F;
-    // for energy conservation, the diffuse and specular light can't
-    // be above 1.0 (unless the surface emits light); to preserve this
-    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    // to preserve energy, Kd, the diffuse component, should equal 1.0 - kS.
     vec3 kD = vec3(1.0) - kS;
-    // multiply kD by the inverse metalness such that only non-metals 
-    // have diffuse lighting, or a linear blend if partly metal (pure metals
-    // have no diffuse light).
+    // multiply Kd by the inverse the metallic so only non-metals have diffuse lighting
     kD *= 1.0 - metallic;	  
 
-    // scale light by NdotL
     float nDotL = max(dot(N, L), 0.0);
+    vec3 color = (kD * albedo / PI + specular) * radiance * nDotL;
 
-    // accumulatte radiance
-    accumulatedRadiance = (kD * albedo / PI + specular) * radiance * nDotL;
-
-    vec3 color = accumulatedRadiance;
-
-    // HDR tonemapping
+    // HDR tonemapping and gamma correct
     color = color / (color + vec3(1.0));
-    // gamm corraect
-    color = pow(color, vec3(1.0/0.4)); 
+    color = pow(color, vec3(1.0/0.4)); // TODO: need to make exposure a variable 
 
     fragColor = vec4(color, 1.0);
 }
