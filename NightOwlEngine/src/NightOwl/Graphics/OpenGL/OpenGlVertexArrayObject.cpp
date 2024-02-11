@@ -7,7 +7,7 @@
 #include "NightOwl/Graphics/Interfaces/IGraphicsBuffer.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
+#include "..\Types\VertexDataType.h"
 
 namespace NightOwl
 {

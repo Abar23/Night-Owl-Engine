@@ -14,7 +14,7 @@ namespace NightOwl
 			clearColor(DEFAULT_CLEAR_COLOR)
 	{
 		glfwMakeContextCurrent(window);
-		int gladLoadedSucessfully = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		const int gladLoadedSuccessfully = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		ENGINE_ASSERT(gladLoadedSucessfully, "Failed to load glad!");
 		ENGINE_ASSERT(GLVersion.major == 4 && GLVersion.minor == 6, "OpenGL version 4.6 is required for NightOwl!");
 		
@@ -26,7 +26,6 @@ namespace NightOwl
 
 		openGlInfo = GL_CALL(glGetString, GL_VERSION);
 		ENGINE_LOG_INFO("OpenGL vendor: {0}", reinterpret_cast<const char*>(openGlInfo));
-
 		#ifdef DEBUG
 		GL_CALL(glEnable, GL_DEBUG_OUTPUT);
 		GL_CALL(glEnable, GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -34,14 +33,15 @@ namespace NightOwl
 		GL_CALL(glDebugMessageControl, GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, NULL, GL_FALSE);
 		#endif
 
-		GL_CALL(glEnable, GL_BLEND);
-		GL_CALL(glBlendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		EnableCapability(ContextCapabilityType::ColorBlend, true);
+		EnableCapability(ContextCapabilityType::DepthTest, true);
+		EnableCapability(ContextCapabilityType::LineSmooth, true);
+		EnableCapability(ContextCapabilityType::VertexProgramPointSize, true);
+		EnableCapability(ContextCapabilityType::CullFace, true);
 
-		GL_CALL(glEnable, GL_DEPTH_TEST);
-		GL_CALL(glEnable, GL_LINE_SMOOTH);
-		GL_CALL(glEnable, GL_VERTEX_PROGRAM_POINT_SIZE);
+		CullFaceMode(FaceType::Back);
 
-		GL_CALL(glEnable, GL_CULL_FACE);
+		ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
 	}
 
 	void OpenGlContext::AttachContext()
@@ -102,5 +102,34 @@ namespace NightOwl
 	void OpenGlContext::SetClearColor(const Vec4F& color)
 	{
 		clearColor = color;
+	}
+
+	void OpenGlContext::EnableCapability(ContextCapabilityType type, bool enable)
+	{
+		const int openGlCapabilityType = ContextCapabilityTypeToOpenGlType(type);
+		if (openGlCapabilityType == -1)
+		{
+			return;
+		}
+
+		enable ? GL_CALL(glEnable, openGlCapabilityType) : GL_CALL(glDisable, openGlCapabilityType);
+	}
+
+	void OpenGlContext::CullFaceMode(FaceType type)
+	{
+		GL_CALL(glCullFace, CullFaceTypeToOpenGlType(type));
+	}
+
+	void OpenGlContext::ColorBlendFunction(BlendFunctionType sourceFunctionType, BlendFunctionType destinationFunctionType)
+	{
+		const int sourceOpenGlBlendFunctionType = BlendFunctionTypeToOpenGlType(sourceFunctionType);
+		const int destinationOGlBlendFunctionType = BlendFunctionTypeToOpenGlType(destinationFunctionType);
+		if (sourceOpenGlBlendFunctionType == -1 ||
+			destinationOGlBlendFunctionType == -1)
+		{
+			return;
+		}
+
+		GL_CALL(glBlendFunc, sourceOpenGlBlendFunctionType, destinationOGlBlendFunctionType);
 	}
 }

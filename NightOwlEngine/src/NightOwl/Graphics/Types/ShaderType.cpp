@@ -1,6 +1,6 @@
 #include "NightOwlPch.h"
 
-#include "ShaderTypes.h"
+#include "ShaderType.h"
 #include <glad/glad.h>
 
 namespace NightOwl

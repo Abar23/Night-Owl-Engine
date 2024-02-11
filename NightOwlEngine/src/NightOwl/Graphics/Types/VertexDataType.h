@@ -18,5 +18,5 @@ namespace NightOwl
 
 	unsigned int VertexDataTypeToDataTypeSize(VertexDataType type);
 
-	unsigned int VertexDataTypeToOpenGlComponentType(VertexDataType type);
+	int VertexDataTypeToOpenGlComponentType(VertexDataType type);
 }

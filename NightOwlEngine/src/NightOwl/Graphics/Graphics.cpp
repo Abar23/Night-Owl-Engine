@@ -71,9 +71,9 @@ namespace NightOwl
 		const std::vector<MeshRenderer*>& meshRenderers = MeshRendererSystemLocator::Get()->GetMeshRenderers();
 		const Mat4F viewProjectionMatrix = Camera::GetMainCamera()->GetViewProjectionMatrix();
 
-		glEnable(GL_DEPTH_TEST);
-		GL_CALL(glBlendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glCullFace(GL_BACK);
+		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
+		graphicsContext->CullFaceMode(FaceType::Back);
+		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
 
 		deferredGBuffer->Bind();
 		graphicsContext->ClearBuffer();
@@ -144,9 +144,9 @@ namespace NightOwl
 		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
 		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("DebugLightShader");
 
-		glDisable(GL_DEPTH_TEST);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glCullFace(GL_FRONT);
+		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
+		graphicsContext->CullFaceMode(FaceType::Front);
+		graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
 
 		debugLightShader->Bind();
 		lightSystem->SetupLightBuffer();
@@ -196,7 +196,7 @@ namespace NightOwl
 
 	void Graphics::Shutdown()
 	{
-		deferredGBuffer.release();
+		deferredGBuffer.reset();
 		quadMesh.reset();
 	}
 }

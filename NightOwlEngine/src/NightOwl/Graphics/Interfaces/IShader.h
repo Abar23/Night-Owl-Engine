@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IShaderStage.h"
-#include "NightOwl/Graphics/Types/UniformDataTypes.h"
+#include "..\Types\UniformDataType.h"
 #include "NightOwl/Math/Math.h"
 
 namespace NightOwl

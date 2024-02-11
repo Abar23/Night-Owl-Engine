@@ -1,7 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "VertexBufferData.h"
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
+#include "..\Types\VertexDataType.h"
 
 namespace NightOwl
 {

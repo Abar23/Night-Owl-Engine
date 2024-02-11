@@ -1,6 +1,6 @@
 #include "NightOwlPch.h"
 
-#include "VertexDataTypes.h"
+#include "VertexDataType.h"
 #include "NightOwl/Animation/3D/Structures/BoneWeight.h"
 #include "NightOwl/Math/Vec2.h"
 #include "NightOwl/Math/Vec3.h"
@@ -55,7 +55,7 @@ namespace NightOwl
 		}
 	}
 
-	unsigned int VertexDataTypeToOpenGlComponentType(VertexDataType type)
+	int VertexDataTypeToOpenGlComponentType(VertexDataType type)
 	{
 		switch (type)
 		{

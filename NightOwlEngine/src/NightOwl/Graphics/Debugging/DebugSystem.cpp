@@ -6,7 +6,7 @@
 #include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
+#include "..\Types\VertexDataType.h"
 
 namespace NightOwl
 {
@@ -34,7 +34,7 @@ namespace NightOwl
 
 	void DebugSystem::DrawPoint(const Vec3F& point, const Vec3F& color /* = { 0.0f, 1.0f, 0.0 } */)
 	{
-		points.push_back({ point, color });
+		points.emplace_back(point, color );
 	}
 
 	void DebugSystem::Shutdown()

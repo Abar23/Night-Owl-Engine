@@ -16,7 +16,7 @@ namespace NightOwl
 		None
 	};
 
-	UniformDataTypes OpenGlUniformToUniformDataType(const unsigned int type);
+	UniformDataTypes OpenGlUniformToUniformDataType(const int type);
 
 	std::string UniformDataTypeToString(const UniformDataTypes type);
 }
