@@ -19,6 +19,8 @@ namespace NightOwl
 
 		virtual void Bind() = 0;
 
+		virtual void Bind(unsigned int bindingPoint) = 0;
+
 		virtual void Unbind() = 0;
 
 		void SetSize(unsigned int elementCount, unsigned int stride)

@@ -2,7 +2,7 @@
 
 #include "TestScene.h"
 #include "NightOwl/Core/Application/SceneManager.h"
-#include "NightOwl/Core/Locator/SceneManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Input/Input.h"
 #include "NightOwl/Window/WindowApi.h"
 
@@ -16,7 +16,7 @@ namespace Sandbox
 
 	void Application::Init()
 	{
-		auto* sceneManager = NightOwl::SceneManagerLocator::GetSceneManager();
+		auto* sceneManager = NightOwl::SceneManagerLocator::Get();
 
 		sceneManager->AddScene<TestScene>();
 

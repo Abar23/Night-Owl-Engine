@@ -6,6 +6,7 @@
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlContext.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlGraphicsBuffer.h"
+#include "NightOwl/Graphics/OpenGL/OpenGlRenderTexture.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlShader.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlShaderStage.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlTexture2D.h"
@@ -14,12 +15,22 @@
 #include "NightOwl/Window/Interfaces/IWindow.h"
 #include <memory>
 
+#include "NightOwl/Component/Structures/Mesh.h"
+
 
 namespace NightOwl
 {
+	class IRenderTexture;
+
 	class Graphics
 	{
 	public:
+		static void Initialize();
+
+		static void Render();
+
+		static void Shutdown();
+
 		template<typename... Args>
 		static std::shared_ptr<IShader> CreateShader(Args&&... args)
 		{
@@ -41,6 +52,14 @@ namespace NightOwl
 		{
 			#ifdef OPEN_GL
 			return std::make_shared<OpenGlTexture2D>(std::forward<Args>(args)...);
+			#endif
+		}
+
+		template<typename... Args>
+		static std::shared_ptr<IRenderTexture> CreateRenderTexture(Args&&... args)
+		{
+			#ifdef OPEN_GL
+			return std::make_shared<OpenGlRenderTexture>(std::forward<Args>(args)...);
 			#endif
 		}
 
@@ -77,5 +96,9 @@ namespace NightOwl
 
 	private:
 		inline static std::unique_ptr<IContext> graphicsContext{ nullptr };
+
+		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
+
+		inline static std::unique_ptr<Mesh> quadMesh;
 	};
 }

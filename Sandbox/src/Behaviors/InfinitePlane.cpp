@@ -4,7 +4,7 @@
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Component/Structures/SubMeshData.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Materials/Material.h"
 #include "NightOwl/Math/Vec3.h"
@@ -29,13 +29,13 @@ void InfinitePlane::Start()
 
 	NightOwl::MeshRenderer* renderer = gameObject->GetComponent<NightOwl::MeshRenderer>();
 
-	NightOwl::IShader* shader = NightOwl::AssetManagerLocator::GetAssetManager()->GetShaderRepository().GetAsset("InfinitePlane");
+	NightOwl::IShader* shader = NightOwl::AssetManagerLocator::Get()->GetShaderRepository().GetAsset("InfinitePlane");
 
 	renderer->GetMesh()->SetVertices(VERTICES);
 	renderer->GetMesh()->SetTriangles(INDICES);
+	renderer->GetMesh()->SetSubMeshes(SUB_MESH);
 	renderer->GetMesh()->UploadMeshData(true);
 
-	renderer->GetMesh()->SetSubMeshes(SUB_MESH);
 	renderer->GetMaterial()->SetShader(shader);
 	renderer->GetMaterial()->SetVec4F(NightOwl::Vec4F(1.0f, 0.0f, 0.0f, 1.0f), "diffuseColor");
 }

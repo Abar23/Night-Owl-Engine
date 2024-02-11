@@ -1,7 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "RigidBody2D.h"
-#include "NightOwl/Core/Locator/PhysicsEngine2DLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Physics/2D/PhysicsEngine2D.h"
 #include "NightOwl/Physics/2D/Collider/Collider2D.h"
@@ -25,7 +25,7 @@ namespace NightOwl
 			impulseCounter(0),
 			collider(nullptr)
 	{
-		PhysicsEngine2DLocator::GetPhysicsEngine2D()->AddRigidBody2D(this);
+		PhysicsEngine2DLocator::Get()->AddRigidBody2D(this);
 	}
 
 	std::shared_ptr<Component> RigidBody2D::Clone()
@@ -57,7 +57,7 @@ namespace NightOwl
 
 	RigidBody2D::~RigidBody2D()
 	{
-		PhysicsEngine2DLocator::GetPhysicsEngine2D()->RemoveRigidBody2D(this);
+		PhysicsEngine2DLocator::Get()->RemoveRigidBody2D(this);
 	}
 
 	void RigidBody2D::AddForce(Vec2F forceVector)
@@ -228,7 +228,7 @@ namespace NightOwl
 
 	void RigidBody2D::Remove()
 	{
-		PhysicsEngine2DLocator::GetPhysicsEngine2D()->RemoveRigidBody2D(this);
+		PhysicsEngine2DLocator::Get()->RemoveRigidBody2D(this);
 	}
 
 	float RigidBody2D::GetDragCoefficient() const

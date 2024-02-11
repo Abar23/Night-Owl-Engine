@@ -160,9 +160,14 @@ namespace NightOwl
 			}
 
 			UniformDataTypes uniformDataType = OpenGlUniformToUniformDataType(type);
+			if (uniformDataType == UniformDataTypes::None)
+			{
+				continue;
+			}
+
 			std::pair nameToLocationPair = std::make_pair(bufferName, uniformLocation);
 
-			uniformTypeToDataMap[static_cast<int>(uniformDataType)].push_back(nameToLocationPair);
+			uniformTypeToDataMap[static_cast<int>(uniformDataType)].emplace_back(nameToLocationPair);
 		}
 
 		// Loop through all uniform blocks
@@ -175,10 +180,29 @@ namespace NightOwl
 			int blockBinding;
 			GL_CALL(glGetActiveUniformBlockiv, programId, activeUniformBlockIndex, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
 
+			// UniformDataTypes uniformDataType = UniformDataTypes::Buffer;
+			// std::pair nameToLocationPair = std::make_pair(bufferName, blockBinding);
+			//
+			// uniformTypeToDataMap[static_cast<int>(uniformDataType)].push_back(nameToLocationPair);
+		}
+
+		int numBlocks;
+		glGetProgramInterfaceiv(programId, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
+
+		constexpr unsigned int props[] = { GL_BUFFER_BINDING };
+		for (int i = 0; i < numBlocks; ++i) 
+		{
+			GLsizei length;
+			glGetProgramResourceName(programId, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), &length, bufferName);
+
+			const GLint blockIndex = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, bufferName);
+
+			GLint blockBinding;
+			glGetProgramResourceiv(programId, GL_SHADER_STORAGE_BLOCK, blockIndex, 1, props, length, nullptr, &blockBinding);
+
 			UniformDataTypes uniformDataType = UniformDataTypes::Buffer;
 			std::pair nameToLocationPair = std::make_pair(bufferName, blockBinding);
-
-			uniformTypeToDataMap[static_cast<int>(uniformDataType)].push_back(nameToLocationPair);
+			uniformTypeToDataMap[static_cast<int>(uniformDataType)].emplace_back(nameToLocationPair);
 		}
 	}
 

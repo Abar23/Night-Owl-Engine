@@ -5,8 +5,7 @@
 #include "NightOwl/Component/Structures/ClothParticle.h"
 #include "NightOwl/Component/Structures/ClothSpring.h"
 #include "NightOwl/Component/Structures/Mesh.h"
-#include "NightOwl/Core/Locator/ClothSimSystemLocator.h"
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Debugging/DebugSystem.h"
@@ -30,7 +29,7 @@ namespace NightOwl
 		  planeDimension(0),
 		  sphereCollider(nullptr, -1.0f)
 	{
-		ClothSimSystemLocator::GetClothSimSystem()->AddClothSimComponent(this);
+		ClothSimSystemLocator::Get()->AddClothSimComponent(this);
 	}
 
 	void PlanarCloth::Start()
@@ -56,7 +55,7 @@ namespace NightOwl
 
 	void PlanarCloth::DebugRender()
 	{
-		DebugSystem* debugSystem = DebugSystemLocator::GetDebugSystem();
+		DebugSystem* debugSystem = DebugSystemLocator::Get();
 		for (const auto& clothSpring : springs)
 		{
 			Vec3F color = { 1.0f, 0.0f, 1.0f };
@@ -569,6 +568,6 @@ namespace NightOwl
 
 	void PlanarCloth::Remove()
 	{
-		ClothSimSystemLocator::GetClothSimSystem()->RemoveClothSimComponent(this);
+		ClothSimSystemLocator::Get()->RemoveClothSimComponent(this);
 	}
 }

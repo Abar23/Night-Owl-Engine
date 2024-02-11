@@ -12,6 +12,8 @@ namespace NightOwl
 
 		void Bind() override;
 
+		void Bind(unsigned int bindingPoint) override;
+
 		void Unbind() override;
 
 		void SetData(const void* data) override;
@@ -25,5 +27,7 @@ namespace NightOwl
 
 	private:
 		unsigned int openGlBufferType;
+
+		unsigned int bufferBindingPoint;
 	};
 }

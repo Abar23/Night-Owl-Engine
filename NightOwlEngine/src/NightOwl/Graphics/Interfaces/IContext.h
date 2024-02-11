@@ -1,5 +1,8 @@
 #pragma once
 
+#include "NightOwl/Graphics/Types/BlendFunctionType.h"
+#include "NightOwl/Graphics/Types/ContextCapabilityType.h"
+#include "NightOwl/Graphics/Types/FaceType.h"
 #include "NightOwl/Graphics/Types/DrawType.h"
 #include "NightOwl/Math/Vec4.h"
 
@@ -31,5 +34,11 @@ namespace NightOwl
 		virtual void EnableWireFrame(bool enabled) = 0;
 
 		virtual void SetClearColor(const Vec4F& color) = 0;
+
+		virtual void EnableCapability(ContextCapabilityType type, bool enable) = 0;
+
+		virtual void CullFaceMode(FaceType type) = 0;
+
+		virtual void ColorBlendFunction(BlendFunctionType sourceFunctionType, BlendFunctionType destinationFunctionType) = 0;
 	};
 }

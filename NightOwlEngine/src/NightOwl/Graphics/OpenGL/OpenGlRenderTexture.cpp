@@ -3,6 +3,7 @@
 #include "OpenGlRenderTexture.h"
 #include "OpenGlTexture2D.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
 #include "NightOwl/Graphics/Types/GraphicsFormat.h"
 
@@ -17,7 +18,7 @@ namespace NightOwl
 
 		AttachDepthBufferWithFormat(depthBufferFormat);
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		ValidateFrameBuffer();
 	}
 
 	OpenGlRenderTexture::~OpenGlRenderTexture()
@@ -47,7 +48,7 @@ namespace NightOwl
 
 		depthBuffer->Resize(height, width, depthBuffer->GetGraphicsFormat());
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		ValidateFrameBuffer();
 	}
 
 	void OpenGlRenderTexture::AddColorAttachment(GraphicsFormat format)
@@ -62,7 +63,7 @@ namespace NightOwl
 		GL_CALL(glNamedFramebufferTexture, frameBufferId, colorAttachmentValue, colorAttachment->GetTextureId(), 0);
 		GL_CALL(glNamedFramebufferDrawBuffers, frameBufferId, glColorAttachmentValues.size(), glColorAttachmentValues.data());
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		ValidateFrameBuffer();
 	}
 
 	void OpenGlRenderTexture::RemoveColorAttachment(unsigned attachmentIndex)
@@ -71,10 +72,12 @@ namespace NightOwl
 
 		GL_CALL(glNamedFramebufferTexture, frameBufferId, TextureFormatToOpenGlFormat(colorAttachments[attachmentIndex]->GetTextureFormat()), 0, 0);
 
-		std::iter_swap(colorAttachments.begin() + attachmentIndex, colorAttachments.end());
+		std::iter_swap(colorAttachments.begin() + attachmentIndex, colorAttachments.end() - 1);
 		colorAttachments.erase(colorAttachments.begin() + attachmentIndex);
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		GL_CALL(glNamedFramebufferDrawBuffers, frameBufferId, glColorAttachmentValues.size(), glColorAttachmentValues.data());
+
+		ValidateFrameBuffer();
 	}
 
 	void OpenGlRenderTexture::AttachDepthBufferWithFormat(GraphicsFormat graphicsFormat)
@@ -82,18 +85,34 @@ namespace NightOwl
 		ENGINE_ASSERT(graphicsFormat != GraphicsFormat::None, "Tried setting frame buffer's depth attachment graphicsFormat to None.");
 		ENGINE_ASSERT(GraphicsFormatToTextureFormat(graphicsFormat) != TextureFormat::Depth || GraphicsFormatToTextureFormat(graphicsFormat) != TextureFormat::DepthStencil, "Tried setting frame buffer's depth attachment to non-depth texture graphicsFormat.");
 
+		if (depthBuffer == nullptr)
+		{
+			depthBuffer = std::make_shared<OpenGlTexture2D>(nullptr, height, width, graphicsFormat);
+		}
+
 		depthBuffer->Resize(height, width, graphicsFormat);
 
-		GL_CALL(glNamedFramebufferTexture, frameBufferId, TextureFormatToOpenGlFormat(depthBuffer->GetTextureFormat()), depthBuffer->GetTextureId(), 0);
+		const unsigned int depthAttachmentType = depthBuffer->GetTextureFormat() == TextureFormat::Depth ? GL_DEPTH_ATTACHMENT : GL_DEPTH_STENCIL_ATTACHMENT;
+		GL_CALL(glNamedFramebufferTexture, frameBufferId, depthAttachmentType, depthBuffer->GetTextureId(), 0);
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		ValidateFrameBuffer();
+	}
+
+	ITexture2D* OpenGlRenderTexture::GetColorAttachment(unsigned attachmentIndex)
+	{
+		ENGINE_ASSERT(attachmentIndex >= 0 && attachmentIndex < colorAttachments.size(), "Trying to get color attachment from invalid index in frame buffer");
+
+		return colorAttachments[attachmentIndex].get();
 	}
 
 	void OpenGlRenderTexture::RemoveDepthAttachment()
 	{
-		glNamedFramebufferTexture(frameBufferId, TextureFormatToOpenGlFormat(depthBuffer->GetTextureFormat()), 0, 0);
+		const unsigned int depthAttachmentType = depthBuffer->GetTextureFormat() == TextureFormat::Depth ? GL_DEPTH_ATTACHMENT : GL_DEPTH_STENCIL_ATTACHMENT;
+		GL_CALL(glNamedFramebufferTexture, frameBufferId, depthAttachmentType, depthBuffer->GetTextureId(), 0);
 
-		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
+		GL_CALL(glNamedFramebufferTexture, frameBufferId, GL_DEPTH_ATTACHMENT, 0, 0);
+
+		ValidateFrameBuffer();
 	}
 
 	void OpenGlRenderTexture::SetFilterMode(TextureFilterMode textureFilterMode)
@@ -102,5 +121,10 @@ namespace NightOwl
 		{
 			colorAttachment->SetFilterMode(textureFilterMode);
 		}
+	}
+
+	void OpenGlRenderTexture::ValidateFrameBuffer()
+	{
+		CHECK_FRAME_BUFFER_COMPLETENESS(frameBufferId);
 	}
 }

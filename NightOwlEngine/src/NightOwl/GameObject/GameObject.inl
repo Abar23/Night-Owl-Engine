@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NightOwl/Behavior/OwlBehaviorManager.h"
-#include "NightOwl/Core/Locator/OwlBehaviorManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 
 namespace NightOwl
@@ -22,7 +22,7 @@ namespace NightOwl
 
 		if (owlBehavior != nullptr)
 		{
-			OwlBehaviorManagerLocator::GetOwlBehaviorManager()->AddOwlBehavior(owlBehavior);
+			OwlBehaviorManagerLocator::Get()->AddOwlBehavior(owlBehavior);
 			owlBehaviorList.insert(owlBehavior);
 		}
 		else

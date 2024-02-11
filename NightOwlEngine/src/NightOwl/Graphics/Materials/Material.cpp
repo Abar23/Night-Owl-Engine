@@ -4,13 +4,13 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 
 namespace NightOwl
 {
 	Material::Material()
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		// Set default shader to the engine's standard shader
 		shader = assetManager->GetShaderRepository().GetAsset("StandardShader");
@@ -20,7 +20,7 @@ namespace NightOwl
 
 	Material::Material(const std::string& shaderName)
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		shader = assetManager->GetShaderRepository().GetAsset(shaderName);
 
@@ -72,6 +72,20 @@ namespace NightOwl
 				texture->Bind(currentTextureUnit);
 			}
 			currentTextureUnit++;
+		}
+
+		for (const auto& [bindingPoint, buffer] : bufferUniforms | std::views::values)
+		{
+			if (buffer == nullptr)
+			{
+				continue;
+			}
+
+			if (buffer->GetBufferType() == BufferType::Storage || 
+				buffer->GetBufferType() == BufferType::Uniform)
+			{
+				buffer->Bind(bindingPoint);
+			}
 		}
 	}
 
@@ -168,7 +182,7 @@ namespace NightOwl
 		return floatUniformMap[uniformName] .second;
 	}
 
-	void Material::SetTexture(const ITexture2D* texture, const std::string& uniformName)
+	void Material::SetTexture(ITexture2D* texture, const std::string& uniformName)
 	{
 		if (textureUniformMap.contains(uniformName) == false)
 		{
@@ -186,6 +200,26 @@ namespace NightOwl
 		}
 
 		return textureUniformMap[uniformName].second;
+	}
+
+	void Material::SetBuffer(IGraphicsBuffer* buffer, const std::string& uniformName)
+	{
+		if (bufferUniforms.contains(uniformName) == false)
+		{
+			return;
+		}
+
+		bufferUniforms[uniformName].second = buffer;
+	}
+
+	const IGraphicsBuffer* Material::GetBuffer(const std::string& uniformName)
+	{
+		if (bufferUniforms.contains(uniformName) == false)
+		{
+			return nullptr;
+		}
+
+		return bufferUniforms[uniformName].second;
 	}
 
 	const IShader* Material::GetShader() const
@@ -233,8 +267,9 @@ namespace NightOwl
 					break;
 
 				case UniformDataTypes::Buffer:
-					// create buffer property map
+					bufferUniforms[uniformName] = std::make_pair(uniformLocation, nullptr);
 					break;
+
 				default: 
 					break;
 				}
@@ -249,5 +284,6 @@ namespace NightOwl
 		integerUniformMap.clear();
 		vectorUniformMap.clear();
 		matrixUniformMap.clear();
+		bufferUniforms.clear();
 	}
 }

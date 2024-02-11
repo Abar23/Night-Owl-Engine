@@ -11,7 +11,7 @@
 namespace NightOwl
 {
 	GlfwWindow::GlfwWindow(const std::string& windowName, const unsigned int height, const unsigned int width)
-		:	isFullScreen(false)
+		: isFullScreen(false)
 	{
 		int glfwStartedSuccessfully = glfwInit();
 
@@ -27,8 +27,6 @@ namespace NightOwl
 		#endif
 
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
-		
-		Graphics::CreateContext(this);//Create context
 
 		glfwGetFramebufferSize(windowHandle, &windowProperties.pixelWidth, &windowProperties.pixelHeight);
 
@@ -40,17 +38,17 @@ namespace NightOwl
 		windowProperties.windowName = windowName;
 
 		glfwSetWindowUserPointer(windowHandle, &windowProperties);
-		
+
 		monitorHandle = glfwGetPrimaryMonitor();
-		
+
 		const GLFWvidmode* videoMode = glfwGetVideoMode(monitorHandle);
-		
+
 		monitorProperties.monitorWidth = videoMode->width;
 		monitorProperties.monitorHeight = videoMode->height;
 		monitorProperties.refreshRate = videoMode->refreshRate;
-		
+
 		glfwSetMonitorUserPointer(monitorHandle, &monitorProperties);
-		
+
 		glfwSwapInterval(0);
 
 		glfwSetWindowSizeCallback(windowHandle, ScreenResizeCallback);

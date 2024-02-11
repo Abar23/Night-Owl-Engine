@@ -32,6 +32,12 @@ namespace NightOwl
 
 		void SetClearColor(const Vec4F& color) override;
 
+		void EnableCapability(ContextCapabilityType type, bool enable) override;
+
+		void CullFaceMode(FaceType type) override;
+
+		void ColorBlendFunction(BlendFunctionType sourceFunctionType, BlendFunctionType destinationFunctionType) override;
+
 	private:
 		GLFWwindow* window;
 

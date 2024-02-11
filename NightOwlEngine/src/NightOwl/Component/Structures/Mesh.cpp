@@ -4,7 +4,7 @@
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
 #include "NightOwl/Graphics/Structures/VertexBufferData.h"
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
+#include "..\..\Graphics\Types\VertexDataType.h"
 
 namespace NightOwl
 {
@@ -159,7 +159,7 @@ namespace NightOwl
 		boneWeights.clear();
 	}
 
-	void Mesh::UploadMeshData(bool markNoLongerReadable)
+	void Mesh::UploadMeshData(bool markNoLongerReadable /* = false */)
 	{
 		ValidateMesh();
 		ENGINE_ASSERT(isValid, "Triangle indices reference out of bounds vertices.");

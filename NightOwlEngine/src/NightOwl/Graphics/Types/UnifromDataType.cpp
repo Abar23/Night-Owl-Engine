@@ -1,11 +1,11 @@
 #include "NightOwlPch.h"
 
-#include "UniformDataTypes.h"
+#include "UniformDataType.h"
 #include <glad/glad.h>
 
 namespace NightOwl
 {
-	UniformDataTypes OpenGlUniformToUniformDataType(const unsigned int type)
+	UniformDataTypes OpenGlUniformToUniformDataType(const int type)
 	{
 		switch (type)
 		{

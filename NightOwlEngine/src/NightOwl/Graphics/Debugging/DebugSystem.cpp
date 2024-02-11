@@ -3,10 +3,10 @@
 #include "DebugSystem.h"
 #include "NightOwl/Component/Concrete/Camera.h"
 #include "NightOwl/Core/Asset/AssetManager.h"
-#include "NightOwl/Core/Locator/AssetManagerLocator.h"
+#include "NightOwl/Core/Locator/Locator.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Structures/VertexBufferLayout.h"
-#include "NightOwl/Graphics/Types/VertexDataTypes.h"
+#include "..\Types\VertexDataType.h"
 
 namespace NightOwl
 {
@@ -34,12 +34,20 @@ namespace NightOwl
 
 	void DebugSystem::DrawPoint(const Vec3F& point, const Vec3F& color /* = { 0.0f, 1.0f, 0.0 } */)
 	{
-		points.push_back({ point, color });
+		points.emplace_back(point, color );
+	}
+
+	void DebugSystem::Shutdown()
+	{
+		pointVertexArrayObject.reset();
+		lineVertexArrayObject.reset();
+		lineVertexBuffer.reset();
+		pointVertexBuffer.reset();
 	}
 
 	void DebugSystem::SetupLineGraphics()
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		// Set up debug shader for debug material
 		debugLineMaterial = std::make_shared<Material>();
@@ -64,7 +72,7 @@ namespace NightOwl
 
 	void DebugSystem::SetupPointGraphics()
 	{
-		AssetManager* assetManager = AssetManagerLocator::GetAssetManager();
+		AssetManager* assetManager = AssetManagerLocator::Get();
 
 		// Set up debug shader for debug material
 		debugPointMaterial = std::make_shared<Material>();

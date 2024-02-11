@@ -7,14 +7,14 @@ layout(location = 5) in vec3 materialBitangents;
 layout(location = 6) in ivec4 boneIds;
 layout(location = 7) in vec4 boneWeights;
 
-uniform mat4 modelMatrix; // Assign a unique location to modelMatrix
-uniform mat4 viewProjectionMatrix; // Assign a unique location to viewProjectionMatrix
+layout (location = 100) uniform mat4 modelMatrix; // Assign a unique location to modelMatrix
+layout (location = 101) uniform mat4 viewProjectionMatrix; // Assign a unique location to viewProjectionMatrix
 
-uniform bool hasBones;
+layout (location = 102) uniform bool hasBones;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBonesMatrices[MAX_BONES]; // Assign a unique location to finalBonesMatrices
+layout (location = 103) uniform mat4 finalBonesMatrices[MAX_BONES]; // Assign a unique location to finalBonesMatrices
 
 out vertexData
 {

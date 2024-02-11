@@ -54,9 +54,9 @@ namespace NightOwl
 
 		static void SetMainCamera(Camera& camera);
 
-		std::shared_ptr<IRenderTexture> GetTargetTexture() const;
+		IRenderTexture* GetTargetTexture() const;
 
-		void SetTargetTexture(const std::shared_ptr<IRenderTexture>& targetTexture);
+		void SetTargetTexture(IRenderTexture* targetTexture);
 
 		void Remove() override;
 
@@ -81,7 +81,7 @@ namespace NightOwl
 
 		bool isProjectionDirty;
 
-		std::shared_ptr<IRenderTexture> targetTexture;
+		IRenderTexture* targetTexture;
 
 		void SetProjectionDirtyFlag();
 

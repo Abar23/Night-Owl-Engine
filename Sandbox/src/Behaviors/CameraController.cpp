@@ -1,6 +1,5 @@
 #include "CameraController.h"
 
-#include "NightOwl/Core/Locator/DebugSystemLocator.h"
 #include "NightOwl/Core/Time/Time.h"
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Input/Input.h"
@@ -9,6 +8,7 @@ void CameraController::Start()
 {
 	mainCamera = NightOwl::Camera::GetMainCamera();
 	mainCameraTransform = mainCamera->GetGameObject().GetTransform();
+	mainCameraTransform->Rotate({45, 0, 0}, NightOwl::Space::World);
 	SetCameraToDefaults();
 }
 

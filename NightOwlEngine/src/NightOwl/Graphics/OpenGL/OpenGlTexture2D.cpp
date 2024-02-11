@@ -1,6 +1,7 @@
 #include <NightOwlPch.h>
 
 #include "OpenGlTexture2D.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Graphics/Types/GraphicsFormat.h"
 #include "NightOwl/Graphics/Types/TextureFormat.h"
@@ -15,18 +16,20 @@ namespace NightOwl
 		  textureFormat(TextureFormat::None),
 		  wrapModeU(TextureWrapMode::ClampToEdge),
 		  wrapModeV(TextureWrapMode::MirrorClampToEdge),
-		  textureFilterMode(TextureFilterMode::Point)
-	{
-	}
+		  textureFilterMode(TextureFilterMode::Point),
+		  boundTextureUnit(std::numeric_limits<unsigned int>::max())
+	{ }
 
 	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, GraphicsFormat format, TextureWrapMode wrapModeU /* = TextureWrapMode::ClampToEdge */, TextureWrapMode wrapModeV /* = TextureWrapMode::ClampToEdge  */, TextureFilterMode filterMode /* = TextureFilterMode::Nearest */)
-		: height(height),
+		: textureId(std::numeric_limits<unsigned int>::max()),
+		  height(height),
 		  width(width),
 		  graphicsFormat(format),
 		  textureFormat(GraphicsFormatToTextureFormat(format)),
 		  wrapModeU(wrapModeU),
 		  wrapModeV(wrapModeV),
-		  textureFilterMode(filterMode)
+		  textureFilterMode(filterMode),
+		  boundTextureUnit(std::numeric_limits<unsigned int>::max())
 	{
 		CreateTexture();
 		AllocateTexture();
@@ -47,15 +50,22 @@ namespace NightOwl
 		GL_CALL(glDeleteTextures, 1, &textureId);
 	}
 
-	void OpenGlTexture2D::Bind(unsigned int textureUnit) const
+	void OpenGlTexture2D::Bind(unsigned int textureUnit)
 	{
-		GL_CALL(glActiveTexture, GL_TEXTURE0 + textureUnit);
+		boundTextureUnit = GL_TEXTURE0 + textureUnit;
+
+		GL_CALL(glActiveTexture, boundTextureUnit);
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, textureId);
 	}
 
-	void OpenGlTexture2D::Unbind() const
+	void OpenGlTexture2D::Unbind()
 	{
+		ENGINE_ASSERT(boundTextureUnit != std::numeric_limits<unsigned int>::max(), "Unbinding texture from invalid texture unit.");
+
+		GL_CALL(glActiveTexture, boundTextureUnit);
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
+
+		boundTextureUnit = std::numeric_limits<unsigned int>::max();
 	}
 
 	void OpenGlTexture2D::SetData(const void* pixelData)

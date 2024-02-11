@@ -116,7 +116,7 @@ namespace NightOwl
 			if (owlBehavior)
 			{
 				clonedGameObject->owlBehaviorList.insert(owlBehavior);
-				OwlBehaviorManagerLocator::GetOwlBehaviorManager()->AddOwlBehavior(owlBehavior);
+				OwlBehaviorManagerLocator::Get()->AddOwlBehavior(owlBehavior);
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace NightOwl
 			component->Remove();
 		}
 
-		OwlBehaviorManager* owlBehaviorManager = OwlBehaviorManagerLocator::GetOwlBehaviorManager();
+		OwlBehaviorManager* owlBehaviorManager = OwlBehaviorManagerLocator::Get();
 		for (const auto& owlBehavior : owlBehaviorList)
 		{
 			owlBehaviorManager->RemoveOwlBehavior(owlBehavior);
