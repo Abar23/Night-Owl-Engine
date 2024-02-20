@@ -8,7 +8,6 @@ namespace NightOwl
 	// OpenGL texture format to graphics format: https://registry.khronos.org/OpenGL/specs/gl/glspec45.compatibility.pdf
 	enum class GraphicsFormat
 	{
-		None,
 		R8,
 		R16,
 		R16F,
@@ -29,7 +28,8 @@ namespace NightOwl
 		Depth24,
 		Depth32F,
 		Depth24_Stencil8,
-		Stencil8
+		Stencil8,
+		None
 	};
 
 	TextureFormat GraphicsFormatToTextureFormat(GraphicsFormat graphicsFormat);

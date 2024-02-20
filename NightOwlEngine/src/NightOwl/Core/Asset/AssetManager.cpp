@@ -26,6 +26,11 @@ namespace NightOwl
 		return shaderRepository;
 	}
 
+	AssetRepository<IComputeShader>& AssetManager::GetComputeShaderRepository()
+	{
+		return computeShaderRepository;
+	}
+
 	AssetRepository<ITexture2D>& AssetManager::GetTextureRepository()
 	{
 		return textureRepository;
@@ -65,6 +70,7 @@ namespace NightOwl
 	void AssetManager::ClearSceneAll()
 	{
 		shaderRepository.ClearSceneAssets();
+		computeShaderRepository.ClearAllAssets();
 		textureRepository.ClearSceneAssets();
 		audioClipRepository.ClearSceneAssets();
 		modelRepository.ClearSceneAssets();
@@ -74,6 +80,7 @@ namespace NightOwl
 	void AssetManager::ClearAll()
 	{
 		shaderRepository.ClearAllAssets();
+		computeShaderRepository.ClearAllAssets();
 		textureRepository.ClearAllAssets();
 		audioClipRepository.ClearAllAssets();
 		modelRepository.ClearAllAssets();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Types\ShaderType.h"
+#include "NightOwl/Graphics/Types/ShaderType.h"
 
 namespace NightOwl
 {

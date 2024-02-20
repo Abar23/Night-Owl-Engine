@@ -25,7 +25,7 @@ namespace NightOwl
 
 		void SetSize(unsigned int elementCount, unsigned int stride)
 		{
-			ENGINE_ASSERT(elementCount > 0 && stride > 0, "elementCount and stride must be greater than 0 when setting size of graphics buffer.");
+			//ENGINE_ASSERT(elementCount > 0 && stride > 0, "elementCount and stride must be greater than 0 when setting size of graphics buffer.");
 
 			this->elementCount = elementCount;
 			this->stride = stride;

@@ -31,7 +31,7 @@ namespace NightOwl
 
 		virtual std::shared_ptr<Component> Clone() { return nullptr; }
 
-		GameObject& GetGameObject()
+		GameObject& GetGameObject() const
 		{
 			return *gameObject;
 		}

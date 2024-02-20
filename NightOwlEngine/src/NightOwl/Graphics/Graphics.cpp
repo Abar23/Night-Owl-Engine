@@ -1,7 +1,6 @@
 #include "NightOwlPch.h"
 
 #include "Graphics.h"
-
 #include "Debugging/DebugSystem.h"
 #include "Materials/Material.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
@@ -66,6 +65,9 @@ namespace NightOwl
 
 	void Graphics::Render()
 	{
+		LightSystem* lightSystem = LightSystemLocator::Get();
+		lightSystem->SetupLightBuffers();
+
 		// ********** G-buffer pass ********** //
 		const IShader* gBufferShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBuffer");
 		const std::vector<MeshRenderer*>& meshRenderers = MeshRendererSystemLocator::Get()->GetMeshRenderers();
@@ -77,7 +79,7 @@ namespace NightOwl
 
 		deferredGBuffer->Bind();
 		graphicsContext->ClearBuffer();
-		
+
 		gBufferShader->Bind();
 
 		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
@@ -87,7 +89,7 @@ namespace NightOwl
 
 			const Mat4F modelMatrix = meshRenderer->gameObject->GetTransform()->GetWorldMatrix();
 			gBufferShader->SetUniformMat4F(modelMatrix, "modelMatrix");
-		
+
 			meshRenderer->mesh->Bind();
 			for (const auto& subMesh : meshRenderer->mesh->GetSubMeshes())
 			{
@@ -95,84 +97,139 @@ namespace NightOwl
 			}
 			meshRenderer->mesh->Unbind();
 		}
-		
+
 		deferredGBuffer->Unbind();
 
-		// // ********* Global Lighting Pass ********* //
-		const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
-		
-		LightSystem* lightSystem = LightSystemLocator::Get();
-		
+		// Get Attachments for next rendering steps
 		ITexture2D* positionAttachment = deferredGBuffer->GetColorAttachment(0);
 		ITexture2D* normalAttachment = deferredGBuffer->GetColorAttachment(1);
 		ITexture2D* colorAttachment = deferredGBuffer->GetColorAttachment(2);
-		
-		gBufferLightingShader->Bind();
-		
-		gBufferLightingShader->SetUniformFloat(0.5f, "roughness");
-		gBufferLightingShader->SetUniformFloat(0.0f, "metallic");
-		gBufferLightingShader->SetUniformFloat(0.0f, "ambientOcclusion");
-		
-		gBufferLightingShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
 
-		gBufferLightingShader->SetUniformInt(0, "gPosition");
-		positionAttachment->Bind(0);
-		gBufferLightingShader->SetUniformInt(1, "gNormal");
-		normalAttachment->Bind(1);
-		gBufferLightingShader->SetUniformInt(2, "gAlbedoSpec");
-		colorAttachment->Bind(2);
+		// ********* Global Light Shadow and Lighting Pass ********* //
+		Light* globalLight = Light::GetGlobalLight();
+		const IShader* shadowMapShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("ShadowMap");
 		
-		quadMesh->Bind();
-		graphicsContext->DrawIndexed(DrawType::Triangles, 6);
-		quadMesh->Unbind();
-		
-		positionAttachment->Unbind();
-		normalAttachment->Unbind();
-		colorAttachment->Unbind();
+		if (globalLight->GetShadows() != LightShadows::None)
+		{
+			// ********* Global Light Shadow Pass ********* //
+			glViewport(0, 0, globalLight->GetShadowResolution(), globalLight->GetShadowResolution());
 
-		gBufferLightingShader->Unbind();
-		
-		// // ********* Copy Depth from G-Buffer to Back Buffer ********* //
-		// IWindow* window = WindowApi::GetWindow().get();
-		// // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
-		// // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
-		// // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
-		// GL_CALL(glBlitNamedFramebuffer, deferredGBuffer->GetFrameBufferHandle(), 0, 0, 0, window->GetWidth(), window->GetHeight(), 0, 0, window->GetWidth(), window->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-		//
+			graphicsContext->CullFaceMode(FaceType::Front);
 
+			globalLight->GetShadowFrameBuffer()->Bind();
+
+			shadowMapShader->Bind();
+			graphicsContext->ClearBuffer();
+
+			const Mat4F shadowViewProjectionMatrix = globalLight->GetShadowViewProjectionMatrix();
+			shadowMapShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
+		
+			for (const auto& meshRenderer : meshRenderers)
+			{
+				const Mat4F modelMatrix = meshRenderer->gameObject->GetTransform()->GetWorldMatrix();
+				shadowMapShader->SetUniformMat4F(modelMatrix, "modelMatrix");
+		
+				meshRenderer->mesh->Bind();
+				for (const auto& subMesh : meshRenderer->mesh->GetSubMeshes())
+				{
+					graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
+				}
+				meshRenderer->mesh->Unbind();
+			}
+		
+			shadowMapShader->Unbind();
+		
+			globalLight->GetShadowFrameBuffer()->Unbind();
+		
+			graphicsContext->CullFaceMode(FaceType::Back);
+
+			glViewport(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
+
+			// ********* Global Light Lighting Pass ********* //
+			const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
+
+			ITexture2D* shadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetDepthBuffer().get();
+
+			gBufferLightingShader->Bind();
+
+			lightSystem->GetGlobalLightBuffer()->Bind(0);
+
+			gBufferLightingShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
+
+			gBufferLightingShader->SetUniformFloat(0.5f, "roughness");
+			gBufferLightingShader->SetUniformFloat(0.0f, "metallic");
+			gBufferLightingShader->SetUniformFloat(1.0f, "ambientOcclusion");
+
+			gBufferLightingShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
+
+			gBufferLightingShader->SetUniformInt(0, "gPosition");
+			positionAttachment->Bind(0);
+			gBufferLightingShader->SetUniformInt(1, "gNormal");
+			normalAttachment->Bind(1);
+			gBufferLightingShader->SetUniformInt(2, "gAlbedoSpec");
+			colorAttachment->Bind(2);
+			gBufferLightingShader->SetUniformInt(3, "shadowMap");
+			shadowDepthAttachment->Bind(3);
+
+			quadMesh->Bind();
+			graphicsContext->DrawIndexed(DrawType::Triangles, 6);
+			quadMesh->Unbind();
+
+			positionAttachment->Unbind();
+			normalAttachment->Unbind();
+			colorAttachment->Unbind();
+			shadowDepthAttachment->Unbind();
+
+			lightSystem->GetGlobalLightBuffer()->Unbind();
+
+			gBufferLightingShader->Unbind();
+		}
+		
+		// ********* Copy Depth from G-Buffer to Back Buffer ********* //
+		IWindow* window = WindowApi::GetWindow().get();
+		// blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
+		// the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
+		// depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
+		GL_CALL(glBlitNamedFramebuffer, deferredGBuffer->GetFrameBufferHandle(), 0, 0, 0, window->GetWidth(), window->GetHeight(), 0, 0, window->GetWidth(), window->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		
+		
 		// ********* Local Lighting Pass ********* //
 		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
 		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
-
+		
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
 		graphicsContext->CullFaceMode(FaceType::Front);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
-
+		
 		debugLightShader->Bind();
-		lightSystem->SetupLightBuffer();
-		lightSystem->GetLightBuffer()->Bind(0);
+		lightSystem->GetPointLightBuffer()->Bind(0);
 		sphere->renderer->mesh->Bind();
-
+		
 		debugLightShader->SetUniformFloat(WindowApi::GetWindow()->GetWidth(), "width");
 		debugLightShader->SetUniformFloat(WindowApi::GetWindow()->GetHeight(), "height");
-
-		debugLightShader->SetUniformFloat(0.2f, "roughness");
+		
+		debugLightShader->SetUniformFloat(0.5f, "roughness");
 		debugLightShader->SetUniformFloat(0.0f, "metallic");
 		debugLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
-
+		
 		debugLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
-
+		
 		debugLightShader->SetUniformInt(0, "gPosition");
 		positionAttachment->Bind(0);
 		debugLightShader->SetUniformInt(1, "gNormal");
 		normalAttachment->Bind(1);
 		debugLightShader->SetUniformInt(2, "gAlbedoSpec");
 		colorAttachment->Bind(2);
-
+		
 		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
 		int lightIndex = 0;
 		for (auto& light : lightSystem->GetLights())
 		{
+			if (light == Light::GetGlobalLight())
+			{
+				continue;
+			}
+		
 			light->GetGameObject().GetTransform()->SetLocalScale(light->GetRange());
 			Mat4F modelMatrix = light->GetGameObject().GetTransform()->GetWorldMatrix();
 			debugLightShader->SetUniformMat4F(modelMatrix, "modelMatrix");
@@ -184,13 +241,13 @@ namespace NightOwl
 			}
 			++lightIndex;
 		}
-
+		
 		positionAttachment->Unbind();
 		normalAttachment->Unbind();
 		colorAttachment->Unbind();
-
+		
 		sphere->renderer->mesh->Unbind();
-		lightSystem->GetLightBuffer()->Unbind();
+		lightSystem->GetPointLightBuffer()->Unbind();
 		debugLightShader->Unbind();
 	}
 

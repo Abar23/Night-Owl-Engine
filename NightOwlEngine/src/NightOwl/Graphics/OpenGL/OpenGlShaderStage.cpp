@@ -1,13 +1,11 @@
 #include "NightOwlPch.h"
 
 #include "OpenGlShaderStage.h"
-
-#include <shaderc/shaderc.hpp>
-
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Structures/ShaderIncluder.h"
+#include <shaderc/shaderc.hpp>
 
 namespace NightOwl
 {
@@ -71,7 +69,7 @@ namespace NightOwl
 
 		std::string glslPreprocessShader(preprocessResult.begin(), preprocessResult.end());
 
-		shaderc::SpvCompilationResult compilationResult = glslCompiler.CompileGlslToSpv(glslPreprocessShader, ShaderTypeToShaderCType(shaderType), "test", glslOptions);
+		const shaderc::SpvCompilationResult compilationResult = glslCompiler.CompileGlslToSpv(glslPreprocessShader, ShaderTypeToShaderCType(shaderType), "test", glslOptions);
 		
 		if (compilationResult.GetCompilationStatus() != shaderc_compilation_status_success)
 		{

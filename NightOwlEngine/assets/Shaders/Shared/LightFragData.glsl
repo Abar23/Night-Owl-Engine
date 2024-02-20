@@ -1,11 +1,9 @@
-struct Light
+layout (binding = 0, std430) buffer pointLightStorageBlock
 {
-    vec3 position;
-    vec3 color;
-    float range;
+    PointLight pointLights[];
 };
 
-layout (binding = 0, std430) buffer lightStorageBlock
+layout (binding = 1, std430) buffer directionalLightStorageBlock
 {
-    Light lights[];
+    DirectionalLight directionalLights[];
 };

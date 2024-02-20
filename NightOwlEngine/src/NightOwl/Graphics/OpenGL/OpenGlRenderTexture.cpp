@@ -14,9 +14,28 @@ namespace NightOwl
 	{
 		GL_CALL(glCreateFramebuffers, 1, &frameBufferId);
 
-		AddColorAttachment(firstColorAttachmentFormat);
+		if (firstColorAttachmentFormat != GraphicsFormat::None)
+		{
+			AddColorAttachment(firstColorAttachmentFormat);
+		}
 
-		AttachDepthBufferWithFormat(depthBufferFormat);
+		if (depthBufferFormat != GraphicsFormat::None)
+		{
+			AttachDepthBufferWithFormat(depthBufferFormat);
+		}
+
+		ValidateFrameBuffer();
+	}
+
+	OpenGlRenderTexture::OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat depthBufferFormat)
+		: IRenderTexture(height, width, textureFilterMode)
+	{
+		GL_CALL(glCreateFramebuffers, 1, &frameBufferId);
+
+		if (depthBufferFormat != GraphicsFormat::None)
+		{
+			AttachDepthBufferWithFormat(depthBufferFormat);
+		}
 
 		ValidateFrameBuffer();
 	}

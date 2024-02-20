@@ -76,9 +76,53 @@ namespace NightOwl
 				continue;
 			}
 
-			std::shared_ptr<IShader> shader = Graphics::CreateShader(shaderName);
+			// Get number of files in current directory
+			int numberOfShaderFiles = 0;
+			for (const auto& entry : std::filesystem::directory_iterator(shaderProgramDirectory)) {
+				if (is_regular_file(entry)) {
+					++numberOfShaderFiles;
+				}
+			}
 
-			for (const auto& shaderStageFile : std::filesystem::directory_iterator(shaderProgramDirectory.path()))
+			// No shader files in directory, so continue
+			if (numberOfShaderFiles == 0)
+			{
+				continue;
+			}
+
+			// Compute shader programs will only have 1 file, TODO: CLEAN THIS UP!!
+			if (numberOfShaderFiles == 1)
+			{
+				const std::shared_ptr<IComputeShader> computeShader = Graphics::CreateComputeShader(shaderName);
+
+				const std::filesystem::directory_iterator& directoryIterator = std::filesystem::directory_iterator(shaderProgramDirectory.path());
+
+				const std::filesystem::directory_entry& directoryEntry = *directoryIterator;
+
+				if (is_regular_file(directoryEntry) == false)
+				{
+					continue;
+				}
+
+				std::string shaderStageFilePath = directoryEntry.path().string();
+				Utility::StandardizeFilePathString(shaderStageFilePath);
+
+				const std::string& shaderStageSource = shaderHeader + ReadShader(shaderStageFilePath);
+				const std::string shaderStageExtension = Utility::StripFilePathToExtension(shaderStageFilePath);
+
+				std::shared_ptr<IShaderStage> shaderStage = Graphics::CreateShaderStage(shaderStageSource, ExtensionToShaderType(shaderStageExtension));
+
+				computeShader->AttachAndLinkComputeShaderStage(shaderStage);
+
+				assetManager->GetComputeShaderRepository().AddAsset(shaderName, computeShader, isEngineAsset);
+
+				continue;
+			}
+
+			// If there is more than 1 file, then it is a regular shader program
+			const std::shared_ptr<IShader> shader = Graphics::CreateShader(shaderName);
+
+			for (const std::filesystem::directory_entry& shaderStageFile : std::filesystem::directory_iterator(shaderProgramDirectory.path()))
 			{
 				if (is_regular_file(shaderStageFile) == false)
 				{

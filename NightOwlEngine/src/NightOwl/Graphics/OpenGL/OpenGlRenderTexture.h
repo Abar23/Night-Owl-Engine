@@ -4,10 +4,12 @@
 
 namespace NightOwl
 {
-	class OpenGlRenderTexture : IRenderTexture
+	class OpenGlRenderTexture : public IRenderTexture
 	{
 	public:
 		OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat firstColorAttachmentFormat, GraphicsFormat depthBufferFormat);
+
+		OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat depthBufferFormat);
 
 		~OpenGlRenderTexture() override;
 

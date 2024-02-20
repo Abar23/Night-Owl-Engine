@@ -13,6 +13,7 @@ namespace NightOwl
 		TessEvaluation,
 		Geometry,
 		Fragment,
+		Compute,
 		None
 	};
 
@@ -21,7 +22,8 @@ namespace NightOwl
 		{ "tesc", ShaderType::TessControl },
 		{ "tese", ShaderType::TessEvaluation },
 		{ "geom", ShaderType::Geometry },
-		{ "frag", ShaderType::Fragment }
+		{ "frag", ShaderType::Fragment },
+		{ "comp", ShaderType::Compute}
 	};
 
 	std::string ShaderTypeToString(const ShaderType type);

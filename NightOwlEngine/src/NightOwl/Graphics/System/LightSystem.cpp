@@ -6,7 +6,7 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Interfaces/IGraphicsBuffer.h"
-#include "NightOwl/Graphics/Structures/LightGraphicsStruct.h"
+#include "NightOwl/Graphics/Structures/GraphicsLight.h"
 
 namespace NightOwl
 {
@@ -16,10 +16,12 @@ namespace NightOwl
 
 	void LightSystem::Initialize()
 	{
-		lightGraphicsBuffer = Graphics::CreateGraphicsBuffer(BufferType::Storage);
+		pointLightGraphicsBuffer = Graphics::CreateGraphicsBuffer(BufferType::Storage);
+		directionalLightGraphicsBuffer = Graphics::CreateGraphicsBuffer(BufferType::Storage);
+		globalDirectionalLightGraphicsBuffer = Graphics::CreateGraphicsBuffer(BufferType::Storage);
 	}
 
-	void LightSystem::SetupLightBuffer()
+	void LightSystem::SetupLightBuffers()
 	{
 		if (isDirty == false)
 		{
@@ -27,23 +29,59 @@ namespace NightOwl
 		}
 		isDirty = false;
 
-		lightData.resize(lights.size());
+		pointLightData.clear();
+		directionalLightData.clear();
 
-		// TODO: make = operator for LightGraphicsStruct to Light
-		for (int lightIndex = 0; lightIndex < lights.size(); ++lightIndex)
+		// Setup point light data for shader storage block
+		const Light* globalLight = Light::GetGlobalLight();
+		if (globalLight != nullptr && globalLight->GetType() == LightType::Directional)
 		{
-			lightData[lightIndex].position = lights[lightIndex]->GetGameObject().GetTransform()->GetPosition();
-			lightData[lightIndex].color = lights[lightIndex]->GetColor();
-			lightData[lightIndex].range = lights[lightIndex]->GetRange();
+			const GraphicsDirectionalLight globalDirectionalLight = globalLight;
+			globalDirectionalLightGraphicsBuffer->SetSize(1, sizeof(GraphicsDirectionalLight));
+			globalDirectionalLightGraphicsBuffer->SetData(&globalDirectionalLight);
 		}
 
-		lightGraphicsBuffer->SetSize(lightData.size(), sizeof(LightGraphicsStruct));
-		lightGraphicsBuffer->SetData(lightData.data());
+		for (const auto* light : lights)
+		{
+			if (light == globalLight)
+			{
+				continue;
+			}
+
+			if (light->GetType() == LightType::Point)
+			{
+				GraphicsPointLight graphicsPointLight = light;
+				pointLightData.push_back(graphicsPointLight);
+				continue;
+			}
+
+			if (light->GetType() == LightType::Directional)
+			{
+				GraphicsDirectionalLight graphicsDirectionalLight = light;
+				directionalLightData.push_back(graphicsDirectionalLight);
+			}
+		}
+
+		pointLightGraphicsBuffer->SetSize(pointLightData.size(), sizeof(GraphicsPointLight));
+		pointLightGraphicsBuffer->SetData(pointLightData.data());
+
+		directionalLightGraphicsBuffer->SetSize(directionalLightData.size(), sizeof(GraphicsDirectionalLight));
+		directionalLightGraphicsBuffer->SetData(directionalLightData.data());
 	}
 
-	std::shared_ptr<IGraphicsBuffer> LightSystem::GetLightBuffer()
+	std::shared_ptr<IGraphicsBuffer> LightSystem::GetPointLightBuffer()
 	{
-		return lightGraphicsBuffer;
+		return pointLightGraphicsBuffer;
+	}
+
+	std::shared_ptr<IGraphicsBuffer> LightSystem::GetDirectionalLightBuffer()
+	{
+		return directionalLightGraphicsBuffer;
+	}
+
+	std::shared_ptr<IGraphicsBuffer> LightSystem::GetGlobalLightBuffer()
+	{
+		return globalDirectionalLightGraphicsBuffer;
 	}
 
 	void LightSystem::AddLight(Light* light)
@@ -83,6 +121,8 @@ namespace NightOwl
 
 	void LightSystem::ShutDown()
 	{
-		lightGraphicsBuffer.reset();
+		pointLightGraphicsBuffer.reset();
+		directionalLightGraphicsBuffer.reset();
+		globalDirectionalLightGraphicsBuffer.reset();
 	}
 }

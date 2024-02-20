@@ -3,6 +3,7 @@
 #include "OpenGLShader.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
 #include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
+#include "NightOwl/Graphics/Interfaces/IShaderStage.h"
 
 namespace NightOwl
 {
