@@ -39,7 +39,9 @@ namespace NightOwl
 
 	void OpenGlComputeShader::AttachAndLinkComputeShaderStage(const std::shared_ptr<IShaderStage>& shaderStage) const
 	{
-		ENGINE_ASSERT(shaderStage->GetType() != ShaderType::Compute, "Trying to link and attach non-compute shader stage to computer shader program.");
+		ENGINE_ASSERT(shaderStage->GetType() == ShaderType::Compute, "Trying to link and attach non-compute shader stage to computer shader program.");
+
+		GL_CALL(glAttachShader, programId, shaderStage->GetId());
 
 		GL_CALL(glLinkProgram, programId);
 

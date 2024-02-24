@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TextureFormat.h"
-#include <glad/glad.h>
 
 namespace NightOwl
 {

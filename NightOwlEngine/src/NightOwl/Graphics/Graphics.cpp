@@ -16,6 +16,7 @@
 #include "NightOwl/Window/WindowApi.h"
 #include "System/LightSystem.h"
 #include "System/MeshRendererSystem.h"
+#include "Types/AccessType.h"
 #include "Types/GraphicsFormat.h"
 
 namespace NightOwl
@@ -76,9 +77,11 @@ namespace NightOwl
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 		graphicsContext->CullFaceMode(FaceType::Back);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
+		graphicsContext->SetClearColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 		deferredGBuffer->Bind();
 		graphicsContext->ClearBuffer();
+		graphicsContext->ClearColor();
 
 		gBufferShader->Bind();
 
@@ -114,12 +117,16 @@ namespace NightOwl
 			// ********* Global Light Shadow Pass ********* //
 			glViewport(0, 0, globalLight->GetShadowResolution(), globalLight->GetShadowResolution());
 
-			graphicsContext->CullFaceMode(FaceType::Front);
+			//graphicsContext->CullFaceMode(FaceType::Front);
+			graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, false);
+			graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 			globalLight->GetShadowFrameBuffer()->Bind();
 
 			shadowMapShader->Bind();
 			graphicsContext->ClearBuffer();
+			graphicsContext->ClearColor();
 
 			const Mat4F shadowViewProjectionMatrix = globalLight->GetShadowViewProjectionMatrix();
 			shadowMapShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
@@ -145,23 +152,57 @@ namespace NightOwl
 
 			glViewport(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
 
+			// // ********* Gaussian Compute shader blur step ********* //
+			const IComputeShader* horizontalCompute = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("HorizontalGaussianCompute");
+			const IComputeShader* verticalCompute = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("VerticalGaussianCompute");
+			ITexture2D* blurredShadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(0);
+			ITexture2D* shadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(1);
+			
+			horizontalCompute->Bind();
+			
+			blurredShadowDepthAttachment->BindAsImageUnit(0, AccessType::Read);
+			shadowDepthAttachment->BindAsImageUnit(1, AccessType::Write);
+			
+			horizontalCompute->Dispatch((blurredShadowDepthAttachment->GetWidth() + 128) / 128, blurredShadowDepthAttachment->GetHeight(), 1);
+			
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			
+			blurredShadowDepthAttachment->UnbindImageUnit();
+			shadowDepthAttachment->UnbindImageUnit();
+			
+			horizontalCompute->Unbind();
+			
+			verticalCompute->Bind();
+			
+			shadowDepthAttachment->BindAsImageUnit(0, AccessType::Read);
+			blurredShadowDepthAttachment->BindAsImageUnit(1, AccessType::Write);
+			
+			verticalCompute->Dispatch(shadowDepthAttachment->GetWidth(), (shadowDepthAttachment->GetHeight() + 128) / 128, 1);
+			
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			
+			shadowDepthAttachment->UnbindImageUnit();
+			blurredShadowDepthAttachment->UnbindImageUnit();
+			
+			verticalCompute->Unbind();
+		
 			// ********* Global Light Lighting Pass ********* //
 			const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
 
-			ITexture2D* shadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetDepthBuffer().get();
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, true);
 
 			gBufferLightingShader->Bind();
-
+		
 			lightSystem->GetGlobalLightBuffer()->Bind(0);
-
+		
 			gBufferLightingShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
-
+		
 			gBufferLightingShader->SetUniformFloat(0.5f, "roughness");
 			gBufferLightingShader->SetUniformFloat(0.0f, "metallic");
 			gBufferLightingShader->SetUniformFloat(1.0f, "ambientOcclusion");
-
+		
 			gBufferLightingShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
-
+		
 			gBufferLightingShader->SetUniformInt(0, "gPosition");
 			positionAttachment->Bind(0);
 			gBufferLightingShader->SetUniformInt(1, "gNormal");
@@ -169,29 +210,22 @@ namespace NightOwl
 			gBufferLightingShader->SetUniformInt(2, "gAlbedoSpec");
 			colorAttachment->Bind(2);
 			gBufferLightingShader->SetUniformInt(3, "shadowMap");
-			shadowDepthAttachment->Bind(3);
-
+			blurredShadowDepthAttachment->Bind(3);
+		
 			quadMesh->Bind();
 			graphicsContext->DrawIndexed(DrawType::Triangles, 6);
 			quadMesh->Unbind();
-
+		
 			positionAttachment->Unbind();
 			normalAttachment->Unbind();
 			colorAttachment->Unbind();
-			shadowDepthAttachment->Unbind();
-
+			blurredShadowDepthAttachment->Unbind();
+		
 			lightSystem->GetGlobalLightBuffer()->Unbind();
-
+		
 			gBufferLightingShader->Unbind();
 		}
-		
-		// ********* Copy Depth from G-Buffer to Back Buffer ********* //
-		IWindow* window = WindowApi::GetWindow().get();
-		// blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
-		// the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
-		// depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
-		GL_CALL(glBlitNamedFramebuffer, deferredGBuffer->GetFrameBufferHandle(), 0, 0, 0, window->GetWidth(), window->GetHeight(), 0, 0, window->GetWidth(), window->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-		
+
 		
 		// ********* Local Lighting Pass ********* //
 		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
@@ -200,6 +234,7 @@ namespace NightOwl
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
 		graphicsContext->CullFaceMode(FaceType::Front);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
+		graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 		
 		debugLightShader->Bind();
 		lightSystem->GetPointLightBuffer()->Bind(0);

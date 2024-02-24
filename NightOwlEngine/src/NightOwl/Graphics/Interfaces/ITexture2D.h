@@ -2,6 +2,8 @@
 
 namespace NightOwl
 {
+	enum class AccessType;
+
 	enum class GraphicsFormat;
 
 	enum class TextureFilterMode;
@@ -17,7 +19,11 @@ namespace NightOwl
 
 		virtual void Bind(unsigned int textureUnit) = 0;
 
+		virtual void BindAsImageUnit(unsigned int imageUnit, AccessType access) = 0;
+
 		virtual void Unbind() = 0;
+
+		virtual void UnbindImageUnit() = 0;
 
 		virtual void SetData(const void* pixelData) = 0;
 

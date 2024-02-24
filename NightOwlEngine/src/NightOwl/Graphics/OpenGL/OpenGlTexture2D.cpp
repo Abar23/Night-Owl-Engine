@@ -3,6 +3,7 @@
 #include "OpenGlTexture2D.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+#include "NightOwl/Graphics/Types/AccessType.h"
 #include "NightOwl/Graphics/Types/GraphicsFormat.h"
 #include "NightOwl/Graphics/Types/TextureFormat.h"
 
@@ -15,9 +16,11 @@ namespace NightOwl
 		  graphicsFormat(GraphicsFormat::None),
 		  textureFormat(TextureFormat::None),
 		  wrapModeU(TextureWrapMode::ClampToEdge),
-		  wrapModeV(TextureWrapMode::MirrorClampToEdge),
+		  wrapModeV(TextureWrapMode::ClampToEdge),
 		  textureFilterMode(TextureFilterMode::Point),
-		  boundTextureUnit(std::numeric_limits<unsigned int>::max())
+		  boundTextureUnit(std::numeric_limits<unsigned int>::max()),
+		  boundImageUnit(std::numeric_limits<unsigned int>::max()),
+		  accessForBoundImageUnit(AccessType::Read)
 	{ }
 
 	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, GraphicsFormat format, TextureWrapMode wrapModeU /* = TextureWrapMode::ClampToEdge */, TextureWrapMode wrapModeV /* = TextureWrapMode::ClampToEdge  */, TextureFilterMode filterMode /* = TextureFilterMode::Nearest */)
@@ -58,6 +61,14 @@ namespace NightOwl
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, textureId);
 	}
 
+	void OpenGlTexture2D::BindAsImageUnit(unsigned imageUnit, AccessType access)
+	{
+		boundImageUnit = imageUnit;
+		accessForBoundImageUnit = access;
+
+		GL_CALL(glBindImageTexture, boundImageUnit, textureId, 0, GL_FALSE, 0, AccessTypeToOpenGlType(accessForBoundImageUnit), GraphicsFormatToOpenGlFormat(graphicsFormat));
+	}
+
 	void OpenGlTexture2D::Unbind()
 	{
 		ENGINE_ASSERT(boundTextureUnit != std::numeric_limits<unsigned int>::max(), "Unbinding texture from invalid texture unit.");
@@ -66,6 +77,15 @@ namespace NightOwl
 		GL_CALL(glBindTexture, GL_TEXTURE_2D, 0);
 
 		boundTextureUnit = std::numeric_limits<unsigned int>::max();
+	}
+
+	void OpenGlTexture2D::UnbindImageUnit()
+	{
+		ENGINE_ASSERT(boundImageUnit != std::numeric_limits<unsigned int>::max(), "Unbinding texture from invalid texture unit.");
+
+		GL_CALL(glBindImageTexture, boundImageUnit, 0, 0, GL_FALSE, 0, AccessTypeToOpenGlType(accessForBoundImageUnit), GraphicsFormatToOpenGlFormat(graphicsFormat));
+
+		boundImageUnit = std::numeric_limits<unsigned int>::max();
 	}
 
 	void OpenGlTexture2D::SetData(const void* pixelData)
@@ -87,6 +107,8 @@ namespace NightOwl
 
 	void OpenGlTexture2D::SetWrapModeU(TextureWrapMode wrapMode)
 	{
+		wrapModeU = wrapMode;
+
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_S, TextureWrapModeToOpenglWrapMode(wrapModeU));
 	}
 
@@ -97,7 +119,9 @@ namespace NightOwl
 
 	void OpenGlTexture2D::SetWrapModeV(TextureWrapMode wrapMode)
 	{
-		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, TextureWrapModeToOpenglWrapMode(wrapModeU));
+		wrapModeV = wrapMode;
+
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_WRAP_T, TextureWrapModeToOpenglWrapMode(wrapModeV));
 	}
 
 	TextureWrapMode OpenGlTexture2D::GetWrapModeV() const
@@ -107,6 +131,8 @@ namespace NightOwl
 
 	void OpenGlTexture2D::SetFilterMode(TextureFilterMode filterMode)
 	{
+		textureFilterMode = filterMode;
+
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MIN_FILTER, TextureFilterModeToOpenGlMinFilter(textureFilterMode));
 		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAG_FILTER, TextureFilterModeToOpenGlMagFilter(textureFilterMode));
 	}

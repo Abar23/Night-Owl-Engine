@@ -79,7 +79,7 @@ void TestScene::Init()
 	// Create global directional light
 	auto& globalLightGameObject = AddGameObject("Global Light");
 	auto* globalLightComponent = globalLightGameObject.AddComponent<NightOwl::Light>();
-	globalLightComponent->SetShadows(NightOwl::LightShadows::Hard);
+	globalLightComponent->SetShadows(NightOwl::LightShadows::Soft);
 	globalLightComponent->SetType(NightOwl::LightType::Directional);
 	globalLightComponent->SetIntensity(10.0f);
 	NightOwl::Light::SetGlobalLight(globalLightComponent);

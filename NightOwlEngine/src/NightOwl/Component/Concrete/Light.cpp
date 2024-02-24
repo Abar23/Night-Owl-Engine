@@ -84,9 +84,15 @@ namespace NightOwl
 			return;
 		}
 
-		if (shadowFrameBuffer == nullptr)
+		if (shadows == LightShadows::Hard && shadowFrameBuffer == nullptr)
 		{
 			shadowFrameBuffer = Graphics::CreateRenderTexture(shadowResolution, shadowResolution, TextureFilterMode::Point, GraphicsFormat::Depth32F);
+			return;
+		}
+
+		if (shadows == LightShadows::Soft && shadowFrameBuffer == nullptr)
+		{
+			shadowFrameBuffer = Graphics::CreateRenderTexture(shadowResolution, shadowResolution, TextureFilterMode::Point, GraphicsFormat::RGBA32F);
 		}
 	}
 

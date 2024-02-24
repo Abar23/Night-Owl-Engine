@@ -9,7 +9,7 @@ namespace NightOwl
 	public:
 		OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat firstColorAttachmentFormat, GraphicsFormat depthBufferFormat);
 
-		OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat depthBufferFormat);
+		OpenGlRenderTexture(int height, int width, TextureFilterMode textureFilterMode, GraphicsFormat attachmentFormat);
 
 		~OpenGlRenderTexture() override;
 

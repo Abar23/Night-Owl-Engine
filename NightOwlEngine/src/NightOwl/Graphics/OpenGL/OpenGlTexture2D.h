@@ -19,7 +19,11 @@ namespace NightOwl
 
 		void Bind(unsigned int textureUnit) override;
 
+		void BindAsImageUnit(unsigned imageUnit, AccessType access) override;
+
 		void Unbind() override;
+
+		void UnbindImageUnit() override;
 
 		void SetData(const void* pixelData) override;
 
@@ -72,6 +76,10 @@ namespace NightOwl
 		TextureFilterMode textureFilterMode;
 
 		unsigned int boundTextureUnit;
+
+		unsigned int boundImageUnit;
+
+		AccessType accessForBoundImageUnit;
 	};
 }
 

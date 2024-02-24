@@ -1,0 +1,37 @@
+#include "GaussianKernel.glsl"
+
+layout (local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform readonly image2D sourceImage;
+
+layout(rgba32f, binding = 1) uniform writeonly image2D destinationImage;
+
+shared vec4 v[128 + 101];
+
+void main() {
+    ivec2 size = imageSize(sourceImage);
+    ivec2 gpos = ivec2(gl_GlobalInvocationID.xy);
+    uint lpos = gl_LocalInvocationID.x;
+    int halfWidth = 100 / 2;
+    
+    // Load pixels into shared memory
+    v[lpos] = imageLoad(sourceImage, gpos + ivec2(-halfWidth, 0));
+    if (lpos < 2 * halfWidth) {
+        v[lpos + 128] = imageLoad(sourceImage, gpos + ivec2(128 - halfWidth, 0));
+    }
+
+    // Ensure all threads have loaded their pixels before proceeding
+    memoryBarrierShared();
+    barrier();
+
+    vec4 sum = vec4(0.0);
+
+    // Compute convolution
+    for (int i = -halfWidth; i <= halfWidth; ++i) 
+    {
+        sum += gaussianKernel[i + halfWidth] * v[lpos + i + halfWidth];
+    }
+
+    // Write to destination image
+    imageStore(destinationImage, gpos, sum);
+}
