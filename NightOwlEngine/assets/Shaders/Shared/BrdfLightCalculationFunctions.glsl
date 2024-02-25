@@ -93,6 +93,41 @@ vec3 CholeskyDecomposition(float m11, float m12, float m13, float m22, float m23
     return vec3(c1, c2, c3);
 }
 
+// https://developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-8-summed-area-variance-shadow-maps
+float VarianceShadowMapCalculation(sampler2D shadowMap, 
+                                   vec4 fragmentPositionInLightSpace, 
+                                   vec3 fragmentPosition,
+                                   vec3 normal,
+                                   DirectionalLight directionalLight)
+{
+    float epsilon = 1e-6;
+
+    // perform perspective divide
+    vec3 projectedLightCoordinate = fragmentPositionInLightSpace.xyz / fragmentPositionInLightSpace.w;
+    
+    // transform to [0,1] range
+    projectedLightCoordinate = projectedLightCoordinate * 0.5 + 0.5; 
+    vec4 b = texture(shadowMap, projectedLightCoordinate.xy);
+
+    float M1 = b.x;
+    float M2 = b.y;
+
+    // One-tailed inequality valid if t > Moments.x
+    float p = float(projectedLightCoordinate.z <= M1);
+
+    // Compute variance.
+    float Variance = M2 - (M1 * M1);
+    float minVariance = 3e-6;
+    Variance = max(Variance, minVariance);
+
+    // Compute probabilistic upper bound.
+    float d = projectedLightCoordinate.z - M1;
+    float p_max = Variance / (Variance + d * d);
+
+    return 1.0 - max(p, p_max);
+}
+
+
 float MomentShadowMapCalculation(sampler2D shadowMap, 
                                  vec4 fragmentPositionInLightSpace, 
                                  vec3 fragmentPosition,
@@ -103,6 +138,7 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
 
     // perform perspective divide
     vec3 projectedLightCoordinate = fragmentPositionInLightSpace.xyz / fragmentPositionInLightSpace.w;
+    
     // transform to [0,1] range
     projectedLightCoordinate = projectedLightCoordinate * 0.5 + 0.5; 
     float zF = projectedLightCoordinate.z;
@@ -110,7 +146,9 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
 
     // Step 1
     vec4 b = texture(shadowMap, projectedLightCoordinate.xy);
-    if (b.x - directionalLight.shadowBias < epsilon)
+    
+    // Eliminate near 0 values that should not contribute
+    if (abs(b.x - directionalLight.shadowBias) < epsilon)
     {
         return 0.0;
     }

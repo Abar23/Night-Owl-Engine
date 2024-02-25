@@ -25,7 +25,7 @@ void main()
     vec3 albedo = texture(gAlbedoSpec, inVertexData.materialUvs).rgb;
 
     vec4 fragmentLightSpacePosition = shadowViewProjectionMatrix * vec4(fragmentPosition, 1.0);
-    float shadow = MomentShadowMapCalculation(shadowMap, fragmentLightSpacePosition, fragmentPosition, normal, globalLight);
+    float shadow = VarianceShadowMapCalculation(shadowMap, fragmentLightSpacePosition, fragmentPosition, normal, globalLight);
 
     fragColor = CalculateDirectionalLightBrdf(fragmentPosition, cameraPosition, normal, albedo, metallic, roughness, shadow, globalLight);
 }
