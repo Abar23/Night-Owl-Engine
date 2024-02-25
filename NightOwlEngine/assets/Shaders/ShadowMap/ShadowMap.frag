@@ -4,6 +4,7 @@ in vec4 test;
 
 void main()
 {
+    // homogenous coords are [-1, 1], converting to [0, 0]
     float zDepth = 0.5 * ((test.z / test.w) + 1.0);
     float zDepthSquared = zDepth * zDepth;
     float zDepthCubed = zDepthSquared * zDepth;

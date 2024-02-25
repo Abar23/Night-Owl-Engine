@@ -15,8 +15,28 @@ void main() {
     int halfWidth = 100 / 2;
 
     // Load pixels into shared memory
-    v[lpos] = imageLoad(sourceImage, gpos + ivec2(0, -halfWidth));
+    ivec2 pixelToRead = gpos + ivec2(0, -halfWidth);
+    if (pixelToRead.y < 0)
+    {
+        pixelToRead.y = 0;
+    } 
+    else if (pixelToRead.y >= size.y)
+    {
+        pixelToRead.y = size.y - 1;
+    }
+
+    v[lpos] = imageLoad(sourceImage, pixelToRead);
     if (lpos < 2 * halfWidth) {
+        ivec2 pixelToRead = gpos + ivec2(0, 128 - halfWidth);
+        if (pixelToRead.y < 0)
+        {
+            pixelToRead.y = 0;
+        } 
+        else if (pixelToRead.y >= size.y)
+        {
+            pixelToRead.y = size.y - 1;
+        }
+
         v[lpos + 128] = imageLoad(sourceImage, gpos + ivec2(0, 128 - halfWidth));
     }
 

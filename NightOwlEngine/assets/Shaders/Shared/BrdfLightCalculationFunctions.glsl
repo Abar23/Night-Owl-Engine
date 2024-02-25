@@ -30,7 +30,7 @@ vec3 FresnelSchilckRoughness(vec3 V, vec3 H, vec3 F0, float roughness)
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - vdotH, 5.0);
 }
 
-vec2 quadraticEquation(float a, float b, float c) 
+vec2 QuadraticEquation(float a, float b, float c) 
 {
     float epsilon = 1e-6;
 
@@ -99,28 +99,36 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
                                  vec3 normal,
                                  DirectionalLight directionalLight)
 {
+    float epsilon = 1e-6;
+
     // perform perspective divide
     vec3 projectedLightCoordinate = fragmentPositionInLightSpace.xyz / fragmentPositionInLightSpace.w;
     
     // transform to [0,1] range
-    projectedLightCoordinate = projectedLightCoordinate * 0.5 + 0.5;
+    projectedLightCoordinate = projectedLightCoordinate * 0.5 + 0.5; 
     float zF = projectedLightCoordinate.z;
     float zFSquared = zF * zF;
 
     // Step 1
     vec4 b = texture(shadowMap, projectedLightCoordinate.xy);
+
+    // return black if 
+    if (b.x < epsilon)
+    {
+        return 0.0;
+    }
+
     vec4 bPrime = (1.0 - 1e-3) * b + 1e-3 * vec4(0.5); 
 
     // Step 2
     vec3 c = CholeskyDecomposition(1.0, bPrime.x, bPrime.y, bPrime.y, bPrime.z, bPrime.w, 1, zF, zFSquared);
 
     // Step 3
-    vec2 solutions = quadraticEquation(c.z, c.y, c.x);
+    vec2 solutions = QuadraticEquation(c.z, c.y, c.x);
     float z2 = solutions.x;
     float z3 = solutions.y;
 
     // Step 4
-    float epsilon = 1e-6;
     if (zF < z2 || abs(zF - z2) < epsilon)
     {
         return 0.0;

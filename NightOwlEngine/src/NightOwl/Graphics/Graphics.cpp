@@ -77,7 +77,7 @@ namespace NightOwl
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 		graphicsContext->CullFaceMode(FaceType::Back);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
-		graphicsContext->SetClearColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 		deferredGBuffer->Bind();
 		graphicsContext->ClearBuffer();
@@ -119,7 +119,7 @@ namespace NightOwl
 
 			//graphicsContext->CullFaceMode(FaceType::Front);
 			graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
-			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, false);
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, true);
 			graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 			globalLight->GetShadowFrameBuffer()->Bind();
@@ -127,6 +127,7 @@ namespace NightOwl
 			shadowMapShader->Bind();
 			graphicsContext->ClearBuffer();
 			graphicsContext->ClearColor();
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, false);
 
 			const Mat4F shadowViewProjectionMatrix = globalLight->GetShadowViewProjectionMatrix();
 			shadowMapShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
@@ -148,7 +149,7 @@ namespace NightOwl
 		
 			globalLight->GetShadowFrameBuffer()->Unbind();
 		
-			graphicsContext->CullFaceMode(FaceType::Back);
+			//graphicsContext->CullFaceMode(FaceType::Back);
 
 			glViewport(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
 
