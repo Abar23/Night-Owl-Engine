@@ -50,6 +50,8 @@ namespace NightOwl
 
 		assetManger.LoadEngineAssets();
 
+		Graphics::SetupRenderPipelineAssets();
+
 		// Depends on engine assets being loaded in
 		debugSystem.Init();
 

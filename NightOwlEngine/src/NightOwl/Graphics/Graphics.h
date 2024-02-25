@@ -25,10 +25,14 @@
 
 namespace NightOwl
 {
+	class Model;
+
 	class Graphics
 	{
 	public:
 		static void Initialize();
+
+		static void SetupRenderPipelineAssets();
 
 		static void Render();
 
@@ -111,5 +115,19 @@ namespace NightOwl
 		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
 
 		inline static std::unique_ptr<Mesh> quadMesh;
+
+		inline static IComputeShader* horizontalComputeShader{ nullptr };
+
+		inline static IComputeShader* verticalComputeShader{ nullptr };
+
+		inline static IShader* gBufferShader{ nullptr };
+
+		inline static IShader* shadowMapShader{ nullptr };
+
+		inline static IShader* globalLightShader{ nullptr };
+
+		inline static IShader* localLightShader{ nullptr };
+
+		inline static Model* localLightSphere{ nullptr };
 	};
 }

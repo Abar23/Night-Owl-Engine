@@ -103,7 +103,6 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
 
     // perform perspective divide
     vec3 projectedLightCoordinate = fragmentPositionInLightSpace.xyz / fragmentPositionInLightSpace.w;
-    
     // transform to [0,1] range
     projectedLightCoordinate = projectedLightCoordinate * 0.5 + 0.5; 
     float zF = projectedLightCoordinate.z;
@@ -111,14 +110,12 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
 
     // Step 1
     vec4 b = texture(shadowMap, projectedLightCoordinate.xy);
-
-    // return black if 
-    if (b.x < epsilon)
+    if (b.x - directionalLight.shadowBias < epsilon)
     {
         return 0.0;
     }
-
-    vec4 bPrime = (1.0 - 1e-3) * b + 1e-3 * vec4(0.5); 
+    
+    vec4 bPrime = (1.0 - 1e-3) * b + 1e-3 * vec4(0.5);
 
     // Step 2
     vec3 c = CholeskyDecomposition(1.0, bPrime.x, bPrime.y, bPrime.y, bPrime.z, bPrime.w, 1, zF, zFSquared);

@@ -15,7 +15,7 @@ namespace NightOwl
 		  intensity(1.0f),
 		  shadowProjectionClippingPlanes(0.1f, 100.0f),
 		  shadowOrthographicProjectionSize(10.0f),
-		  shadowBias(0.05f),
+		  shadowBias(0.005f),
 		  shadowResolution(4096),
 		  color(1.0f),
 		  shadows(LightShadows::None),

@@ -31,8 +31,8 @@ void TestScene::Init()
 	assetManager->LoadModel("./assets/Plane/plane.obj");
 
 	// Get models
-	NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
-	NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
+	const NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
+	const NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
 
 	// Sphere IK control object
 	auto& planeGameObject = AddGameObject("Target");
@@ -52,7 +52,7 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr int numberOfLights = 10;
+	constexpr int numberOfLights = 5;
 	constexpr float xStartingPosition = -10.0f;
 	constexpr float zStartingPosition = -10.0f;
 	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
@@ -83,7 +83,7 @@ void TestScene::Init()
 	globalLightComponent->SetType(NightOwl::LightType::Directional);
 	globalLightComponent->SetIntensity(10.0f);
 	NightOwl::Light::SetGlobalLight(globalLightComponent);
-	globalLightGameObject.GetTransform()->Rotate({ -35.0f, 45.0f, 0.0f }, NightOwl::Space::World);
+	globalLightGameObject.GetTransform()->Rotate({ -45.0f, 45.0f, 0.0f }, NightOwl::Space::World);
 	globalLightGameObject.GetTransform()->SetPosition({ 0.0f, 1.0f, 0.0f });
 }
 

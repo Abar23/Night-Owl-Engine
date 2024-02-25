@@ -53,5 +53,8 @@ void main() {
     }
 
     // Write to destination image
-    imageStore(destinationImage, gpos, sum);
+    if (gpos.x >= 0 && gpos.x < size.x)
+    {
+        imageStore(destinationImage, gpos, sum);
+    }
 }

@@ -27,17 +27,17 @@ void main() {
 
     v[lpos] = imageLoad(sourceImage, pixelToRead);
     if (lpos < 2 * halfWidth) {
-        ivec2 pixelToRead = gpos + ivec2(0, 128 - halfWidth);
-        if (pixelToRead.y < 0)
+        ivec2 otherPixelToRead = gpos + ivec2(0, 128 - halfWidth);
+        if (otherPixelToRead.y < 0)
         {
-            pixelToRead.y = 0;
+            otherPixelToRead.y = 0;
         } 
-        else if (pixelToRead.y >= size.y)
+        else if (otherPixelToRead.y >= size.y)
         {
-            pixelToRead.y = size.y - 1;
+            otherPixelToRead.y = size.y - 1;
         }
 
-        v[lpos + 128] = imageLoad(sourceImage, gpos + ivec2(0, 128 - halfWidth));
+        v[lpos + 128] = imageLoad(sourceImage, otherPixelToRead);
     }
 
     // Ensure all threads have loaded their pixels before proceeding
@@ -53,5 +53,8 @@ void main() {
     }
 
     // Write to destination image
-    imageStore(destinationImage, gpos, sum);
+    if (gpos.y >= 0 && gpos.y < size.y)
+    {
+        imageStore(destinationImage, gpos, sum);
+    }
 }
