@@ -70,7 +70,7 @@ void TestScene::Init()
 			auto& lightSphereGameObject = AddGameObject("Target");
 			rendererComponent = lightSphereGameObject.AddComponent<NightOwl::MeshRenderer>();
 			rendererComponent->CloneRenderer(sphere->renderer);
-			lightSphereGameObject.GetTransform()->SetLocalScale(0.2f);
+			lightSphereGameObject.GetTransform()->SetLocalScale(0.3f);
 			lightSphereGameObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, -0.15f, zStartingPosition + lightSpacing * lightIndex });
 			rendererComponent->GetMaterial()->SetVec4F(NightOwl::Vec4F(lightComponent->GetColor().x, lightComponent->GetColor().y, lightComponent->GetColor().z, 0.0f), "diffuseColor");
 		}
