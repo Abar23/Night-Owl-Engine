@@ -159,4 +159,75 @@ namespace NightOwl
 
 		return GL_UNSIGNED_BYTE;
 	}
+
+	int GraphicsFormatToOpenGlImageFormat(GraphicsFormat graphicsFormat)
+	{
+		switch (graphicsFormat)
+		{
+		case GraphicsFormat::R8:
+			return GL_R8;
+
+		case GraphicsFormat::R16:
+			return GL_R16;
+
+		case GraphicsFormat::R16F:
+			return GL_R16F;
+
+		case GraphicsFormat::R32F:
+			return GL_R32F;
+
+		case GraphicsFormat::RG8:
+			return GL_RG8;
+
+		case GraphicsFormat::RG16:
+			return GL_RG16;
+
+		case GraphicsFormat::RG16F:
+			return GL_RG16F;
+
+		case GraphicsFormat::RG32F:
+			return GL_RG32F;
+
+		case GraphicsFormat::RGB8:
+			return GL_RGB8;
+
+		case GraphicsFormat::RGB16:
+			return GL_RGB16;
+
+		case GraphicsFormat::RGB16F:
+			return GL_RGB16F;
+
+		case GraphicsFormat::RGB32F:
+			return GL_RGB32F;
+
+		case GraphicsFormat::RGBA8:
+			return GL_RGBA8;
+
+		case GraphicsFormat::RGBA16:
+			return GL_RGBA16;
+
+		case GraphicsFormat::RGBA16F:
+			return GL_RGBA16F;
+
+		case GraphicsFormat::RGBA32F:
+			return GL_RGBA32F;
+
+		case GraphicsFormat::Depth16:
+			return GL_DEPTH_COMPONENT16;
+
+		case GraphicsFormat::Depth24:
+			return GL_DEPTH_COMPONENT24;
+
+		case GraphicsFormat::Depth32F:
+			return GL_DEPTH_COMPONENT32F;
+
+		case GraphicsFormat::Depth24_Stencil8:
+			return GL_DEPTH24_STENCIL8;
+
+		case GraphicsFormat::Stencil8:
+			return GL_STENCIL_INDEX8;
+		}
+
+		return GL_RGBA8;
+	}
 }

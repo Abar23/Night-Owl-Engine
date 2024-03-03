@@ -1,9 +1,19 @@
 #pragma once
 
+#include "NightOwl/Component/Structures/Mesh.h"
+#include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/Graphics/Interfaces/IComputeShader.h"
+#include "NightOwl/Graphics/Interfaces/IContext.h"
+#include "NightOwl/Graphics/Interfaces/IRenderTexture.h"
 #include "NightOwl/Graphics/Interfaces/IShader.h"
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
-#include "NightOwl/Graphics/Interfaces/IContext.h"
 #include "NightOwl/Graphics/Interfaces/IVertexArrayObject.h"
+#include "NightOwl/Graphics/Types/BufferType.h"
+#include "NightOwl/Window/Interfaces/IWindow.h"
+#include <memory>
+
+#ifdef OPEN_GL
+#include "NightOwl/Graphics/OpenGL/OpenGlComputeShader.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlContext.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlGraphicsBuffer.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlRenderTexture.h"
@@ -11,21 +21,18 @@
 #include "NightOwl/Graphics/OpenGL/OpenGlShaderStage.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlTexture2D.h"
 #include "NightOwl/Graphics/OpenGL/OpenGlVertexArrayObject.h"
-#include "NightOwl/Core/Utitlity/Assert.h"
-#include "NightOwl/Window/Interfaces/IWindow.h"
-#include <memory>
-
-#include "NightOwl/Component/Structures/Mesh.h"
-
+#endif
 
 namespace NightOwl
 {
-	class IRenderTexture;
+	class Model;
 
 	class Graphics
 	{
 	public:
 		static void Initialize();
+
+		static void SetupRenderPipelineAssets();
 
 		static void Render();
 
@@ -38,6 +45,14 @@ namespace NightOwl
 			return std::make_shared<OpenGlShader>(std::forward<Args>(args)...);
 			#endif
 		}
+
+		static std::shared_ptr<IComputeShader> CreateComputeShader(const std::string& computeShaderName)
+		{
+			#ifdef OPEN_GL
+			return std::make_shared<OpenGlComputeShader>(computeShaderName);
+			#endif
+		}
+
 
 		template<typename... Args>
 		static std::shared_ptr<IShaderStage> CreateShaderStage(Args&&... args)
@@ -78,7 +93,7 @@ namespace NightOwl
 
 			return graphicsContext;
 		}
-
+		
 		static std::shared_ptr<IGraphicsBuffer> CreateGraphicsBuffer(BufferType bufferType)
 		{
 			#ifdef OPEN_GL
@@ -100,5 +115,19 @@ namespace NightOwl
 		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
 
 		inline static std::unique_ptr<Mesh> quadMesh;
+
+		inline static IComputeShader* horizontalComputeShader{ nullptr };
+
+		inline static IComputeShader* verticalComputeShader{ nullptr };
+
+		inline static IShader* gBufferShader{ nullptr };
+
+		inline static IShader* shadowMapShader{ nullptr };
+
+		inline static IShader* globalLightShader{ nullptr };
+
+		inline static IShader* localLightShader{ nullptr };
+
+		inline static Model* localLightSphere{ nullptr };
 	};
 }

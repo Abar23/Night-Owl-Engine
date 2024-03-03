@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NightOwl/Graphics/Interfaces/IShader.h"
-#include "..\Types\UniformDataType.h"
 #include "NightOwl/Math/Math.h"
 
 namespace NightOwl

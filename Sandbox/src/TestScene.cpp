@@ -1,7 +1,5 @@
 #include "TestScene.h"
 
-#include <random>
-
 #include "Behaviors/CameraController.h"
 #include "Behaviors/IkTargetController.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
@@ -14,6 +12,7 @@
 #include "NightOwl/GameObject/GameObject.h"
 #include "NightOwl/Graphics/Graphics.h"
 #include "NightOwl/Graphics/Materials/Material.h"
+#include <random>
 
 class InfinitePlane;
 
@@ -32,8 +31,8 @@ void TestScene::Init()
 	assetManager->LoadModel("./assets/Plane/plane.obj");
 
 	// Get models
-	NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
-	NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
+	const NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
+	const NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
 
 	// Sphere IK control object
 	auto& planeGameObject = AddGameObject("Target");
@@ -53,7 +52,7 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr int numberOfLights = 40;
+	constexpr int numberOfLights = 10;
 	constexpr float xStartingPosition = -10.0f;
 	constexpr float zStartingPosition = -10.0f;
 	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
@@ -64,17 +63,28 @@ void TestScene::Init()
 			auto& lightTestObject = AddGameObject("Light");
 			auto* lightComponent = lightTestObject.AddComponent<NightOwl::Light>();
 			lightComponent->SetColor({ distribution(generator), distribution(generator), distribution(generator) });
-			lightComponent->SetRange(1.0f);
-			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.0f, zStartingPosition + lightSpacing * lightIndex});
+			lightComponent->SetRange(3.0f);
+			lightComponent->SetIntensity(10.0f);
+			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.5f, zStartingPosition + lightSpacing * lightIndex});
 
 			auto& lightSphereGameObject = AddGameObject("Target");
 			rendererComponent = lightSphereGameObject.AddComponent<NightOwl::MeshRenderer>();
 			rendererComponent->CloneRenderer(sphere->renderer);
-			lightSphereGameObject.GetTransform()->SetLocalScale(0.05f);
+			lightSphereGameObject.GetTransform()->SetLocalScale(0.2f);
 			lightSphereGameObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, -0.15f, zStartingPosition + lightSpacing * lightIndex });
 			rendererComponent->GetMaterial()->SetVec4F(NightOwl::Vec4F(lightComponent->GetColor().x, lightComponent->GetColor().y, lightComponent->GetColor().z, 0.0f), "diffuseColor");
 		}
 	}
+
+	// Create global directional light
+	auto& globalLightGameObject = AddGameObject("Global Light");
+	auto* globalLightComponent = globalLightGameObject.AddComponent<NightOwl::Light>();
+	globalLightComponent->SetShadows(NightOwl::LightShadows::Soft);
+	globalLightComponent->SetType(NightOwl::LightType::Directional);
+	globalLightComponent->SetIntensity(10.0f);
+	NightOwl::Light::SetGlobalLight(globalLightComponent);
+	globalLightGameObject.GetTransform()->Rotate({ -45.0f, 45.0f, 0.0f }, NightOwl::Space::World);
+	globalLightGameObject.GetTransform()->SetPosition({ 0.0f, 1.0f, 0.0f });
 }
 
 void TestScene::Reset()

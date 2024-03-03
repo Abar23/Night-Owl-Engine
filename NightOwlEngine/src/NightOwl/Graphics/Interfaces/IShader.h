@@ -1,11 +1,12 @@
 #pragma once
 
-#include "IShaderStage.h"
-#include "..\Types\UniformDataType.h"
+#include "NightOwl/Graphics/Types/UniformDataType.h"
 #include "NightOwl/Math/Math.h"
 
 namespace NightOwl
 {
+	class IShaderStage;
+
 	class IShader
 	{
 	public:

@@ -1,7 +1,11 @@
 #pragma once
 
+#include "NightOwl/Math/Vec4.h"
+
 namespace NightOwl
 {
+	enum class AccessType;
+
 	enum class GraphicsFormat;
 
 	enum class TextureFilterMode;
@@ -17,7 +21,11 @@ namespace NightOwl
 
 		virtual void Bind(unsigned int textureUnit) = 0;
 
+		virtual void BindAsImageUnit(unsigned int imageUnit, AccessType access) = 0;
+
 		virtual void Unbind() = 0;
+
+		virtual void UnbindImageUnit() = 0;
 
 		virtual void SetData(const void* pixelData) = 0;
 
@@ -38,6 +46,10 @@ namespace NightOwl
 		virtual int GetWidth() const = 0;
 
 		virtual int GetHeight() const = 0;
+
+		virtual Vec4F GetBorderColor() const = 0;
+
+		virtual void SetBorderColor(const Vec4F& borderColor) = 0;
 
 		virtual GraphicsFormat GetGraphicsFormat() = 0;
 

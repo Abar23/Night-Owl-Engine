@@ -15,7 +15,7 @@ namespace NightOwl
 	{
 		glfwMakeContextCurrent(window);
 		const int gladLoadedSuccessfully = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		ENGINE_ASSERT(gladLoadedSucessfully, "Failed to load glad!");
+		ENGINE_ASSERT(gladLoadedSuccessfully, "Failed to load glad!");
 		ENGINE_ASSERT(GLVersion.major == 4 && GLVersion.minor == 6, "OpenGL version 4.6 is required for NightOwl!");
 		
 		const unsigned char* openGlInfo = GL_CALL(glGetString, GL_VENDOR);
@@ -112,7 +112,13 @@ namespace NightOwl
 			return;
 		}
 
-		enable ? GL_CALL(glEnable, openGlCapabilityType) : GL_CALL(glDisable, openGlCapabilityType);
+		if (enable)
+		{
+			GL_CALL(glEnable, openGlCapabilityType);
+			return;
+		}
+
+		GL_CALL(glDisable, openGlCapabilityType);
 	}
 
 	void OpenGlContext::CullFaceMode(FaceType type)
@@ -131,5 +137,10 @@ namespace NightOwl
 		}
 
 		GL_CALL(glBlendFunc, sourceOpenGlBlendFunctionType, destinationOGlBlendFunctionType);
+	}
+
+	void OpenGlContext::SetViewPort(int lowerLeftX, int lowerLeftY, int width, int height)
+	{
+		GL_CALL(glViewport, lowerLeftX, lowerLeftY, width, height);
 	}
 }

@@ -1,7 +1,6 @@
 #include "NightOwlPch.h"
 
 #include "Graphics.h"
-
 #include "Debugging/DebugSystem.h"
 #include "Materials/Material.h"
 #include "NightOwl/Animation/3D/Structures/Model.h"
@@ -17,6 +16,7 @@
 #include "NightOwl/Window/WindowApi.h"
 #include "System/LightSystem.h"
 #include "System/MeshRendererSystem.h"
+#include "Types/AccessType.h"
 #include "Types/GraphicsFormat.h"
 
 namespace NightOwl
@@ -64,20 +64,48 @@ namespace NightOwl
 		quadMesh->UploadMeshData(true);
 	}
 
+	void Graphics::SetupRenderPipelineAssets()
+	{
+		// horizontalComputeShader = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("HorizontalGaussianCompute");
+		// verticalComputeShader = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("VerticalGaussianCompute");
+		//
+		// gBufferShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBuffer");
+		// shadowMapShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("ShadowMap");
+		// globalLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
+		// localLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
+		//
+		// localLightSphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
+	}
+
 	void Graphics::Render()
 	{
+		horizontalComputeShader = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("HorizontalGaussianCompute");
+		verticalComputeShader = AssetManagerLocator::Get()->GetComputeShaderRepository().GetAsset("VerticalGaussianCompute");
+
+		gBufferShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBuffer");
+		shadowMapShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("ShadowMap");
+		globalLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
+		localLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
+
+		localLightSphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
+
+
+		LightSystem* lightSystem = LightSystemLocator::Get();
+		lightSystem->SetupLightBuffers();
+
 		// ********** G-buffer pass ********** //
-		const IShader* gBufferShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBuffer");
 		const std::vector<MeshRenderer*>& meshRenderers = MeshRendererSystemLocator::Get()->GetMeshRenderers();
 		const Mat4F viewProjectionMatrix = Camera::GetMainCamera()->GetViewProjectionMatrix();
 
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 		graphicsContext->CullFaceMode(FaceType::Back);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
+		graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
 		deferredGBuffer->Bind();
+		graphicsContext->ClearColor();
 		graphicsContext->ClearBuffer();
-		
+
 		gBufferShader->Bind();
 
 		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
@@ -87,7 +115,7 @@ namespace NightOwl
 
 			const Mat4F modelMatrix = meshRenderer->gameObject->GetTransform()->GetWorldMatrix();
 			gBufferShader->SetUniformMat4F(modelMatrix, "modelMatrix");
-		
+
 			meshRenderer->mesh->Bind();
 			for (const auto& subMesh : meshRenderer->mesh->GetSubMeshes())
 			{
@@ -95,103 +123,184 @@ namespace NightOwl
 			}
 			meshRenderer->mesh->Unbind();
 		}
-		
+
 		deferredGBuffer->Unbind();
 
-		// // ********* Global Lighting Pass ********* //
-		const IShader* gBufferLightingShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
-		
-		LightSystem* lightSystem = LightSystemLocator::Get();
-		
+		// Get Attachments for next rendering steps
 		ITexture2D* positionAttachment = deferredGBuffer->GetColorAttachment(0);
 		ITexture2D* normalAttachment = deferredGBuffer->GetColorAttachment(1);
 		ITexture2D* colorAttachment = deferredGBuffer->GetColorAttachment(2);
-		
-		gBufferLightingShader->Bind();
-		
-		gBufferLightingShader->SetUniformFloat(0.5f, "roughness");
-		gBufferLightingShader->SetUniformFloat(0.0f, "metallic");
-		gBufferLightingShader->SetUniformFloat(0.0f, "ambientOcclusion");
-		
-		gBufferLightingShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
 
-		gBufferLightingShader->SetUniformInt(0, "gPosition");
-		positionAttachment->Bind(0);
-		gBufferLightingShader->SetUniformInt(1, "gNormal");
-		normalAttachment->Bind(1);
-		gBufferLightingShader->SetUniformInt(2, "gAlbedoSpec");
-		colorAttachment->Bind(2);
+		// ********* Global Light Shadow and Lighting Pass ********* //
+		Light* globalLight = Light::GetGlobalLight();
 		
-		quadMesh->Bind();
-		graphicsContext->DrawIndexed(DrawType::Triangles, 6);
-		quadMesh->Unbind();
-		
-		positionAttachment->Unbind();
-		normalAttachment->Unbind();
-		colorAttachment->Unbind();
+		if (globalLight->GetShadows() != LightShadows::None)
+		{
+			// ********* Global Light Shadow Pass ********* //
+			graphicsContext->SetViewPort(0, 0, globalLight->GetShadowResolution(), globalLight->GetShadowResolution());
 
-		gBufferLightingShader->Unbind();
-		
-		// // ********* Copy Depth from G-Buffer to Back Buffer ********* //
-		// IWindow* window = WindowApi::GetWindow().get();
-		// // blit to default framebuffer. Note that this may or may not work as the internal formats of both the FBO and default framebuffer have to match.
-		// // the internal formats are implementation defined. This works on all of my systems, but if it doesn't on yours you'll likely have to write to the 		
-		// // depth buffer in another shader stage (or somehow see to match the default framebuffer's internal format with the FBO's internal format).
-		// GL_CALL(glBlitNamedFramebuffer, deferredGBuffer->GetFrameBufferHandle(), 0, 0, 0, window->GetWidth(), window->GetHeight(), 0, 0, window->GetWidth(), window->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-		//
+			graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, false);
+			graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 
+			globalLight->GetShadowFrameBuffer()->Bind();
+
+			shadowMapShader->Bind();
+			graphicsContext->ClearColor();
+			graphicsContext->ClearBuffer();
+
+			const Mat4F shadowViewProjectionMatrix = globalLight->GetShadowViewProjectionMatrix();
+			shadowMapShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
+		
+			for (const auto& meshRenderer : meshRenderers)
+			{
+				const Mat4F modelMatrix = meshRenderer->gameObject->GetTransform()->GetWorldMatrix();
+				shadowMapShader->SetUniformMat4F(modelMatrix, "modelMatrix");
+		
+				meshRenderer->mesh->Bind();
+				for (const auto& subMesh : meshRenderer->mesh->GetSubMeshes())
+				{
+					graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
+				}
+				meshRenderer->mesh->Unbind();
+			}
+		
+			shadowMapShader->Unbind();
+		
+			globalLight->GetShadowFrameBuffer()->Unbind();
+
+			graphicsContext->SetViewPort(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
+
+			// ********* Gaussian Compute shader blur step ********* //
+			ITexture2D* blurredShadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(0);
+			ITexture2D* shadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(1);
+
+			blurredShadowDepthAttachment->SetBorderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			blurredShadowDepthAttachment->SetWrapModeU(TextureWrapMode::ClampToBorder);
+			blurredShadowDepthAttachment->SetWrapModeV(TextureWrapMode::ClampToBorder);
+
+			// Horizontal blur step
+			horizontalComputeShader->Bind();
+			
+			blurredShadowDepthAttachment->BindAsImageUnit(0, AccessType::Read);
+			shadowDepthAttachment->BindAsImageUnit(1, AccessType::Write);
+			
+			horizontalComputeShader->Dispatch((blurredShadowDepthAttachment->GetWidth() + 128) / 128, blurredShadowDepthAttachment->GetHeight(), 1);
+			
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			
+			blurredShadowDepthAttachment->UnbindImageUnit();
+			shadowDepthAttachment->UnbindImageUnit();
+
+			horizontalComputeShader->Unbind();
+
+			// Vertical blur step
+			verticalComputeShader->Bind();
+			
+			shadowDepthAttachment->BindAsImageUnit(0, AccessType::Read);
+			blurredShadowDepthAttachment->BindAsImageUnit(1, AccessType::Write);
+			
+			verticalComputeShader->Dispatch(shadowDepthAttachment->GetWidth(), (shadowDepthAttachment->GetHeight() + 128) / 128, 1);
+			
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			
+			shadowDepthAttachment->UnbindImageUnit();
+			blurredShadowDepthAttachment->UnbindImageUnit();
+			
+			verticalComputeShader->Unbind();
+
+			// ********* Global Light Lighting Pass ********* //
+			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, true);
+
+			globalLightShader->Bind();
+		
+			lightSystem->GetGlobalLightBuffer()->Bind(0);
+		
+			globalLightShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
+		
+			globalLightShader->SetUniformFloat(0.5f, "roughness");
+			globalLightShader->SetUniformFloat(0.0f, "metallic");
+			globalLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
+		
+			globalLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
+		
+			globalLightShader->SetUniformInt(0, "gPosition");
+			positionAttachment->Bind(0);
+			globalLightShader->SetUniformInt(1, "gNormal");
+			normalAttachment->Bind(1);
+			globalLightShader->SetUniformInt(2, "gAlbedoSpec");
+			colorAttachment->Bind(2);
+			globalLightShader->SetUniformInt(3, "shadowMap");
+			blurredShadowDepthAttachment->Bind(3);
+		
+			quadMesh->Bind();
+			graphicsContext->DrawIndexed(DrawType::Triangles, 6);
+			quadMesh->Unbind();
+		
+			positionAttachment->Unbind();
+			normalAttachment->Unbind();
+			colorAttachment->Unbind();
+			blurredShadowDepthAttachment->Unbind();
+		
+			lightSystem->GetGlobalLightBuffer()->Unbind();
+		
+			globalLightShader->Unbind();
+		}
+
+		
 		// ********* Local Lighting Pass ********* //
-		const Model* sphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
-		const IShader* debugLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
-
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
 		graphicsContext->CullFaceMode(FaceType::Front);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
-
-		debugLightShader->Bind();
-		lightSystem->SetupLightBuffer();
-		lightSystem->GetLightBuffer()->Bind(0);
-		sphere->renderer->mesh->Bind();
-
-		debugLightShader->SetUniformFloat(WindowApi::GetWindow()->GetWidth(), "width");
-		debugLightShader->SetUniformFloat(WindowApi::GetWindow()->GetHeight(), "height");
-
-		debugLightShader->SetUniformFloat(0.2f, "roughness");
-		debugLightShader->SetUniformFloat(0.0f, "metallic");
-		debugLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
-
-		debugLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
-
-		debugLightShader->SetUniformInt(0, "gPosition");
+		
+		localLightShader->Bind();
+		lightSystem->GetPointLightBuffer()->Bind(0);
+		localLightSphere->renderer->mesh->Bind();
+		
+		localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetWidth(), "width");
+		localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetHeight(), "height");
+		
+		localLightShader->SetUniformFloat(0.5f, "roughness");
+		localLightShader->SetUniformFloat(0.0f, "metallic");
+		localLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
+		
+		localLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
+		
+		localLightShader->SetUniformInt(0, "gPosition");
 		positionAttachment->Bind(0);
-		debugLightShader->SetUniformInt(1, "gNormal");
+		localLightShader->SetUniformInt(1, "gNormal");
 		normalAttachment->Bind(1);
-		debugLightShader->SetUniformInt(2, "gAlbedoSpec");
+		localLightShader->SetUniformInt(2, "gAlbedoSpec");
 		colorAttachment->Bind(2);
-
+		
 		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
 		int lightIndex = 0;
 		for (auto& light : lightSystem->GetLights())
 		{
+			if (light == Light::GetGlobalLight())
+			{
+				continue;
+			}
+		
 			light->GetGameObject().GetTransform()->SetLocalScale(light->GetRange());
 			Mat4F modelMatrix = light->GetGameObject().GetTransform()->GetWorldMatrix();
-			debugLightShader->SetUniformMat4F(modelMatrix, "modelMatrix");
-			debugLightShader->SetUniformInt(lightIndex, "lightIndex");
+			localLightShader->SetUniformMat4F(modelMatrix, "modelMatrix");
+			localLightShader->SetUniformInt(lightIndex, "lightIndex");
 		
-			for (const auto& subMesh : sphere->renderer->mesh->GetSubMeshes())
+			for (const auto& subMesh : localLightSphere->renderer->mesh->GetSubMeshes())
 			{
 				graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
 			}
 			++lightIndex;
 		}
-
+		
 		positionAttachment->Unbind();
 		normalAttachment->Unbind();
 		colorAttachment->Unbind();
-
-		sphere->renderer->mesh->Unbind();
-		lightSystem->GetLightBuffer()->Unbind();
-		debugLightShader->Unbind();
+		
+		localLightSphere->renderer->mesh->Unbind();
+		lightSystem->GetPointLightBuffer()->Unbind();
+		localLightShader->Unbind();
 	}
 
 	void Graphics::Shutdown()

@@ -97,8 +97,8 @@ namespace NightOwl
 				currentMaterial->SetInteger(0, "hasBones");
 			}
 
-			LightSystemLocator::Get()->SetupLightBuffer();
-			currentMaterial->SetBuffer(LightSystemLocator::Get()->GetLightBuffer().get(), "lightStorageBlock");
+			LightSystemLocator::Get()->SetupLightBuffers();
+			currentMaterial->SetBuffer(LightSystemLocator::Get()->GetPointLightBuffer().get(), "lightStorageBlock");
 
 			currentMaterial->Bind();
 			Graphics::GetContext()->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);

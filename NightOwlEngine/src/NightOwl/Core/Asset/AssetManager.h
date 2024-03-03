@@ -10,6 +10,8 @@ namespace NightOwl
 
 	class AudioClip;
 
+	class IComputeShader;
+
 	class ITexture2D;
 
 	class IShader;
@@ -20,6 +22,8 @@ namespace NightOwl
 	{
 	public:
 		AssetRepository<IShader>& GetShaderRepository();
+
+		AssetRepository<IComputeShader>& GetComputeShaderRepository();
 
 		AssetRepository<ITexture2D>& GetTextureRepository();
 
@@ -49,6 +53,8 @@ namespace NightOwl
 
 	private:
 		AssetRepository<IShader> shaderRepository;
+
+		AssetRepository<IComputeShader> computeShaderRepository;
 
 		AssetRepository<ITexture2D> textureRepository;
 

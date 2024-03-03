@@ -24,6 +24,9 @@ namespace NightOwl
 		case ShaderType::Fragment:
 			return std::string{ "Fragment" };
 
+		case ShaderType::Compute:
+			return std::string{ "Compute" };
+
 		default:
 			return std::string{ "None" };
 		}
@@ -83,6 +86,9 @@ namespace NightOwl
 		case ShaderType::Fragment:
 			return GL_FRAGMENT_SHADER;
 
+		case ShaderType::Compute:
+			return GL_COMPUTE_SHADER;
+
 		default:
 			return GL_VERTEX_SHADER;
 		}
@@ -96,16 +102,19 @@ namespace NightOwl
 			return shaderc_vertex_shader;
 
 		case ShaderType::TessControl:
-			return shaderc_glsl_tess_control_shader;
+			return shaderc_tess_control_shader;
 
 		case ShaderType::TessEvaluation:
-			return shaderc_glsl_tess_evaluation_shader;
+			return shaderc_tess_evaluation_shader;
 
 		case ShaderType::Geometry:
 			return shaderc_geometry_shader;
 
 		case ShaderType::Fragment:
 			return shaderc_fragment_shader;
+
+		case ShaderType::Compute:
+			return shaderc_compute_shader;
 
 		default:
 			return shaderc_vertex_shader;
