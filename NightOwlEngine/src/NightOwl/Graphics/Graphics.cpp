@@ -137,7 +137,7 @@ namespace NightOwl
 		if (globalLight->GetShadows() != LightShadows::None)
 		{
 			// ********* Global Light Shadow Pass ********* //
-			glViewport(0, 0, globalLight->GetShadowResolution(), globalLight->GetShadowResolution());
+			graphicsContext->SetViewPort(0, 0, globalLight->GetShadowResolution(), globalLight->GetShadowResolution());
 
 			graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 			graphicsContext->EnableCapability(ContextCapabilityType::ColorBlend, false);
@@ -169,14 +169,13 @@ namespace NightOwl
 		
 			globalLight->GetShadowFrameBuffer()->Unbind();
 
-			glViewport(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
+			graphicsContext->SetViewPort(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight());
 
 			// ********* Gaussian Compute shader blur step ********* //
 			ITexture2D* blurredShadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(0);
 			ITexture2D* shadowDepthAttachment = globalLight->GetShadowFrameBuffer()->GetColorAttachment(1);
 
-			constexpr GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Set border color to white
-			GL_CALL(glTextureParameterfv, blurredShadowDepthAttachment->GetTextureId(), GL_TEXTURE_BORDER_COLOR, borderColor);
+			blurredShadowDepthAttachment->SetBorderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 			blurredShadowDepthAttachment->SetWrapModeU(TextureWrapMode::ClampToBorder);
 			blurredShadowDepthAttachment->SetWrapModeV(TextureWrapMode::ClampToBorder);
 

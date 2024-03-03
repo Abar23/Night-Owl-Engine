@@ -138,4 +138,9 @@ namespace NightOwl
 
 		GL_CALL(glBlendFunc, sourceOpenGlBlendFunctionType, destinationOGlBlendFunctionType);
 	}
+
+	void OpenGlContext::SetViewPort(int lowerLeftX, int lowerLeftY, int width, int height)
+	{
+		GL_CALL(glViewport, lowerLeftX, lowerLeftY, width, height);
+	}
 }

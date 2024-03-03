@@ -38,6 +38,8 @@ namespace NightOwl
 
 		void ColorBlendFunction(BlendFunctionType sourceFunctionType, BlendFunctionType destinationFunctionType) override;
 
+		void SetViewPort(int lowerLeftX, int lowerLeftY, int width, int height) override;
+
 	private:
 		GLFWwindow* window;
 

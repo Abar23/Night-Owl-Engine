@@ -100,8 +100,6 @@ float VarianceShadowMapCalculation(sampler2D shadowMap,
                                    vec3 normal,
                                    DirectionalLight directionalLight)
 {
-    float epsilon = 1e-6;
-
     // perform perspective divide
     vec3 projectedLightCoordinate = fragmentPositionInLightSpace.xyz / fragmentPositionInLightSpace.w;
     
@@ -116,15 +114,15 @@ float VarianceShadowMapCalculation(sampler2D shadowMap,
     float p = float(projectedLightCoordinate.z <= M1);
 
     // Compute variance.
-    float Variance = M2 - (M1 * M1);
+    float variance = M2 - (M1 * M1);
     float minVariance = 3e-6;
-    Variance = max(Variance, minVariance);
+    variance = max(variance, minVariance);
 
     // Compute probabilistic upper bound.
     float d = projectedLightCoordinate.z - M1;
-    float p_max = Variance / (Variance + d * d);
+    float pMax = variance / (variance + d * d);
 
-    return 1.0 - max(p, p_max);
+    return 1.0 - max(p, pMax);
 }
 
 

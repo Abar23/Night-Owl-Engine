@@ -40,5 +40,7 @@ namespace NightOwl
 		virtual void CullFaceMode(FaceType type) = 0;
 
 		virtual void ColorBlendFunction(BlendFunctionType sourceFunctionType, BlendFunctionType destinationFunctionType) = 0;
+
+		virtual void SetViewPort(int lowerLeftX, int lowerLeftY, int width, int height) = 0;
 	};
 }

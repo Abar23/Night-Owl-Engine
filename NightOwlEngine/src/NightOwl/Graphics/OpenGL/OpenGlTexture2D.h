@@ -3,6 +3,7 @@
 #include "NightOwl/Graphics/Interfaces/ITexture2D.h"
 #include "NightOwl/Graphics/Types/TextureFilterMode.h"
 #include "NightOwl/Graphics/Types/TextureWrapMode.h"
+#include "NightOwl/Math/Vec4.h"
 
 namespace NightOwl
 {
@@ -45,6 +46,10 @@ namespace NightOwl
 
 		int GetHeight() const override;
 
+		Vec4F GetBorderColor() const override;
+
+		void SetBorderColor(const Vec4F& borderColor) override;
+
 		GraphicsFormat GetGraphicsFormat() override;
 
 		TextureFormat GetTextureFormat() override;
@@ -80,6 +85,8 @@ namespace NightOwl
 		unsigned int boundImageUnit;
 
 		AccessType accessForBoundImageUnit;
+
+		Vec4F borderColor;
 	};
 }
 

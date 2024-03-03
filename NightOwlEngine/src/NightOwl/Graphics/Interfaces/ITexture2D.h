@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NightOwl/Math/Vec4.h"
+
 namespace NightOwl
 {
 	enum class AccessType;
@@ -44,6 +46,10 @@ namespace NightOwl
 		virtual int GetWidth() const = 0;
 
 		virtual int GetHeight() const = 0;
+
+		virtual Vec4F GetBorderColor() const = 0;
+
+		virtual void SetBorderColor(const Vec4F& borderColor) = 0;
 
 		virtual GraphicsFormat GetGraphicsFormat() = 0;
 

@@ -20,7 +20,8 @@ namespace NightOwl
 		  textureFilterMode(TextureFilterMode::Point),
 		  boundTextureUnit(std::numeric_limits<unsigned int>::max()),
 		  boundImageUnit(std::numeric_limits<unsigned int>::max()),
-		  accessForBoundImageUnit(AccessType::Read)
+		  accessForBoundImageUnit(AccessType::Read),
+		  borderColor(0.0f, 0.0f, 0.0f, 1.0f)
 	{ }
 
 	OpenGlTexture2D::OpenGlTexture2D(const void* pixelData, int height, int width, GraphicsFormat format, TextureWrapMode wrapModeU /* = TextureWrapMode::ClampToEdge */, TextureWrapMode wrapModeV /* = TextureWrapMode::ClampToEdge  */, TextureFilterMode filterMode /* = TextureFilterMode::Nearest */)
@@ -32,7 +33,8 @@ namespace NightOwl
 		  wrapModeU(wrapModeU),
 		  wrapModeV(wrapModeV),
 		  textureFilterMode(filterMode),
-		  boundTextureUnit(std::numeric_limits<unsigned int>::max())
+		  boundTextureUnit(std::numeric_limits<unsigned int>::max()),
+		  borderColor(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 		CreateTexture();
 		AllocateTexture();
@@ -150,6 +152,18 @@ namespace NightOwl
 	int OpenGlTexture2D::GetHeight() const
 	{
 		return height;
+	}
+
+	Vec4F OpenGlTexture2D::GetBorderColor() const
+	{
+		return borderColor;
+	}
+
+	void OpenGlTexture2D::SetBorderColor(const Vec4F& borderColor)
+	{
+		this->borderColor = borderColor;
+
+		GL_CALL(glTextureParameterfv, textureId, GL_TEXTURE_BORDER_COLOR, borderColor.GetValuePointer());
 	}
 
 	GraphicsFormat OpenGlTexture2D::GetGraphicsFormat()

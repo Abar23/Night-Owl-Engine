@@ -52,7 +52,7 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr int numberOfLights = 5;
+	constexpr int numberOfLights = 10;
 	constexpr float xStartingPosition = -10.0f;
 	constexpr float zStartingPosition = -10.0f;
 	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
@@ -70,7 +70,7 @@ void TestScene::Init()
 			auto& lightSphereGameObject = AddGameObject("Target");
 			rendererComponent = lightSphereGameObject.AddComponent<NightOwl::MeshRenderer>();
 			rendererComponent->CloneRenderer(sphere->renderer);
-			lightSphereGameObject.GetTransform()->SetLocalScale(0.3f);
+			lightSphereGameObject.GetTransform()->SetLocalScale(0.2f);
 			lightSphereGameObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, -0.15f, zStartingPosition + lightSpacing * lightIndex });
 			rendererComponent->GetMaterial()->SetVec4F(NightOwl::Vec4F(lightComponent->GetColor().x, lightComponent->GetColor().y, lightComponent->GetColor().z, 0.0f), "diffuseColor");
 		}
