@@ -14,6 +14,8 @@
 #include "NightOwl/Graphics/Materials/Material.h"
 #include <random>
 
+#include "NightOwl/Graphics/Types/TextureFilterMode.h"
+
 class InfinitePlane;
 
 TestScene::TestScene()
@@ -29,6 +31,10 @@ void TestScene::Init()
 	assetManager->LoadShaders("./assets/Shaders");
 	assetManager->LoadModel("./assets/Sphere/sphere.obj");
 	assetManager->LoadModel("./assets/Plane/plane.obj");
+	assetManager->LoadTexture2D("./assets/HdrSkybox/Alexs_Apt_2k_Irradiance.hdr");
+	NightOwl::ITexture2D* skybox = assetManager->LoadTexture2D("./assets/HdrSkybox/Alexs_Apt_2k.hdr");
+	skybox->SetMaxMipMapLevel(12);
+	skybox->SetFilterMode(NightOwl::TextureFilterMode::Trilinear);
 
 	// Get models
 	const NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");

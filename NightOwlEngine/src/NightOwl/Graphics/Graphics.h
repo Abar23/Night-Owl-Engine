@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NightOwl/Component/Structures/HammersleyPairs.h"
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
 #include "NightOwl/Graphics/Interfaces/IComputeShader.h"
@@ -112,9 +113,11 @@ namespace NightOwl
 	private:
 		inline static std::unique_ptr<IContext> graphicsContext{ nullptr };
 
-		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
+		inline static std::shared_ptr<IRenderTexture> deferredGBuffer{ nullptr };
 
 		inline static std::unique_ptr<Mesh> quadMesh;
+
+		inline static std::shared_ptr<IGraphicsBuffer> hammersleyPairsGraphicsBuffer{ nullptr };
 
 		inline static IComputeShader* horizontalComputeShader{ nullptr };
 
@@ -128,6 +131,10 @@ namespace NightOwl
 
 		inline static IShader* localLightShader{ nullptr };
 
-		inline static Model* localLightSphere{ nullptr };
+		inline static IShader* skySphereShader{ nullptr };
+
+		inline static Model* sphereModel{ nullptr };
+
+		inline static HammersleyPairs hammersleyPairs{ 40 };
 	};
 }

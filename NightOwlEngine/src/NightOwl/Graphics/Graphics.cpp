@@ -1,3 +1,5 @@
+
+
 #include "NightOwlPch.h"
 
 #include "Graphics.h"
@@ -27,11 +29,8 @@ namespace NightOwl
 		CreateContext(window);
 
 		// Create G-Buffer and add initial position color and depth buffers
-		deferredGBuffer.reset(reinterpret_cast<IRenderTexture*>(new OpenGlRenderTexture(window->GetHeight(), 
-																						window->GetWidth(),
-																						TextureFilterMode::Point, 
-																						GraphicsFormat::RGBA32F,
-																						GraphicsFormat::Depth24)));
+		deferredGBuffer = CreateRenderTexture(window->GetHeight(), window->GetWidth(), TextureFilterMode::Point, GraphicsFormat::RGBA32F, GraphicsFormat::Depth24);
+		
 		// add normal color buffer
 		deferredGBuffer->AddColorAttachment(GraphicsFormat::RGBA32F);
 		// add color + specular color buffer
@@ -62,6 +61,10 @@ namespace NightOwl
 		quadMesh->SetUVs(UVS);
 		quadMesh->SetTriangles(INDICES);
 		quadMesh->UploadMeshData(true);
+
+		hammersleyPairsGraphicsBuffer = CreateGraphicsBuffer(BufferType::Storage);
+		hammersleyPairsGraphicsBuffer->SetSize(hammersleyPairs.GetHammersleyPairs().size(), sizeof(hammersleyPairs.GetHammersleyPairs()[0]));
+		hammersleyPairsGraphicsBuffer->SetData(hammersleyPairs.GetHammersleyPairs().data());
 	}
 
 	void Graphics::SetupRenderPipelineAssets()
@@ -74,7 +77,7 @@ namespace NightOwl
 		// globalLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
 		// localLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
 		//
-		// localLightSphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
+		// sphereModel = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
 	}
 
 	void Graphics::Render()
@@ -86,9 +89,12 @@ namespace NightOwl
 		shadowMapShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("ShadowMap");
 		globalLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferGlobalLighting");
 		localLightShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("GBufferLocalLighting");
+		skySphereShader = AssetManagerLocator::Get()->GetShaderRepository().GetAsset("SkySphere");
 
-		localLightSphere = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
-
+		sphereModel = AssetManagerLocator::Get()->GetModelRepository().GetAsset("sphere");
+		
+		ITexture2D* hdrSkybox = AssetManagerLocator::Get()->GetTextureRepository().GetAsset("Alexs_Apt_2k.hdr");
+		ITexture2D* hdrIrradianceMap = AssetManagerLocator::Get()->GetTextureRepository().GetAsset("Alexs_Apt_2k_Irradiance.hdr");
 
 		LightSystem* lightSystem = LightSystemLocator::Get();
 		lightSystem->SetupLightBuffers();
@@ -100,7 +106,7 @@ namespace NightOwl
 		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 		graphicsContext->CullFaceMode(FaceType::Back);
 		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
-		graphicsContext->SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+		graphicsContext->SetClearColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
 		deferredGBuffer->Bind();
 		graphicsContext->ClearColor();
@@ -215,11 +221,15 @@ namespace NightOwl
 			globalLightShader->Bind();
 		
 			lightSystem->GetGlobalLightBuffer()->Bind(0);
-		
+			hammersleyPairsGraphicsBuffer->Bind(3);
+
 			globalLightShader->SetUniformMat4F(shadowViewProjectionMatrix, "shadowViewProjectionMatrix");
-		
-			globalLightShader->SetUniformFloat(0.5f, "roughness");
-			globalLightShader->SetUniformFloat(0.0f, "metallic");
+
+			globalLightShader->SetUniformFloat(hdrSkybox->GetWidth(), "screenWidth");
+			globalLightShader->SetUniformFloat(hdrSkybox->GetHeight(), "screenHeight");
+
+			globalLightShader->SetUniformFloat(1.0f, "roughness");
+			globalLightShader->SetUniformFloat(1.0f, "metallic");
 			globalLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
 		
 			globalLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
@@ -232,7 +242,11 @@ namespace NightOwl
 			colorAttachment->Bind(2);
 			globalLightShader->SetUniformInt(3, "shadowMap");
 			blurredShadowDepthAttachment->Bind(3);
-		
+			globalLightShader->SetUniformInt(4, "hdrIrradianceMap");
+			hdrIrradianceMap->Bind(4);
+			globalLightShader->SetUniformInt(5, "hdrSkybox");
+			hdrSkybox->Bind(5);
+
 			quadMesh->Bind();
 			graphicsContext->DrawIndexed(DrawType::Triangles, 6);
 			quadMesh->Unbind();
@@ -241,71 +255,107 @@ namespace NightOwl
 			normalAttachment->Unbind();
 			colorAttachment->Unbind();
 			blurredShadowDepthAttachment->Unbind();
+			hdrIrradianceMap->Unbind();
+			hdrSkybox->Unbind();
 		
 			lightSystem->GetGlobalLightBuffer()->Unbind();
-		
+			hammersleyPairsGraphicsBuffer->Unbind();
+
 			globalLightShader->Unbind();
 		}
 
 		
-		// ********* Local Lighting Pass ********* //
-		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
+		// // ********* Local Lighting Pass ********* //
+		// graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, false);
+		// graphicsContext->CullFaceMode(FaceType::Front);
+		// graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
+		//
+		// localLightShader->Bind();
+		// lightSystem->GetPointLightBuffer()->Bind(0);
+		// sphereModel->renderer->mesh->Bind();
+		//
+		// localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetWidth(), "width");
+		// localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetHeight(), "height");
+		//
+		// localLightShader->SetUniformFloat(0.5f, "roughness");
+		// localLightShader->SetUniformFloat(0.0f, "metallic");
+		// localLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
+		//
+		// localLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
+		//
+		// localLightShader->SetUniformInt(0, "gPosition");
+		// positionAttachment->Bind(0);
+		// localLightShader->SetUniformInt(1, "gNormal");
+		// normalAttachment->Bind(1);
+		// localLightShader->SetUniformInt(2, "gAlbedoSpec");
+		// colorAttachment->Bind(2);
+		//
+		// gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
+		// int lightIndex = 0;
+		// for (auto& light : lightSystem->GetLights())
+		// {
+		// 	if (light == Light::GetGlobalLight())
+		// 	{
+		// 		continue;
+		// 	}
+		//
+		// 	light->GetGameObject().GetTransform()->SetLocalScale(light->GetRange());
+		// 	Mat4F modelMatrix = light->GetGameObject().GetTransform()->GetWorldMatrix();
+		// 	localLightShader->SetUniformMat4F(modelMatrix, "modelMatrix");
+		// 	localLightShader->SetUniformInt(lightIndex, "lightIndex");
+		//
+		// 	for (const auto& subMesh : sphereModel->renderer->mesh->GetSubMeshes())
+		// 	{
+		// 		graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
+		// 	}
+		// 	++lightIndex;
+		// }
+		//
+		// positionAttachment->Unbind();
+		// normalAttachment->Unbind();
+		// colorAttachment->Unbind();
+		//
+		// sphereModel->renderer->mesh->Unbind();
+		// lightSystem->GetPointLightBuffer()->Unbind();
+		// localLightShader->Unbind();
+
+		// ********* Sky Sphere Pass ********* //
+		// copy gBuffer depth to back buffer for depth testing
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, deferredGBuffer->GetFrameBufferHandle());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+		glBlitFramebuffer(0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight(), 0, 0, WindowApi::GetWindow()->GetWidth(), WindowApi::GetWindow()->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		graphicsContext->EnableCapability(ContextCapabilityType::DepthTest, true);
 		graphicsContext->CullFaceMode(FaceType::Front);
-		graphicsContext->ColorBlendFunction(BlendFunctionType::One, BlendFunctionType::One);
-		
-		localLightShader->Bind();
-		lightSystem->GetPointLightBuffer()->Bind(0);
-		localLightSphere->renderer->mesh->Bind();
-		
-		localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetWidth(), "width");
-		localLightShader->SetUniformFloat(WindowApi::GetWindow()->GetHeight(), "height");
-		
-		localLightShader->SetUniformFloat(0.5f, "roughness");
-		localLightShader->SetUniformFloat(0.0f, "metallic");
-		localLightShader->SetUniformFloat(1.0f, "ambientOcclusion");
-		
-		localLightShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
-		
-		localLightShader->SetUniformInt(0, "gPosition");
-		positionAttachment->Bind(0);
-		localLightShader->SetUniformInt(1, "gNormal");
-		normalAttachment->Bind(1);
-		localLightShader->SetUniformInt(2, "gAlbedoSpec");
-		colorAttachment->Bind(2);
-		
-		gBufferShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
-		int lightIndex = 0;
-		for (auto& light : lightSystem->GetLights())
+		graphicsContext->ColorBlendFunction(BlendFunctionType::SourceAlpha, BlendFunctionType::OneMinusSourceAlpha);
+
+		const Mat4F skySphereModelMatrix = Mat4F::MakeScale(30.0f);
+		skySphereShader->Bind();
+
+		skySphereShader->SetUniformMat4F(viewProjectionMatrix, "viewProjectionMatrix");
+		skySphereShader->SetUniformMat4F(skySphereModelMatrix, "modelMatrix");
+		skySphereShader->SetUniformVec3F(Camera::GetMainCamera()->GetGameObject().GetTransform()->GetPosition(), "cameraPosition");
+
+		hdrSkybox->Bind(0);
+		sphereModel->renderer->GetMesh()->Bind();
+
+		for (const auto& subMesh : sphereModel->renderer->mesh->GetSubMeshes())
 		{
-			if (light == Light::GetGlobalLight())
-			{
-				continue;
-			}
-		
-			light->GetGameObject().GetTransform()->SetLocalScale(light->GetRange());
-			Mat4F modelMatrix = light->GetGameObject().GetTransform()->GetWorldMatrix();
-			localLightShader->SetUniformMat4F(modelMatrix, "modelMatrix");
-			localLightShader->SetUniformInt(lightIndex, "lightIndex");
-		
-			for (const auto& subMesh : localLightSphere->renderer->mesh->GetSubMeshes())
-			{
-				graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
-			}
-			++lightIndex;
+			graphicsContext->DrawIndexedBaseVertex(DrawType::Triangles, subMesh.indexCount, subMesh.indexStart, subMesh.baseVertex);
 		}
-		
-		positionAttachment->Unbind();
-		normalAttachment->Unbind();
-		colorAttachment->Unbind();
-		
-		localLightSphere->renderer->mesh->Unbind();
-		lightSystem->GetPointLightBuffer()->Unbind();
-		localLightShader->Unbind();
+
+		sphereModel->renderer->GetMesh()->Unbind();
+		hdrSkybox->Unbind();
+		skySphereShader->Unbind();
+
+		graphicsContext->CullFaceMode(FaceType::Back);
 	}
 
 	void Graphics::Shutdown()
 	{
 		deferredGBuffer.reset();
 		quadMesh.reset();
+		hammersleyPairsGraphicsBuffer.reset();
 	}
 }

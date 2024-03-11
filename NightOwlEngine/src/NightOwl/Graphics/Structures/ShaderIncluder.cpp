@@ -33,4 +33,9 @@ namespace NightOwl
 	{
 		delete data;
 	}
+
+	bool ShaderIncluder::HasShaderBeenIncluded(const std::string& shaderName)
+	{
+		return false;
+	}
 }

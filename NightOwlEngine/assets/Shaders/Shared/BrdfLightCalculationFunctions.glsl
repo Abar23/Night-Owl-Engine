@@ -24,9 +24,9 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	return SchlickGGX(N, L, k) * SchlickGGX(N, V, k);
 }
 
-vec3 FresnelSchilckRoughness(vec3 V, vec3 H, vec3 F0, float roughness)
+vec3 FresnelSchilckRoughness(vec3 H, vec3 L, vec3 F0, float roughness)
 {
-	float vdotH = clamp(dot(H, V), 0.0, 1.0);
+	float vdotH = clamp(dot(H, L), 0.0, 1.0);
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - vdotH, 5.0);
 }
 
@@ -240,12 +240,12 @@ vec4 CalculatePointLightBrdf(vec3 fragmentPosition,
     vec3 H = normalize(V + L);
 
     float attenuation = (1.0 / (distance * distance) - 1.0 / (pointLight.range * pointLight.range));
-    vec3 radiance = pointLight.color * attenuation;
+    vec3 radiance = pointLight.color * pointLight.intensity * attenuation;
 
     // Cook-Torrance BRDF
     float NDF = TrowbridgeReitzNormalDistribution(N, H, roughness);   
     float G = GeometrySmith(N, V, L, roughness);      
-    vec3 F = FresnelSchilckRoughness(H, V, F0, roughness);
+    vec3 F = FresnelSchilckRoughness(H, L, F0, roughness);
 
     vec3 numerator = NDF * G * F; 
     float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
@@ -259,7 +259,7 @@ vec4 CalculatePointLightBrdf(vec3 fragmentPosition,
     kD *= 1.0 - metallic;	  
 
     float nDotL = max(dot(N, L), 0.0);
-    vec3 color = (kD * albedo / PI + specular) * radiance * nDotL * pointLight.intensity;
+    vec3 color = (kD * albedo / PI + specular) * radiance * nDotL;
 
     // HDR tonemapping and gamma correct
     color = color / (color + vec3(1.0));
@@ -271,14 +271,18 @@ vec4 CalculatePointLightBrdf(vec3 fragmentPosition,
 vec4 CalculateDirectionalLightBrdf(vec3 fragmentPosition, 
                                    vec3 cameraPosition,
                                    vec3 normal, 
-                                   vec3 albedo, 
+                                   vec3 albedo,
+                                   vec2 screenDimensions,
                                    float metallic, 
                                    float roughness,
                                    float shadow,
-                                   DirectionalLight directionalLight)
+                                   DirectionalLight directionalLight,
+                                   sampler2D hdrIrradianceMap,
+                                   sampler2D hdrSkybox)
 {
     vec3 N = normal;
     vec3 V = normalize(cameraPosition - fragmentPosition);
+    float nDotV = max(dot(N, V), 0.0);
 
     // calculate reflectance at normal incidence    
     vec3 F0 = vec3(0.04); 
@@ -288,29 +292,58 @@ vec4 CalculateDirectionalLightBrdf(vec3 fragmentPosition,
     vec3 L = directionalLight.direction;
     vec3 H = normalize(V + L);
     
-    // Cook-Torrance BRDF
-    float NDF = TrowbridgeReitzNormalDistribution(N, H, roughness);   
-    float G = GeometrySmith(N, V, L, roughness);      
-    vec3 F = FresnelSchilckRoughness(H, V, F0, roughness);
+    // Form a rotation transformation that takes the Z-axis to the reflection direction
+    vec3 R = 2.0 * nDotV * N - V;
+    vec3 A = normalize(vec3(-R.y, R.x, 0.0));
+    vec3 B = normalize(cross(R, A));
 
-    vec3 numerator = NDF * G * F; 
-    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-    vec3 specular = numerator / denominator;
-    
+    vec3 specular = vec3(0.0);
+    int numberOfHammersleyPairs = hammersleyPairs.length();
+    for (int randomDirectionIndex = 0; randomDirectionIndex < numberOfHammersleyPairs; ++randomDirectionIndex)
+    {
+        // calculate UV using skewed hammersley point
+        vec2 hammersleyPair = hammersleyPairs[randomDirectionIndex].point;
+        float theta = atan((roughness * sqrt(hammersleyPair.y)) / sqrt(1.0 - hammersleyPair.y));
+        vec2 uv = vec2(hammersleyPair.x, theta / PI);
+
+        // Calculate L using uv which will be used to index the irradiance map
+        vec3 L = SkyboxUvToDirection(uv);
+
+        // Calcualte wK using L with the rotation applied and read the HDR pixel for wK
+        vec3 wK = normalize(L.x * A + L.y * B + L.z * R);
+        vec3 H = normalize(wK + V);
+        float level = 0.5 * log2((screenDimensions.x * screenDimensions.y) / numberOfHammersleyPairs) - 0.5 * log2(TrowbridgeReitzNormalDistribution(N, H, roughness) / 4.0);
+        vec3 irradianceColor = DirectionVectorToSkyboxColorAtMipMapLevel(hdrSkybox, wK, level).rgb;
+
+        float wKDotN = max(dot(wK, N), 0.0);
+
+        // Evaluate Monte-Carlo estimator
+        float G = GeometrySmith(H, V, wK, roughness);      
+        vec3 F = FresnelSchilckRoughness(H, wK, F0, roughness);
+        float denominator = 4.0 * wKDotN * nDotV + 0.0001; // prevent divide by zero
+        
+        specular += F * G * wKDotN * irradianceColor / denominator;
+    }
+    specular /= numberOfHammersleyPairs;
+
+    vec3 F = FresnelSchilckRoughness(H, L, F0, roughness);
+
     // kS is equal to Fresnel
     vec3 kS = F;
-    // to preserve energy, Kd, the diffuse component, should equal 1.0 - kS.
-    vec3 kD = vec3(1.0) - kS;
-    // multiply Kd by the inverse the metallic so only non-metals have diffuse lighting
-    kD *= 1.0 - metallic;	
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = DirectionVectorToSkyboxColor(hdrIrradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo / PI;
 
-    // scale light by NdotL
-    float nDotL = max(dot(N, L), 0.0);
-    vec3 color = (kD * albedo / PI + specular) * directionalLight.color * nDotL * directionalLight.intensity * (1.0 - shadow);
+    float NdotL = max(dot(N, L), 0.0);        
+
+    vec3 radiance = NdotL * directionalLight.color * directionalLight.intensity;
+    vec3 color = (diffuse + specular) * radiance * (1.0 - shadow);
 
     // HDR tonemapping and gamma correct
     color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/0.4));
+    color = pow(color, vec3(1.0/2.2));
 
     return vec4(color, 1.0);
 }

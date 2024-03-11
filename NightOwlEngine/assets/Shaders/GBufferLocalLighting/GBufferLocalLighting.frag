@@ -2,6 +2,9 @@
 #include "FragInputs.glsl"
 #include "GraphicsLightStructs.glsl"
 #include "LightFragData.glsl"
+#include "HammersleyStruct.glsl"
+#include "HammersleyData.glsl"
+#include "SphericalSkyboxFunctions.glsl"
 #include "BrdfLightCalculationFunctions.glsl"
 
 uniform int lightIndex;
