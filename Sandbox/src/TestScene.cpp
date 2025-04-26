@@ -15,6 +15,7 @@
 #include <random>
 
 #include "NightOwl/Graphics/Types/TextureFilterMode.h"
+#include "NightOwl/Graphics/Types/TextureWrapMode.h"
 
 class InfinitePlane;
 
@@ -31,25 +32,36 @@ void TestScene::Init()
 	assetManager->LoadShaders("./assets/Shaders");
 	assetManager->LoadModel("./assets/Sphere/sphere.obj");
 	assetManager->LoadModel("./assets/Plane/plane.obj");
+	// assetManager->LoadModel("./assets/Dragons/Asian Dragon.stl");
+	// assetManager->LoadModel("./assets/Dragons/Syrax Head.stl");
+	assetManager->LoadModel("./assets/Squirrel/Squirrel.dae");
 	assetManager->LoadTexture2D("./assets/HdrSkybox/Alexs_Apt_2k_Irradiance.hdr");
 	NightOwl::ITexture2D* skybox = assetManager->LoadTexture2D("./assets/HdrSkybox/Alexs_Apt_2k.hdr");
 	skybox->SetMaxMipMapLevel(12);
+	skybox->SetWrapModeU(NightOwl::TextureWrapMode::Repeat);
+	skybox->SetWrapModeV(NightOwl::TextureWrapMode::Repeat);
 	skybox->SetFilterMode(NightOwl::TextureFilterMode::Trilinear);
 
 	// Get models
-	const NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
-	const NightOwl::Model* sphere = assetManager->GetModelRepository().GetAsset("sphere");
+	//const NightOwl::Model* plane = assetManager->GetModelRepository().GetAsset("plane");
+	const NightOwl::Model* squirrel = assetManager->GetModelRepository().GetAsset("Squirrel");
 
-	// Sphere IK control object
-	auto& planeGameObject = AddGameObject("Target");
-	planeGameObject.AddComponent<IkTargetController>();
-	auto* rendererComponent = planeGameObject.AddComponent<NightOwl::MeshRenderer>();
-	rendererComponent->CloneRenderer(plane->renderer);
-	rendererComponent->GetMaterial()->SetVec4F({ 0.5, 0.5, 0.5, 1.0 }, "diffuseColor");
+	// Setup squirrel model
+	auto& squirrelObject = AddGameObject("Squirrel");
+	auto* rendererComponent = squirrelObject.AddComponent<NightOwl::MeshRenderer>();
+	rendererComponent->CloneRenderer(squirrel->renderer);
+
+	// // Sphere IK control object
+	// auto& planeGameObject = AddGameObject("Target");
+	// planeGameObject.AddComponent<IkTargetController>();
+	// rendererComponent = planeGameObject.AddComponent<NightOwl::MeshRenderer>();
+	// rendererComponent->CloneRenderer(plane->renderer);
+	// rendererComponent->GetMaterial()->SetVec4F({ 0.5, 0.5, 0.5, 1.0 }, "diffuseColor");
 
 	// Camera
 	NightOwl::GameObject& mainCameraGameObject = AddGameObject("Main Camera");
-	mainCameraGameObject.AddComponent<NightOwl::Camera>();
+	auto* cameraComponent = mainCameraGameObject.AddComponent<NightOwl::Camera>();
+	cameraComponent->SetFarClippingPlane(20000.0f);
 	mainCameraGameObject.AddComponent<CameraController>();
 
 	// Create a random engine
@@ -58,7 +70,7 @@ void TestScene::Init()
 	// Create a uniform distribution for floating-point values between 0 and 1
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-	constexpr int numberOfLights = 10;
+	constexpr int numberOfLights = 1;
 	constexpr float xStartingPosition = -10.0f;
 	constexpr float zStartingPosition = -10.0f;
 	constexpr float lightSpacing = -1.0f * xStartingPosition / numberOfLights;
@@ -69,16 +81,9 @@ void TestScene::Init()
 			auto& lightTestObject = AddGameObject("Light");
 			auto* lightComponent = lightTestObject.AddComponent<NightOwl::Light>();
 			lightComponent->SetColor({ distribution(generator), distribution(generator), distribution(generator) });
-			lightComponent->SetRange(3.0f);
-			lightComponent->SetIntensity(10.0f);
-			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.5f, zStartingPosition + lightSpacing * lightIndex});
-
-			auto& lightSphereGameObject = AddGameObject("Target");
-			rendererComponent = lightSphereGameObject.AddComponent<NightOwl::MeshRenderer>();
-			rendererComponent->CloneRenderer(sphere->renderer);
-			lightSphereGameObject.GetTransform()->SetLocalScale(0.2f);
-			lightSphereGameObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, -0.15f, zStartingPosition + lightSpacing * lightIndex });
-			rendererComponent->GetMaterial()->SetVec4F(NightOwl::Vec4F(lightComponent->GetColor().x, lightComponent->GetColor().y, lightComponent->GetColor().z, 0.0f), "diffuseColor");
+			lightComponent->SetRange(1000.0f);
+			lightComponent->SetIntensity(100.0f);
+			lightTestObject.GetTransform()->SetPosition({ xStartingPosition + lightSpacing * i, 0.5f, zStartingPosition + lightSpacing * lightIndex });
 		}
 	}
 
@@ -89,8 +94,8 @@ void TestScene::Init()
 	globalLightComponent->SetType(NightOwl::LightType::Directional);
 	globalLightComponent->SetIntensity(10.0f);
 	NightOwl::Light::SetGlobalLight(globalLightComponent);
-	globalLightGameObject.GetTransform()->Rotate({ -45.0f, 45.0f, 0.0f }, NightOwl::Space::World);
-	globalLightGameObject.GetTransform()->SetPosition({ 0.0f, 1.0f, 0.0f });
+	globalLightGameObject.GetTransform()->Rotate({ -90.0f, 0.0f, 0.0f }, NightOwl::Space::World);
+	globalLightGameObject.GetTransform()->SetPosition({ 0.0f, 80.0f, 0.0f });
 }
 
 void TestScene::Reset()

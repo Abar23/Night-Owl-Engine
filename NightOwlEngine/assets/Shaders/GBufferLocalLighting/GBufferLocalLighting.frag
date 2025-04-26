@@ -6,11 +6,14 @@
 #include "HammersleyData.glsl"
 #include "SphericalSkyboxFunctions.glsl"
 #include "BrdfLightCalculationFunctions.glsl"
+#include "ColorConversion.glsl"
 
 uniform int lightIndex;
 
 uniform float width;
 uniform float height;
+uniform float exposure;
+uniform float contrast;
 
 uniform vec3 cameraPosition;
 
@@ -25,5 +28,7 @@ void main()
     vec3 normal = texture(gNormal, gl_FragCoord.xy/vec2(width,height)).rgb;
     vec3 albedo = texture(gAlbedoSpec, gl_FragCoord.xy/vec2(width,height)).rgb;
 
-    fragColor = CalculatePointLightBrdf(fragmentPosition, cameraPosition, normal, albedo, metallic, roughness, pointLights[lightIndex]);
+    vec4 lightColor = CalculatePointLightBrdf(fragmentPosition, cameraPosition, normal, albedo, metallic, roughness, pointLights[lightIndex]);
+    
+    fragColor = ToneMapping(lightColor.xyz, exposure, contrast);
 }

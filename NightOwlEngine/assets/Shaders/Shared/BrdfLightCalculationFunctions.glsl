@@ -151,10 +151,10 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
         return 0.0;
     }
     
-    vec4 bPrime = (1.0 - 1e-3) * b + 1e-3 * vec4(0.5);
+    vec4 bPrime = (1.0 - 3e-5) * b + 3e-5 * vec4(0.5);
 
     // Step 2
-    vec3 c = CholeskyDecomposition(1.0, bPrime.x, bPrime.y, bPrime.y, bPrime.z, bPrime.w, 1, zF, zFSquared);
+    vec3 c = CholeskyDecomposition(1.0, bPrime.x, bPrime.y, bPrime.y, bPrime.z, bPrime.w, 1.0, zF, zFSquared);
 
     // Step 3
     vec2 solutions = QuadraticEquation(c.z, c.y, c.x);
@@ -172,13 +172,13 @@ float MomentShadowMapCalculation(sampler2D shadowMap,
     {
         float numerator = zF * z3 - bPrime.x * (zF + z3) + bPrime.y;
         float denominator = (z3 - z2) * (zF - z2);
-        return numerator / denominator;
+        return numerator / (denominator + 0.0001);
     }
 
     // Step 6
     float numerator = z2 * z3 - bPrime.x * (z2 + z3) + bPrime.y;
     float denominator = (zF - z2) * (zF - z3);
-    return 1.0 - (numerator / denominator);
+    return 1.0 - (numerator / (denominator + 0.0001));
 }
 
 float CalculateDirectionalLightShadow(sampler2D shadowMap, 
@@ -204,8 +204,6 @@ float CalculateDirectionalLightShadow(sampler2D shadowMap,
    
     // check whether current frag pos is in shadow
     float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
-
-    // Moment shadow map stuff here?
     
     // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projectedLightCoordinate.z > 1.0)
@@ -261,10 +259,6 @@ vec4 CalculatePointLightBrdf(vec3 fragmentPosition,
     float nDotL = max(dot(N, L), 0.0);
     vec3 color = (kD * albedo / PI + specular) * radiance * nDotL;
 
-    // HDR tonemapping and gamma correct
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/0.4));
-
     return vec4(color, 1.0);
 }
 
@@ -276,6 +270,7 @@ vec4 CalculateDirectionalLightBrdf(vec3 fragmentPosition,
                                    float metallic, 
                                    float roughness,
                                    float shadow,
+                                   float blurredAmbientObscurrance,
                                    DirectionalLight directionalLight,
                                    sampler2D hdrIrradianceMap,
                                    sampler2D hdrSkybox)
@@ -312,15 +307,19 @@ vec4 CalculateDirectionalLightBrdf(vec3 fragmentPosition,
         // Calcualte wK using L with the rotation applied and read the HDR pixel for wK
         vec3 wK = normalize(L.x * A + L.y * B + L.z * R);
         vec3 H = normalize(wK + V);
-        float level = 0.5 * log2((screenDimensions.x * screenDimensions.y) / numberOfHammersleyPairs) - 0.5 * log2(TrowbridgeReitzNormalDistribution(N, H, roughness) / 4.0);
-        vec3 irradianceColor = DirectionVectorToSkyboxColorAtMipMapLevel(hdrSkybox, wK, level).rgb;
+        float level = 0.5 * log2((screenDimensions.x * screenDimensions.y) / numberOfHammersleyPairs) - 0.5 * log2(TrowbridgeReitzNormalDistribution(N, H, roughness));
+        if (roughness < 0.001)
+        {
+            level = 0.0;
+        }
 
+        vec3 irradianceColor = DirectionVectorToSkyboxColorAtMipMapLevel(hdrSkybox, wK * -1.0, level).rgb;
         float wKDotN = max(dot(wK, N), 0.0);
 
         // Evaluate Monte-Carlo estimator
         float G = GeometrySmith(H, V, wK, roughness);      
         vec3 F = FresnelSchilckRoughness(H, wK, F0, roughness);
-        float denominator = 4.0 * wKDotN * nDotV + 0.0001; // prevent divide by zero
+        float denominator = 4.0 * wKDotN * nDotV + 0.01; // prevent divide by zero
         
         specular += F * G * wKDotN * irradianceColor / denominator;
     }
@@ -333,17 +332,15 @@ vec4 CalculateDirectionalLightBrdf(vec3 fragmentPosition,
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
     
-    vec3 irradiance = DirectionVectorToSkyboxColor(hdrIrradianceMap, N).rgb;
-    vec3 diffuse = irradiance * albedo / PI;
+    vec3 irradiance = DirectionVectorToSkyboxColor(hdrIrradianceMap, N * -1.0).rgb;
+    vec3 diffuse = irradiance * albedo * blurredAmbientObscurrance/ PI;
 
     float NdotL = max(dot(N, L), 0.0);        
 
     vec3 radiance = NdotL * directionalLight.color * directionalLight.intensity;
-    vec3 color = (diffuse + specular) * radiance * (1.0 - shadow);
-
-    // HDR tonemapping and gamma correct
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));
-
+    vec3 color = (kD * diffuse) * (1.0 - shadow) * radiance;
+    color += specular * (1.0 - shadow);
+    color += diffuse * 0.3 * blurredAmbientObscurrance;
+    
     return vec4(color, 1.0);
 }
