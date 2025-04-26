@@ -26,6 +26,12 @@ namespace NightOwl
 
 		#endif
 
+		#ifdef OPEN_GL
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // Set to core profile
+		#endif
+		
 		windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), windowName.c_str(), nullptr, nullptr);
 
 		glfwGetFramebufferSize(windowHandle, &windowProperties.pixelWidth, &windowProperties.pixelHeight);

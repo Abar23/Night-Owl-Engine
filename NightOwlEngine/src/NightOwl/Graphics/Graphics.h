@@ -2,6 +2,7 @@
 
 #include "NightOwl/Component/Structures/Mesh.h"
 #include "NightOwl/Core/Utitlity/Assert.h"
+#include "NightOwl/Graphics/Structures/HammersleyPairs.h"
 #include "NightOwl/Graphics/Interfaces/IComputeShader.h"
 #include "NightOwl/Graphics/Interfaces/IContext.h"
 #include "NightOwl/Graphics/Interfaces/IRenderTexture.h"
@@ -112,9 +113,19 @@ namespace NightOwl
 	private:
 		inline static std::unique_ptr<IContext> graphicsContext{ nullptr };
 
-		inline static std::unique_ptr<IRenderTexture> deferredGBuffer{ nullptr };
+		inline static std::shared_ptr<IRenderTexture> deferredGBuffer{ nullptr };
+
+		inline static std::shared_ptr<IRenderTexture> ambientObscurranceRenderTexture{ nullptr };
+
+		inline static std::shared_ptr<IRenderTexture> ambientObscurranceBlurredRenderTexture{ nullptr };
+
+		inline static std::shared_ptr<IRenderTexture> bloomFrameBufferRenderTexture{ nullptr };
+
+		inline static std::shared_ptr<IRenderTexture> renderedSceneRenderTexture{ nullptr };
 
 		inline static std::unique_ptr<Mesh> quadMesh;
+
+		inline static std::shared_ptr<IGraphicsBuffer> hammersleyPairsGraphicsBuffer{ nullptr };
 
 		inline static IComputeShader* horizontalComputeShader{ nullptr };
 
@@ -128,6 +139,28 @@ namespace NightOwl
 
 		inline static IShader* localLightShader{ nullptr };
 
-		inline static Model* localLightSphere{ nullptr };
+		inline static IShader* skySphereShader{ nullptr };
+
+		inline static IShader* ambientObscurranceShader{ nullptr };
+
+		inline static IShader* ambientObscurranceBilateralBlurShader{ nullptr };
+
+		inline static IShader* bloomBrightColorExtractionShader{ nullptr };
+
+		inline static IShader* bloomPostProcessingShader{ nullptr };
+
+		inline static Model* sphereModel{ nullptr };
+
+		inline static HammersleyPairs hammersleyPairs{ 40 };
+
+		inline static float roughness{ 0.0f };
+		inline static float metallic{ 0.0f };
+		inline static float exposure{ 3.0f };
+		inline static float contrast{ 1.5f };
+		inline static float ambientObscurranceScale{ 1.0f };
+		inline static float ambientObscurranceContrast{ 1.0f };
+		inline static float ambientObscurranceWorldSpaceRange{ 1.0f };
+		inline static int ambientObscurranceNumberOfSamples{ 20 };
+		inline static bool ambientObscurranceEnabled{ true };
 	};
 }

@@ -88,7 +88,10 @@ namespace NightOwl
 
 		for (int componentIndex = 0; componentIndex < componentList.size(); componentIndex++)
 		{
-			if (dynamic_cast<T*>(componentList[componentIndex].get())) return componentIndex;
+			if (dynamic_cast<T*>(componentList[componentIndex].get()))
+			{
+				return componentIndex;
+			}
 		}
 
 		return notFound;

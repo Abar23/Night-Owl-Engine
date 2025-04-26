@@ -69,17 +69,24 @@ namespace NightOwl
 
 		std::string glslPreprocessShader(preprocessResult.begin(), preprocessResult.end());
 
-		const shaderc::SpvCompilationResult compilationResult = glslCompiler.CompileGlslToSpv(glslPreprocessShader, ShaderTypeToShaderCType(shaderType), "test", glslOptions);
+		// const shaderc::SpvCompilationResult compilationResult = glslCompiler.CompileGlslToSpv(glslPreprocessShader, ShaderTypeToShaderCType(shaderType), "test", glslOptions);
+		//
+		// if (compilationResult.GetCompilationStatus() != shaderc_compilation_status_success)
+		// {
+		// 	ENGINE_LOG_INFO(compilationResult.GetErrorMessage());
+		// }
+		//
+		// std::vector<unsigned int> glslShaderData(compilationResult.begin(), compilationResult.end());
+		//
+		// GL_CALL(glShaderBinary, 1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, glslShaderData.data(), glslShaderData.size() * sizeof(unsigned int));
+
+		const char* sourcePtr = glslPreprocessShader.c_str();
+		GL_CALL(glShaderSource, shaderId, 1, &sourcePtr, nullptr);
+		GL_CALL(glCompileShader, shaderId);
 		
-		if (compilationResult.GetCompilationStatus() != shaderc_compilation_status_success)
-		{
-			ENGINE_LOG_INFO(compilationResult.GetErrorMessage());
-		}
-
-		std::vector<unsigned int> glslShaderData(compilationResult.begin(), compilationResult.end());
-
-		GL_CALL(glShaderBinary, 1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, glslShaderData.data(), glslShaderData.size() * sizeof(unsigned int));
-		GL_CALL(glSpecializeShader, shaderId, "main", 0, nullptr, nullptr);
+		CHECK_SHADER_COMPILER_ERRORS(shaderId);
+		
+		//GL_CALL(glSpecializeShader, shaderId, "main", 0, nullptr, nullptr);
 	}
 
 	void OpenGlShaderStage::DeleteShaderStage() const
