@@ -1,7 +1,6 @@
 #pragma once
 
-#include "rapidjson/document.h"
-#include <cstddef>
+#include <rapidjson/document.h>
 
 namespace NightOwl
 {

@@ -2,7 +2,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <shaderc/shaderc.h>
+#include <shaderc/shaderc.hpp>
 
 namespace NightOwl
 {

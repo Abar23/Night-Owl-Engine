@@ -1,10 +1,10 @@
-project "NightOwlEngine"  
-    kind "StaticLib"   
-    language "C++"   
+project "NightOwlEngine"
+    kind "StaticLib"
+    language "C++"
     cppdialect "C++20"
-    staticruntime "on"
+    staticruntime "off"
 
-    targetdir ("./build/bin/" .. outputDir .. "/%{prj.name}") 
+    targetdir ("./build/bin/" .. outputDir .. "/%{prj.name}")
     objdir ("./build/obj/" .. outputDir .. "/%{prj.name}")
 
     pchheader "NightOwlPch.h"
@@ -27,28 +27,27 @@ project "NightOwlEngine"
         "ENGINE_ANIMATION_DIRECTORY=\"../NightOwlEngine/assets/Animations\""
     }
 
-    files 
-    { 
-        sourceDir .. "/**.h", 
-        sourceDir .. "/**.cpp",
-        sourceDir .. "/**.inl" 
-    } 
+    files
+    {
+        "./src/**.h",
+        "./src/**.cpp",
+        "./src/**.inl"
+    }
 
     includedirs
     {
-        sourceDir,
-        vendorDir .. "/glad/include",
-        vendorDir .. "/GLFW/include",
-        vendorDir .. "/imgui/include",
-        vendorDir .. "/stb/include",
-        vendorDir .. "/rapidjson/include",
-        vendorDir .. "/nlohmann/single_include",
-        vendorDir .. "/OpenAL/include",
-        vendorDir .. "/libsndfile/include",
-        vendorDir .. "/Assimp/include",
-        vendorDir .. "/shaderc/include",
-        vendorDir .. "/SPIRV-Cross/SPIRV-Cross-main/include",
-        vendorDir .. "/shaderc/shaderc-main/libshaderc/include",
+        "./src",
+        "%{IncludeDirs.Glad}",
+        "%{IncludeDirs.GLFW}",
+        "%{IncludeDirs.Stb}",
+        "%{IncludeDirs.Imgui}",
+        "%{IncludeDirs.Nlohmann}",
+        "%{IncludeDirs.RapidJson}",
+        "%{IncludeDirs.OpenAL}",
+        "%{IncludeDirs.LibSndFile}",
+        "%{IncludeDirs.Assimp}",
+        "%{IncludeDirs.VMA}",
+        "%{IncludeDirs.VulkanSDK}"
     }
 
     links
@@ -57,16 +56,9 @@ project "NightOwlEngine"
         "Glad",
         "ImGui",
         "opengl32.lib",
-        "OpenAL32.lib",
-        "sndfile.lib",
-        "assimp-vc143-mt.lib",
-        "shaderc_combined.lib"
-    }
-
-    libdirs 
-    {
-        vendorDir .. "/OpenAL/libs/Win64",
-        vendorDir .. "/Assimp/lib/x64"
+        "%{Libraries.OpenAL}",
+        "%{Libraries.Assimp}",
+        "%{Libraries.Vulkan}"
     }
 
     filter "system:windows"
@@ -75,44 +67,34 @@ project "NightOwlEngine"
     filter "configurations:Debug"
         defines "DEBUG" 
         runtime "Debug"
-        symbols "on" 
-
-        libdirs 
-        {
-            vendorDir .. "/libsndfile/Debug",
-            vendorDir .. "/Assimp/lib/x64",
-            vendorDir .. "/SPIRV-Cross/build/Debug",
-            vendorDir .. "/shaderc/build/libshaderc/Debug"
-        }
+        symbols "on"
 
         links
         {
-            "spirv-cross-cored.lib",
-            "spirv-cross-cppd.lib",
-            "spirv-cross-glsld.lib",
-            "spirv-cross-reflectd.lib",
-            "spirv-cross-utild.lib",
+            "%{Libraries.LibSndFileDebug}",
+            "%{Libraries.SpirvCrossCppDebug}",
+            "%{Libraries.SpirvCrossCoreDebug}",
+            "%{Libraries.SpirvCrossGlslDebug}",
+            "%{Libraries.SpirvCrossReflectDebug}",
+            "%{Libraries.SpirvCrossUtilDebug}",
+            "%{Libraries.SpirvToolsDebug}",
+            "%{Libraries.ShaderCCombinedDebug}"
         }
 
-    filter "configurations:Release"  
+    filter "configurations:Release"
         defines "RELEASE" 
         runtime "Release"
-        optimize "on" 
-
-        libdirs 
-        {
-            vendorDir .. "/libsndfile/Release",
-            vendorDir .. "/shaderc/lib/Release",
-            vendorDir .. "/SPIRV-Cross/build/Release",
-            vendorDir .. "/shaderc/build/libshaderc/Release"
-        }
+        optimize "on"
 
         links
         {
-            "spirv-cross-core.lib",
-            "spirv-cross-cpp.lib",
-            "spirv-cross-glsl.lib",
-            "spirv-cross-reflect.lib",
-            "spirv-cross-util.lib"
+            "%{Libraries.LibSndFile}",
+            "%{Libraries.SpirvCrossCpp}",
+            "%{Libraries.SpirvCrossCore}",
+            "%{Libraries.SpirvCrossGlsl}",
+            "%{Libraries.SpirvCrossReflect}",
+            "%{Libraries.SpirvCrossUtil}",
+            "%{Libraries.SpirvTools}",
+            "%{Libraries.ShaderCCombined}"
         }
-    
+

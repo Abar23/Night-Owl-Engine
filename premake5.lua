@@ -1,24 +1,22 @@
 require "PremakeActions/clean"
 require "PremakeActions/generate"
+require "PremakeHelpers/BuildDependencies"
 
 if _ACTION == "vs2022" then
-    workspace "NightOwlEngine"  
+    workspace "NightOwlEngine"
         architecture "x86_64"
         startproject "Sandbox"
-        
-        configurations 
-        { 
-            "Debug", 
-            "Release"
-        } 
 
-        flags  
+        configurations
+        {
+            "Debug",
+            "Release"
+        }
+
+        flags
         {
             "MultiProcessorCompile"
         }
-
-        sourceDir = "./src"
-        vendorDir = "./vendor"
 
         defines
         {

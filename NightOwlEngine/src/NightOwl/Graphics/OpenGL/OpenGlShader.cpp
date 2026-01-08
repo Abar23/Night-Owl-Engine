@@ -175,7 +175,7 @@ namespace NightOwl
 		int numUniformBlocks;
 		GL_CALL(glGetProgramiv, programId, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
 		for (int activeUniformBlockIndex = 0; activeUniformBlockIndex < numUniformBlocks; ++activeUniformBlockIndex) {
-			glGetActiveUniformBlockName(programId, activeUniformBlockIndex, sizeof(bufferName), NULL, bufferName);
+			GL_CALL(glGetActiveUniformBlockName, programId, activeUniformBlockIndex, sizeof(bufferName), NULL, bufferName);
 
 			// Get the binding point for the uniform block.
 			int blockBinding;
@@ -188,21 +188,18 @@ namespace NightOwl
 		}
 
 		int numBlocks;
-		glGetProgramInterfaceiv(programId, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
+		GL_CALL(glGetProgramInterfaceiv, programId, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks);
 
-		constexpr unsigned int props[] = { GL_BUFFER_BINDING };
-		for (int i = 0; i < numBlocks; ++i) 
+		constexpr unsigned int props[] = { GL_NAME_LENGTH, GL_BUFFER_BINDING };
+		for (int shaderStorageBlockIndex = 0; shaderStorageBlockIndex < numBlocks; ++shaderStorageBlockIndex) 
 		{
-			GLsizei length;
-			glGetProgramResourceName(programId, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), &length, bufferName);
-
-			const GLint blockIndex = glGetProgramResourceIndex(programId, GL_SHADER_STORAGE_BLOCK, bufferName);
-
-			GLint blockBinding;
-			glGetProgramResourceiv(programId, GL_SHADER_STORAGE_BLOCK, blockIndex, 1, props, length, nullptr, &blockBinding);
+			GLint blockBinding[2];
+			GL_CALL(glGetProgramResourceiv, programId, GL_SHADER_STORAGE_BLOCK, shaderStorageBlockIndex, 3, props, 3, nullptr, blockBinding);
+			
+			GL_CALL(glGetProgramResourceName, programId, GL_SHADER_STORAGE_BLOCK, shaderStorageBlockIndex, blockBinding[0], nullptr, bufferName);
 
 			UniformDataTypes uniformDataType = UniformDataTypes::Buffer;
-			std::pair nameToLocationPair = std::make_pair(bufferName, blockBinding);
+			std::pair nameToLocationPair = std::make_pair(bufferName, blockBinding[1]);
 			uniformTypeToDataMap[static_cast<int>(uniformDataType)].emplace_back(nameToLocationPair);
 		}
 	}

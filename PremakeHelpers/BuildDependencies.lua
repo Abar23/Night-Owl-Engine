@@ -1,0 +1,39 @@
+VulkanSDKDir = os.getenv("VULKAN_SDK")
+EngineSourceDir = "%{wks.location}/NightOwlEngine/src/"
+EngineVendorDir = "%{wks.location}/NightOwlEngine/vendor/"
+
+IncludeDirs = {}
+IncludeDirs["EngineSource"] = EngineSourceDir
+IncludeDirs["RapidJson"] = EngineVendorDir .. "/rapidjson/include"
+IncludeDirs["Glad"] = EngineVendorDir .. "/glad/include"
+IncludeDirs["GLFW"] = EngineVendorDir .. "/GLFW/include"
+IncludeDirs["Stb"] = EngineVendorDir ..  "/stb/include"
+IncludeDirs["Imgui"] = EngineVendorDir .. "/imgui/include"
+IncludeDirs["Nlohmann"] = EngineVendorDir .. "/nlohmann/single_include"
+IncludeDirs["OpenAL"] = EngineVendorDir .. "/OpenAL/include"
+IncludeDirs["LibSndFile"] = EngineVendorDir .. "/libsndfile/include"
+IncludeDirs["Assimp"] = EngineVendorDir .. "/Assimp/include"
+IncludeDirs["VMA"] = VulkanSDKDir .. "/Include/vma"
+IncludeDirs["VulkanSDK"] = VulkanSDKDir .. "/Include/"
+
+Libraries = {}
+Libraries["OpenAL"] = EngineVendorDir .. "OpenAL/libs/Win64/OpenAL32.lib"
+Libraries["Assimp"] = EngineVendorDir .. "Assimp/lib/x64/assimp-vc143-mt.lib"
+Libraries["LibSndFile"] = EngineVendorDir .. "/libsndfile/Release/sndfile.lib"
+Libraries["LibSndFileDebug"] = EngineVendorDir .. "/libsndfile/Debug/sndfile.lib"
+Libraries["Vulkan"] = VulkanSDKDir .. "/Lib/vulkan-1.lib"
+Libraries["SpirvCrossCpp"] = VulkanSDKDir .. "/Lib/spirv-cross-cpp.lib"
+Libraries["SpirvCrossCore"] = VulkanSDKDir .. "/Lib/spirv-cross-core.lib"
+Libraries["SpirvCrossGlsl"] = VulkanSDKDir .. "/Lib/spirv-cross-glsl.lib"
+Libraries["SpirvCrossReflect"] = VulkanSDKDir .. "/Lib/spirv-cross-reflect.lib"
+Libraries["SpirvCrossUtil"] = VulkanSDKDir .. "/Lib/spirv-cross-util.lib"
+Libraries["SpirvTools"] = VulkanSDKDir .. "/Lib/SPIRV-Tools.lib"
+Libraries["ShaderCCombined"] = VulkanSDKDir .. "/Lib/shaderc_combined.lib"
+Libraries["SpirvCrossCppDebug"] = VulkanSDKDir .. "/Lib/spirv-cross-cppd.lib"
+Libraries["SpirvCrossCoreDebug"] = VulkanSDKDir .. "/Lib/spirv-cross-cored.lib"
+Libraries["SpirvCrossGlslDebug"] = VulkanSDKDir .. "/Lib/spirv-cross-glsld.lib"
+Libraries["SpirvCrossReflectDebug"] = VulkanSDKDir .. "/Lib/spirv-cross-reflectd.lib"
+Libraries["SpirvCrossUtilDebug"] = VulkanSDKDir .. "/Lib/spirv-cross-utild.lib"
+Libraries["SpirvToolsDebug"] = VulkanSDKDir .. "/Lib/SPIRV-Toolsd.lib"
+Libraries["ShaderCCombinedDebug"] = VulkanSDKDir .. "/Lib/shaderc_combinedd.lib"
+

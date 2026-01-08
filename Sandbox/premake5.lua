@@ -2,16 +2,16 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
-    targetdir ("./build/bin/" .. outputDir .. "/%{prj.name}") 
+    targetdir ("./build/bin/" .. outputDir .. "/%{prj.name}")
     objdir ("./build/obj/" .. outputDir .. "/%{prj.name}")
 
 	files
 	{
-        sourceDir .. "/**.h", 
-        sourceDir .. "/**.cpp",
-        sourceDir .. "/**.inl" 
+        "./src/**.h",
+        "./src/**.cpp",
+        "./src/**.inl"
 	}
 
 	defines
@@ -21,19 +21,19 @@ project "Sandbox"
 
 	includedirs
 	{
-		sourceDir,
-		"%{wks.location}/NightOwlEngine/vendor/glad/include",
-		"%{wks.location}/NightOwlEngine/vendor/GLFW/include",
-		"%{wks.location}/NightOwlEngine/vendor/imgui/include",
-		"%{wks.location}/NightOwlEngine/vendor/stb/include",
-		"%{wks.location}/NightOwlEngine/vendor/rapidjson/include",
-		"%{wks.location}/NightOwlEngine/vendor/nlohmann/single_include",
-		"%{wks.location}/NightOwlEngine/vendor/OpenAL/include",
-		"%{wks.location}/NightOwlEngine/vendor/libsndfile/include",
-		"%{wks.location}/NightOwlEngine/vendor/Assimp/include",
-		"%{wks.location}/NightOwlEngine/vendor/SPIRV-Cross/SPIRV-Cross-main/include",
-		"%{wks.location}/NightOwlEngine/vendor/shaderc/shaderc-main/libshaderc/include",
-		"%{wks.location}/NightOwlEngine/src"
+		"./src",
+		"%{IncludeDirs.EngineSource}",
+		"%{IncludeDirs.Glad}",
+		"%{IncludeDirs.GLFW}",
+		"%{IncludeDirs.Stb}",
+		"%{IncludeDirs.Imgui}",
+		"%{IncludeDirs.Nlohmann}",
+		"%{IncludeDirs.RapidJson}",
+		"%{IncludeDirs.OpenAL}",
+		"%{IncludeDirs.LibSndFile}",
+		"%{IncludeDirs.Assimp}",
+		"%{IncludeDirs.VMA}",
+		"%{IncludeDirs.VulkanSDK}"
 	}
 
 	links
@@ -43,15 +43,15 @@ project "Sandbox"
 
 	filter "system:windows"
 		systemversion "latest"
-		
+
 		postbuildcommands 
-		{ 
+		{
 			"copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""		
+			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
 		}
 
 	filter "configurations:Debug"
-		defines "DEBUG" 
+		defines "DEBUG"
 		runtime "Debug"
 		symbols "on"
 
@@ -69,4 +69,3 @@ project "Sandbox"
         { 
             "copy \"..\\NightOwlEngine\\vendor\\libsndfile\\Release\\*.dll\" \"$(ProjectDir)$(OutDir)\""
         }
-		
