@@ -13,6 +13,7 @@ namespace NightOwl
 		: textureId(std::numeric_limits<unsigned int>::max()), 
 		  height(0), 
 		  width(0),
+		  maxMipMapLevel(1),
 		  graphicsFormat(GraphicsFormat::None),
 		  textureFormat(TextureFormat::None),
 		  wrapModeU(TextureWrapMode::ClampToEdge),
@@ -30,9 +31,6 @@ namespace NightOwl
 		  width(width),
 		  graphicsFormat(format),
 		  textureFormat(GraphicsFormatToTextureFormat(format)),
-		  wrapModeU(wrapModeU),
-		  wrapModeV(wrapModeV),
-		  textureFilterMode(filterMode),
 		  boundTextureUnit(std::numeric_limits<unsigned int>::max()),
 		  borderColor(0.0f, 0.0f, 0.0f, 1.0f)
 	{
@@ -44,9 +42,12 @@ namespace NightOwl
 		SetWrapModeU(wrapModeU);
 		SetWrapModeV(wrapModeV);
 
+		SetMaxMipMapLevel(1);
+
 		if (pixelData != nullptr)
 		{
 			SetData(pixelData);
+			GL_CALL(glGenerateTextureMipmap, textureId);
 		}
 	}
 
@@ -181,6 +182,20 @@ namespace NightOwl
 		return textureId;
 	}
 
+	void OpenGlTexture2D::SetMaxMipMapLevel(int maxMipMapLevel)
+	{
+		ENGINE_ASSERT(maxMipMapLevel > 0, "Invalid mipmap level set on Texture2D!");
+
+		this->maxMipMapLevel = maxMipMapLevel;
+
+		GL_CALL(glTextureParameteri, textureId, GL_TEXTURE_MAX_LEVEL, maxMipMapLevel - 1);
+	}
+
+	int OpenGlTexture2D::GetMaxMipMapLevel() const
+	{
+		return maxMipMapLevel;
+	}
+
 	void OpenGlTexture2D::CreateTexture()
 	{
 		GL_CALL(glCreateTextures, GL_TEXTURE_2D, 1, &textureId);
@@ -193,6 +208,6 @@ namespace NightOwl
 
 	void OpenGlTexture2D::AllocateTexture()
 	{
-		GL_CALL(glTextureStorage2D, textureId, 1, GraphicsFormatToOpenGlFormat(graphicsFormat), width, height);
+		GL_CALL(glTextureStorage2D, textureId, 1 + std::floor(std::log2(std::max(width, height))), GraphicsFormatToOpenGlFormat(graphicsFormat), width, height);
 	}
 }

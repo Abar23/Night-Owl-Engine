@@ -13,8 +13,10 @@ namespace NightOwl
 			return GL_NEAREST;
 
 		case TextureFilterMode::Bilinear:
-		case TextureFilterMode::Trilinear:
 			return GL_LINEAR;
+
+		case TextureFilterMode::Trilinear:
+			return GL_LINEAR_MIPMAP_LINEAR;
 
 		default:
 			return GL_NEAREST;
@@ -29,10 +31,8 @@ namespace NightOwl
 			return GL_NEAREST;
 
 		case TextureFilterMode::Bilinear:
-			return GL_LINEAR;
-
 		case TextureFilterMode::Trilinear:
-			return GL_LINEAR_MIPMAP_LINEAR;
+			return GL_LINEAR;
 
 		default:
 			return GL_NEAREST;

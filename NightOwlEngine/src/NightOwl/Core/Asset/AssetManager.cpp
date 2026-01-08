@@ -56,12 +56,20 @@ namespace NightOwl
 		return shaderIncludeRepository;
 	}
 
-	stbi_uc* AssetManager::ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels)
+	void* AssetManager::ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels, bool isHdr /* = false */)
 	{
 		stbi_set_flip_vertically_on_load(true);
 
-		stbi_uc* data = stbi_load(filePath.c_str(), &width, &height, &numberOfChannels, 4);
-
+		void* data;
+		if (isHdr)
+		{
+			data = stbi_loadf(filePath.c_str(), &width, &height, &numberOfChannels, 0);
+		}
+		else
+		{
+			data = stbi_load(filePath.c_str(), &width, &height, &numberOfChannels, 0);
+		}
+		 
 		ENGINE_ASSERT(data != nullptr, "Failed to load texture from file path: {0}", filePath);
 
 		return data;
@@ -95,7 +103,6 @@ namespace NightOwl
 	ITexture2D* AssetManager::LoadTexture2D(const std::string& filePath, bool isEngineAsset /* = false */)
 	{
 		const std::string textureName = Utility::StripFilePathToNameWithExtension(filePath);
-
 		if (textureRepository.HasAsset(textureName))
 		{
 			return textureRepository.GetAsset(textureName);
@@ -104,24 +111,51 @@ namespace NightOwl
 		int width;
 		int height;
 		int numberOfChannels;
-		stbi_uc* data = ReadTexture2D(filePath, width, height, numberOfChannels);
-
 		GraphicsFormat textureGraphicsFormat;
-		if (numberOfChannels == 1)
+		void* data;
+
+		const std::string textureExtension = Utility::StripFilePathToExtension(filePath);
+		if (textureExtension == "hdr")
 		{
-			textureGraphicsFormat = GraphicsFormat::R8;
+			data = ReadTexture2D(filePath, width, height, numberOfChannels, true);
+
+			if (numberOfChannels == 1)
+			{
+				textureGraphicsFormat = GraphicsFormat::R32F;
+			}
+			else if (numberOfChannels == 2)
+			{
+				textureGraphicsFormat = GraphicsFormat::RG32F;
+			}
+			else if (numberOfChannels == 3)
+			{
+				textureGraphicsFormat = GraphicsFormat::RGB32F;
+			}
+			else if (numberOfChannels == 4)
+			{
+				textureGraphicsFormat = GraphicsFormat::RGBA32F;
+			}
 		}
-		else if (numberOfChannels == 2)
+		else
 		{
-			textureGraphicsFormat = GraphicsFormat::RG8;
-		}
-		else if (numberOfChannels == 3)
-		{
-			textureGraphicsFormat = GraphicsFormat::RGB8;
-		}
-		else if (numberOfChannels == 4)
-		{
-			textureGraphicsFormat = GraphicsFormat::RGBA8;
+			data = ReadTexture2D(filePath, width, height, numberOfChannels);
+
+			if (numberOfChannels == 1)
+			{
+				textureGraphicsFormat = GraphicsFormat::R8;
+			}
+			else if (numberOfChannels == 2)
+			{
+				textureGraphicsFormat = GraphicsFormat::RG8;
+			}
+			else if (numberOfChannels == 3)
+			{
+				textureGraphicsFormat = GraphicsFormat::RGB8;
+			}
+			else if (numberOfChannels == 4)
+			{
+				textureGraphicsFormat = GraphicsFormat::RGBA8;
+			}
 		}
 
 		const std::shared_ptr<ITexture2D> texture = Graphics::CreateTexture2D(data, height, width, textureGraphicsFormat);
@@ -129,7 +163,7 @@ namespace NightOwl
 		textureRepository.AddAsset(textureName, texture, isEngineAsset);
 
 		stbi_image_free(data);
-		
+
 		return texture.get();
 	}
 

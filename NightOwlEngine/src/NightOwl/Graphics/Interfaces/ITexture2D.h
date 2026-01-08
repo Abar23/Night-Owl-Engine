@@ -57,6 +57,10 @@ namespace NightOwl
 
 		virtual unsigned int GetTextureId() const = 0;
 
+		virtual void SetMaxMipMapLevel(int maxMipMapLevel) = 0;
+
+		virtual int GetMaxMipMapLevel() const = 0;
+
 	protected:
 		virtual void CreateTexture() = 0;
 

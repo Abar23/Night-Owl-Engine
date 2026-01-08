@@ -2,8 +2,6 @@
 
 #include "AssetRepository.h"
 
-typedef unsigned char stbi_uc;
-
 namespace NightOwl
 {
 	class Animation;
@@ -66,6 +64,6 @@ namespace NightOwl
 
 		AssetRepository<std::string> shaderIncludeRepository;
 
-		stbi_uc* ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels);
+		void* ReadTexture2D(const std::string& filePath, int& width, int& height, int& numberOfChannels, bool isHdr = false);
 	};
 }

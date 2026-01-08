@@ -93,6 +93,7 @@ namespace NightOwl
 		if (shadows == LightShadows::Soft && shadowFrameBuffer == nullptr)
 		{
 			shadowFrameBuffer = Graphics::CreateRenderTexture(shadowResolution, shadowResolution, TextureFilterMode::Point, GraphicsFormat::RGBA32F);
+			shadowFrameBuffer->AttachDepthBufferWithFormat(GraphicsFormat::Depth32F);
 		}
 	}
 

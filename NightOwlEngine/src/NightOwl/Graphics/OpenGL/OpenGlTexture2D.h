@@ -56,6 +56,10 @@ namespace NightOwl
 
 		unsigned int GetTextureId() const override;
 
+		void SetMaxMipMapLevel(int maxMipMapLevel) override;
+
+		int GetMaxMipMapLevel() const override;
+
 	protected:
 		void CreateTexture() override;
 
@@ -69,6 +73,8 @@ namespace NightOwl
 		int height;
 
 		int width;
+
+		int maxMipMapLevel;
 
 		GraphicsFormat graphicsFormat;
 

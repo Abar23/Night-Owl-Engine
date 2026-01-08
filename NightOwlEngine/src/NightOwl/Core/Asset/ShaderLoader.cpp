@@ -7,6 +7,8 @@
 #include "NightOwl/Graphics/Graphics.h"
 #include <filesystem>
 
+#include "NightOwl/Core/Utitlity/GlErrorCheck.h"
+
 
 namespace NightOwl
 {
@@ -75,7 +77,7 @@ namespace NightOwl
 			{
 				continue;
 			}
-
+			
 			// Get number of files in current directory
 			int numberOfShaderFiles = 0;
 			for (const auto& entry : std::filesystem::directory_iterator(shaderProgramDirectory)) {
@@ -134,14 +136,14 @@ namespace NightOwl
 
 				const std::string& shaderStageSource = shaderHeader + ReadShader(shaderStageFilePath);
 				const std::string shaderStageExtension = Utility::StripFilePathToExtension(shaderStageFilePath);
-
+				
 				std::shared_ptr<IShaderStage> shaderStage = Graphics::CreateShaderStage(shaderStageSource, ExtensionToShaderType(shaderStageExtension));
 
 				shader->AddShaderStage(shaderStage);
 			}
 
 			shader->AttachAndLinkShaderStages();
-
+			
 			assetManager->GetShaderRepository().AddAsset(shaderName, shader, isEngineAsset);
 		}
 	}

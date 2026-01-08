@@ -8,7 +8,7 @@ void CameraController::Start()
 {
 	mainCamera = NightOwl::Camera::GetMainCamera();
 	mainCameraTransform = mainCamera->GetGameObject().GetTransform();
-	mainCameraTransform->Rotate({0, 0, 0}, NightOwl::Space::World);
+	mainCameraTransform->Rotate({0, 135, 0}, NightOwl::Space::World);
 	SetCameraToDefaults();
 }
 
