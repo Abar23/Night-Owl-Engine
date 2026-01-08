@@ -12,9 +12,9 @@ namespace NightOwl
 
 		int pixelWidth;
 
-		int screenHeight;
+		unsigned int screenHeight;
 
-		int screenWidth;
+		unsigned int screenWidth;
 
 		float aspectRatio;
 

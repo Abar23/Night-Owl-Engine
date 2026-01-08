@@ -1,15 +1,8 @@
-[submodule "NightOwlEngine/vendor/SPIRV-Cross/SPIRV-Cross-main"]
-	path = NightOwlEngine/vendor/SPIRV-Cross/SPIRV-Cross-main
-	url = https://github.com/KhronosGroup/SPIRV-Cross.git
-[submodule "NightOwlEngine/vendor/shaderc/shaderc-main"]
-	path = NightOwlEngine/vendor/shaderc/shaderc-main
-	url = https://github.com/google/shaderc.git
-[submodule "NightOwlEngine/vendor/glslang"]
-	path = NightOwlEngine/vendor/glslang
-	url = https://github.com/KhronosGroup/glslang.git
-[submodule "NightOwlEngine/vendor/SPIRV-Headers"]
-	path = NightOwlEngine/vendor/SPIRV-Headers
-	url = https://github.com/KhronosGroup/SPIRV-Headers.git
-[submodule "NightOwlEngine/vendor/SPIRV-Tools"]
-	path = NightOwlEngine/vendor/SPIRV-Tools
-	url = https://github.com/KhronosGroup/SPIRV-Tools.git
+[submodule "ImguiDocking"]
+	path = NightOwlEngine/vendor/ImguiDocking
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "GLFWLatest"]
+	path = NightOwlEngine/vendor/GLFWLatest
+	url = https://github.com/glfw/glfw.git
+	branch = latest

@@ -52,7 +52,6 @@ project "NightOwlEngine"
 
     links
     {
-        "GLFW",
         "Glad",
         "ImGui",
         "opengl32.lib",
@@ -78,7 +77,8 @@ project "NightOwlEngine"
             "%{Libraries.SpirvCrossReflectDebug}",
             "%{Libraries.SpirvCrossUtilDebug}",
             "%{Libraries.SpirvToolsDebug}",
-            "%{Libraries.ShaderCCombinedDebug}"
+            "%{Libraries.ShaderCCombinedDebug}",
+            "%{Libraries.GLFWDebug}"
         }
 
     filter "configurations:Release"
@@ -95,6 +95,7 @@ project "NightOwlEngine"
             "%{Libraries.SpirvCrossReflect}",
             "%{Libraries.SpirvCrossUtil}",
             "%{Libraries.SpirvTools}",
-            "%{Libraries.ShaderCCombined}"
+            "%{Libraries.ShaderCCombined}",
+            "%{Libraries.GLFW}"
         }
 
