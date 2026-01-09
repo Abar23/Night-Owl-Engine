@@ -28,7 +28,6 @@ if _ACTION == "vs2022" then
 
         group "Dependencies"
             include "NightOwlEngine/vendor/Glad"
-            include "NightOwlEngine/vendor/ImGui"
         group ""
 
         group "NightOwlEngine"

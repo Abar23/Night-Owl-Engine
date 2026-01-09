@@ -43,6 +43,37 @@ local dependencies = {
             GLFW_BUILD_TESTS = OFF,
             GLFW_BUILD_DOCS = OFF
         }
+    },
+    {
+        relativeSourceDirectory = "Assimp",
+        customOptions = {
+            ASSIMP_HUNTER_ENABLED = OFF,
+            BUILD_SHARED_LIBS = OFF, 
+            ASSIMP_BUILD_FRAMEWORK = OFF,
+            ASSIMP_DOUBLE_PRECISION = OFF,
+            ASSIMP_OPT_BUILD_PACKAGES = OFF,
+            ASSIMP_ANDROID_JNIIOSYSTEM = OFF,
+            ASSIMP_NO_EXPORT = OFF,
+            ASSIMP_BUILD_ZLIB = ON,
+            ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT = ON,
+            ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT = ON,
+            ASSIMP_BUILD_ASSIMP_TOOLS = OFF,
+            ASSIMP_BUILD_SAMPLES = OFF,
+            ASSIMP_BUILD_TESTS = ON,
+            ASSIMP_COVERALLS = OFF,
+            ASSIMP_INSTALL = ON,
+            ASSIMP_WARNINGS_AS_ERRORS = ON,
+            ASSIMP_ASAN = OFF,
+            ASSIMP_UBSAN = OFF,
+            ASSIMP_BUILD_DOCS = OFF,
+            ASSIMP_INJECT_DEBUG_POSTFIX = ON,
+            ASSIMP_IGNORE_GIT_HASH = OFF,
+            ASSIMP_INSTALL_PDB = ON,
+            USE_STATIC_CRT = OFF,
+            ASSIMP_BUILD_DRACO = OFF,
+            ASSIMP_BUILD_ASSIMP_VIEW = ON,
+            ASSIMP_BUILD_USD_IMPORTER = OFF
+        }
     }
 }
 

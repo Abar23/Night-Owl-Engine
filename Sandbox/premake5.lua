@@ -32,6 +32,7 @@ project "Sandbox"
 		"%{IncludeDirs.OpenAL}",
 		"%{IncludeDirs.LibSndFile}",
 		"%{IncludeDirs.Assimp}",
+        "%{IncludeDirs.AssimpBuild}",
 		"%{IncludeDirs.VMA}",
 		"%{IncludeDirs.VulkanSDK}"
 	}
@@ -47,7 +48,6 @@ project "Sandbox"
 		postbuildcommands 
 		{
 			"copy \"..\\NightOwlEngine\\vendor\\OpenAL\\bin\\Win64\\*.dll\" \"$(ProjectDir)$(OutDir)\"",
-			"copy \"..\\NightOwlEngine\\vendor\\Assimp\\bin\\x64\\*.dll\" \"$(ProjectDir)$(OutDir)\""
 		}
 
 	filter "configurations:Debug"

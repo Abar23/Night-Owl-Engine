@@ -46,6 +46,7 @@ project "NightOwlEngine"
         "%{IncludeDirs.OpenAL}",
         "%{IncludeDirs.LibSndFile}",
         "%{IncludeDirs.Assimp}",
+        "%{IncludeDirs.AssimpBuild}",
         "%{IncludeDirs.VMA}",
         "%{IncludeDirs.VulkanSDK}"
     }
@@ -53,10 +54,8 @@ project "NightOwlEngine"
     links
     {
         "Glad",
-        "ImGui",
         "opengl32.lib",
         "%{Libraries.OpenAL}",
-        "%{Libraries.Assimp}",
         "%{Libraries.Vulkan}"
     }
 
@@ -76,9 +75,10 @@ project "NightOwlEngine"
             "%{Libraries.SpirvCrossGlslDebug}",
             "%{Libraries.SpirvCrossReflectDebug}",
             "%{Libraries.SpirvCrossUtilDebug}",
-            "%{Libraries.SpirvToolsDebug}",
             "%{Libraries.ShaderCCombinedDebug}",
-            "%{Libraries.GLFWDebug}"
+            "%{Libraries.GLFWDebug}",
+            "%{Libraries.AssimpDebug}",
+            "%{Libraries.ZlibDebug}"
         }
 
     filter "configurations:Release"
@@ -94,8 +94,9 @@ project "NightOwlEngine"
             "%{Libraries.SpirvCrossGlsl}",
             "%{Libraries.SpirvCrossReflect}",
             "%{Libraries.SpirvCrossUtil}",
-            "%{Libraries.SpirvTools}",
             "%{Libraries.ShaderCCombined}",
-            "%{Libraries.GLFW}"
+            "%{Libraries.GLFW}",
+            "%{Libraries.Assimp}",
+            "%{Libraries.Zlib}"
         }
 

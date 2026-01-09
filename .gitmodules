@@ -6,3 +6,7 @@
 	path = NightOwlEngine/vendor/GLFWLatest
 	url = https://github.com/glfw/glfw.git
 	branch = latest
+[submodule "Assimp"]
+	path = NightOwlEngine/vendor/Assimp
+	url = https://github.com/assimp/assimp.git
+	branch = master

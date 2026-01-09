@@ -1,6 +1,6 @@
 VulkanSDKDir = os.getenv("VULKAN_SDK")
-EngineSourceDir = "%{wks.location}/NightOwlEngine/src/"
-EngineVendorDir = "%{wks.location}/NightOwlEngine/vendor/"
+EngineSourceDir = "%{wks.location}/NightOwlEngine/src"
+EngineVendorDir = "%{wks.location}/NightOwlEngine/vendor"
 
 IncludeDirs = {}
 IncludeDirs["EngineSource"] = EngineSourceDir
@@ -8,17 +8,21 @@ IncludeDirs["RapidJson"] = EngineVendorDir .. "/rapidjson/include"
 IncludeDirs["Glad"] = EngineVendorDir .. "/glad/include"
 IncludeDirs["GLFW"] = EngineVendorDir .. "/GLFWLatest/include"
 IncludeDirs["Stb"] = EngineVendorDir ..  "/stb/include"
-IncludeDirs["Imgui"] = EngineVendorDir .. "/imgui/include"
+IncludeDirs["Imgui"] = EngineVendorDir .. "/ImguiDocking"
 IncludeDirs["Nlohmann"] = EngineVendorDir .. "/nlohmann/single_include"
 IncludeDirs["OpenAL"] = EngineVendorDir .. "/OpenAL/include"
 IncludeDirs["LibSndFile"] = EngineVendorDir .. "/libsndfile/include"
 IncludeDirs["Assimp"] = EngineVendorDir .. "/Assimp/include"
+IncludeDirs["AssimpBuild"] = EngineVendorDir .. "/Assimp/build/include"
 IncludeDirs["VMA"] = VulkanSDKDir .. "/Include/vma"
 IncludeDirs["VulkanSDK"] = VulkanSDKDir .. "/Include/"
 
 Libraries = {}
-Libraries["OpenAL"] = EngineVendorDir .. "OpenAL/libs/Win64/OpenAL32.lib"
-Libraries["Assimp"] = EngineVendorDir .. "Assimp/lib/x64/assimp-vc143-mt.lib"
+Libraries["OpenAL"] = EngineVendorDir .. "/OpenAL/libs/Win64/OpenAL32.lib"
+Libraries["Assimp"] = EngineVendorDir .. "/Assimp/build/lib/Release/assimp-vc143-mt.lib"
+Libraries["AssimpDebug"] = EngineVendorDir .. "/Assimp/build/lib/Debug/assimp-vc143-mtd.lib"
+Libraries["Zlib"] = EngineVendorDir .. "/Assimp/build/contrib/zlib/Release/zlibstatic.lib"
+Libraries["ZlibDebug"] = EngineVendorDir .. "/Assimp/build/contrib/zlib/Debug/zlibstaticd.lib"
 Libraries["LibSndFile"] = EngineVendorDir .. "/libsndfile/Release/sndfile.lib"
 Libraries["LibSndFileDebug"] = EngineVendorDir .. "/libsndfile/Debug/sndfile.lib"
 Libraries["GLFW"] = EngineVendorDir .. "/GLFWLatest/build/src/Release/glfw3.lib"
