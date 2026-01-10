@@ -22,8 +22,9 @@ if _ACTION == "vs2022" then
         {
             "_USE_MATH_DEFINES",
             "_CRT_SECURE_NO_WARNINGS",
+            "GLFW_INCLUDE_VULKAN"
         }
-
+        
         outputDir = "%{cfg.buildcfg}_%{cfg.system}_%{cfg.architecture}"
 
         group "Dependencies"

@@ -14,11 +14,6 @@ project "Sandbox"
         "./src/**.inl"
 	}
 
-	defines
-	{
-		"GLFW_INCLUDE_NONE",
-	}
-
 	includedirs
 	{
 		"./src",

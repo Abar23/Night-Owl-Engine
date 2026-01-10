@@ -24,7 +24,8 @@ project "NightOwlEngine"
         "ENGINE_SHADER_DIRECTORY=\"../NightOwlEngine/assets/Shaders\"",
         "ENGINE_MODEL_DIRECTORY=\"../NightOwlEngine/assets/Models\"",
         "ENGINE_AUDIO_DIRECTORY=\"../NightOwlEngine/assets/Audio\"",
-        "ENGINE_ANIMATION_DIRECTORY=\"../NightOwlEngine/assets/Animations\""
+        "ENGINE_ANIMATION_DIRECTORY=\"../NightOwlEngine/assets/Animations\"",
+        "ENGINE_NAME=\"NightOwlEngine\""
     }
 
     files

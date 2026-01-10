@@ -2,8 +2,7 @@ premake.modules.clean = {}
 local m = premake.modules.clean
 
 local CMAKE_DEPENDENCY_DIRS = {
-    "./NightOwlEngine/vendor/shaderc",
-    "./NightOwlEngine/vendor/SPIRV-Cross"
+    "./NightOwlEngine/vendor/GLFWLatest"
 }
 
 newaction {
